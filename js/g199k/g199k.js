@@ -1,6 +1,7 @@
 const R199kModule = {
     // ⚠️ SAU NÀY BẠN SẼ ĐỔI ĐOẠN LINK APPS SCRIPT RIÊNG CỦA GOOGLE SHEET R199K VÀO ĐÂY
     WEB_APP_URL: "https://script.google.com/macros/s/AKfycbzhh5Dzq2fuWK3zQPFB67DHf4QZE9efj0b2g6jQzsqUsXGK5hLnFgMSfdMt33hiyrAc/exec",
+    THUCHI_WEB_APP_URL: "https://script.google.com/macros/s/AKfycbwNA4KT2HEPkCCeQu8ZHLhapDREaNyOUHh9UcleiA6HrxVzLOfNRLpkEDj7zLRJ79kYsQ/exec",
     mode: 'NEW', // Mặc định là Đăng ký mới
     searchId: 0,
 
@@ -148,7 +149,7 @@ const currentSearchId = ++this.searchId;
         .then(res => {
             if (currentSearchId !== this.searchId) return;
             if (res.status === "success") {
-                // Bật khóa bảo vệ trước khi gán giá trị vào các ô input
+
                 this.isAutofilling = true;
 
                 // Cập nhật dữ liệu thông minh: Không ghi đè lên ô người dùng đang gõ
@@ -226,6 +227,29 @@ taoHoaDon: function () {
     return `HD${y}${m}${d}${h}${i}${s}${rand}`;
 },
 
+
+guiThuChi: function(hoaDon, name, goi, tien) {
+
+    fetch(this.THUCHI_WEB_APP_URL, {
+        method: "POST",
+        headers: {
+            "Content-Type": "text/plain"
+        },
+        body: JSON.stringify({
+            hoaDon: hoaDon,
+            khachHang: name,
+            ghiChu: goi,
+            loaiGd: "R-199",
+            soTien: Number(tien),
+            mode: "THU TIỀN",
+            adminName: UserModule.uName || "ADMIN"
+        })
+    })
+    .catch(err => console.log("Lỗi ghi Thu Chi:", err));
+
+},
+
+
     submitR199k: function() {
         const gid = document.getElementById('r-gid').value.trim().toUpperCase();
         const name = document.getElementById('r-name').value.trim();
@@ -235,7 +259,7 @@ taoHoaDon: function () {
         const end = document.getElementById('r-end').value;
         const tien = document.getElementById('r-tien').value;
         const hoaDon = this.taoHoaDon();
-        
+
         if (this.mode === 'RENEW' && (!gid || gid === "TỰ ĐỘNG SINH")) {
             NotiModule.show("Vui lòng gõ mã GID để tìm kiếm khách hàng gia hạn!", "error");
             return;
@@ -268,6 +292,15 @@ taoHoaDon: function () {
         .then(response => response.json())
         .then(res => {
             if (res.status === "success") {
+
+        // Ghi thêm vào Thu Chi
+        this.guiThuChi(
+            hoaDon,
+            name,
+            goi,
+            tien
+        );
+
                 NotiModule.show(`Đã đồng bộ thành viên vào bảng R-199K thành công!`, "success");
                 document.getElementById('r-name').value = "";
                 document.getElementById('r-gmail').value = "";
@@ -291,7 +324,6 @@ taoHoaDon: function () {
 
 
 
-// [BẮT BUỘC] Kích hoạt chạy khởi tạo ngay khi tải xong trang web
 document.addEventListener("DOMContentLoaded", () => {
     R199kModule.init();
 });

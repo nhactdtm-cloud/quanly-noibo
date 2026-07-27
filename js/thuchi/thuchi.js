@@ -27,11 +27,18 @@ const ThuChiModule = {
         }
     },
     
+    taoHoaDon: function () {
+    return "HD" +
+        Date.now().toString(36).toUpperCase() +
+        Math.random().toString(36).substring(2, 6).toUpperCase();
+    },
+    
     subData: function() {
         const kh = document.getElementById('kh').value || "-";
         const gc = document.getElementById('gc').value || "-";
         const lgd = document.getElementById('lgd').value;
         const st = document.getElementById('st').value;
+        const hoaDon = this.taoHoaDon();
         
         // Phòng hờ nếu UserModule chưa chạy thì mặc định ghi nhận là ADMIN
         const currentAdmin = (typeof UserModule !== 'undefined' && UserModule.uName) ? UserModule.uName : "ADMIN";
@@ -50,6 +57,7 @@ const ThuChiModule = {
         btnSubmit.disabled = true;
 
         const payload = {
+            hoaDon: hoaDon,
             khachHang: kh,
             ghiChu: gc,
             loaiGd: lgd,
@@ -67,7 +75,7 @@ const ThuChiModule = {
         .then(response => response.json())
         .then(res => {
             if (res.status === "success") {
-                const realId = res.generatedId || "HD-OK";
+                const realId = res.generatedId || hoaDon;
 
                 // Cộng dồn dữ liệu tổng kết trên widget màn hình
                 this.totalOrders += 1;
