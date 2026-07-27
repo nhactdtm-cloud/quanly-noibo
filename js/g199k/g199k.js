@@ -111,17 +111,24 @@ const R199kModule = {
     },
 
     tựĐộngTìmKiếmKháchHàng: function(type = 'GID') {
-        if (this.mode !== 'RENEW') return; // Chỉ chạy ở tab Gia hạn / Hủy [1]
+        if (this.mode !== 'RENEW') return; // Chỉ chạy ở tab Gia hạn / Hủy
+
+        // Khóa tạm thời để tránh vòng lặp vô hạn khi điền dữ liệu tự động
+        if (this.isAutofilling) return; 
 
         let url = `${this.WEB_APP_URL}?action=GET_USER`;
+        const inputGid = document.getElementById('r-gid');
+        const inputName = document.getElementById('r-name');
+        const inputGmail = document.getElementById('r-gmail');
+        const selectGoi = document.getElementById('r-goi');
         
         if (type === 'GID') {
-            const gid = document.getElementById('r-gid').value.trim().toUpperCase();
-            if (gid.length < 5) return; // [1] GID từ 5 ký tự mới tìm
+            const gid = inputGid.value.trim().toUpperCase();
+            if (gid.length < 5) return; // Mã ngắn quá thì bỏ qua
             url += `&gid=${encodeURIComponent(gid)}`;
         } else {
-            const name = document.getElementById('r-name').value.trim();
-            if (name.length < 3) return; // Tên từ 3 ký tự trở lên mới tìm để tránh spam API
+            const name = inputName.value.trim();
+            if (name.length < 3) return; // Tên ngắn quá thì bỏ qua không gửi API
             url += `&name=${encodeURIComponent(name)}`;
         }
 
@@ -129,23 +136,36 @@ const R199kModule = {
         .then(response => response.json())
         .then(res => {
             if (res.status === "success") {
-                // Điền thông tin chuẩn hóa vào form [1]
-                document.getElementById('r-gid').value = res.data.gid;
-                document.getElementById('r-name').value = res.data.name;
-                document.getElementById('r-gmail').value = res.data.gmail; // [1]
-                
-                if(res.data.goi) { // [1]
-                     document.getElementById('r-goi').value = res.data.goi; // [1]
-                     this.tínhNgàyKếtThúc(); // [1]
+                // Bật khóa bảo vệ trước khi gán giá trị vào các ô input
+                this.isAutofilling = true;
+
+                // Cập nhật dữ liệu thông minh: Không ghi đè lên ô người dùng đang gõ
+                if (type === 'GID') {
+                    inputName.value = res.data.name;
+                } else {
+                    inputGid.value = res.data.gid;
                 }
+                
+                inputGmail.value = res.data.gmail;
+                
+                if (res.data.goi) {
+                     selectGoi.value = res.data.goi;
+                     this.tínhNgàyKếtThúc(); 
+                }
+                
                 NotiModule.show(`Đã tìm thấy khách hàng: ${res.data.name}!`, "success");
+                
+                // Giải phóng khóa bảo vệ sau khi điền xong dữ liệu
+                setTimeout(() => { this.isAutofilling = false; }, 100);
             }
         })
-        .catch(err => console.log("Lỗi tìm kiếm ngầm: ", err));
+        .catch(err => {
+            console.log("Lỗi tìm kiếm ngầm: ", err);
+            this.isAutofilling = false; // Đảm bảo mở khóa nếu lỗi mạng
+        });
     },
 
-
-
+    
     tínhNgàyKếtThúc: function() {
         const ngàyBắtĐầuValue = document.getElementById('r-start').value;
         const gói = document.getElementById('r-goi').value;
