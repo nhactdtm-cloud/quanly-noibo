@@ -1,0 +1,28 @@
+#lg-sc {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: var(--bg);
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+.lg-bx {
+    background: var(--sf);
+    width: 100%;
+    max-width: 360px;
+    padding: 30px;
+    border-radius: var(--r);
+    border: 1px solid var(--b);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    text-align: center;
+}
+.login-sub {
+    font-size: 13px;
+    color: var(--ts);
+    margin-bottom: 24px;
+}
