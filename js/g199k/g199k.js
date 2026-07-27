@@ -210,6 +210,22 @@ const currentSearchId = ++this.searchId;
         }
     },
 
+taoHoaDon: function () {
+    const now = new Date();
+
+    const y = now.getFullYear();
+    const m = String(now.getMonth() + 1).padStart(2, "0");
+    const d = String(now.getDate()).padStart(2, "0");
+
+    const h = String(now.getHours()).padStart(2, "0");
+    const i = String(now.getMinutes()).padStart(2, "0");
+    const s = String(now.getSeconds()).padStart(2, "0");
+
+    const rand = Math.floor(Math.random() * 900 + 100);
+
+    return `HD${y}${m}${d}${h}${i}${s}${rand}`;
+},
+
     submitR199k: function() {
         const gid = document.getElementById('r-gid').value.trim().toUpperCase();
         const name = document.getElementById('r-name').value.trim();
@@ -218,7 +234,8 @@ const currentSearchId = ++this.searchId;
         const start = document.getElementById('r-start').value;
         const end = document.getElementById('r-end').value;
         const tien = document.getElementById('r-tien').value;
-
+        const hoaDon = this.taoHoaDon();
+        
         if (this.mode === 'RENEW' && (!gid || gid === "TỰ ĐỘNG SINH")) {
             NotiModule.show("Vui lòng gõ mã GID để tìm kiếm khách hàng gia hạn!", "error");
             return;
@@ -229,6 +246,7 @@ const currentSearchId = ++this.searchId;
         btn.innerText = "ĐANG ĐỒNG BỘ...";
         btn.disabled = true;
 
+
         const payload = {
             action: this.mode,
             gid: gid,
@@ -238,6 +256,7 @@ const currentSearchId = ++this.searchId;
             start: start,
             end: end,
             tien: tien,
+            hoaDon: hoaDon,
             adminName: "ADMIN"
         };
 
