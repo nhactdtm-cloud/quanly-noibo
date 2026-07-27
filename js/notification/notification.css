@@ -2,7 +2,7 @@
    TOAST NOTIFICATION - MODERN EUROPEAN SaaS PREMIUM STYLE
    ========================================================================== */
 
-/* Khung chứa: Đặt ở góc trên bên phải trên PC, khống chế khoảng cách tinh tế */
+/* Khung chứa cố định ở góc trên bên phải trên PC */
 #toast-container {
     position: fixed;
     top: 24px;
@@ -13,19 +13,19 @@
     gap: 12px;
     max-width: 380px;
     width: 100%;
-    pointer-events: none; /* Tránh cản trở chuột khi thông báo chưa biến mất */
+    pointer-events: none;
 }
 
-/* Định dạng hộp thông báo đơn lẻ - Phong cách Thụy Sĩ */
+/* Định dạng hộp thông báo đơn lẻ */
 .toast-item {
-    pointer-events: auto; /* Cho phép người dùng tương tác nếu cần */
-    background: #ffffff; /* Nút nền luôn trắng tinh khiết tạo sự sang trọng */
-    color: #09090b; /* Chữ đen sâu chuẩn Apple */
+    pointer-events: auto;
+    background: #ffffff;
+    color: #09090b;
     padding: 16px 20px;
-    border-radius: 16px; /* Bo góc lớn đồng bộ với form hệ thống */
-    border: 1px solid #e4e4e7; /* Viền mỏng màu xám Zinc tinh tế */
+    border-radius: 16px;
+    border: 1px solid #e4e4e7;
     
-    /* Hệ thống đổ bóng đa tầng siêu mịn (Soft Ambient Shadow) */
+    /* Hệ thống đổ bóng mềm tầng sâu */
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03), 
                 0 10px 15px -3px rgba(0, 0, 0, 0.08), 
                 0 20px 25px -5px rgba(0, 0, 0, 0.05);
@@ -34,103 +34,72 @@
     font-weight: 600;
     line-height: 1.5;
     display: flex;
-    align-items: flex-start; /* Căn đỉnh icon nếu nội dung chữ dài xuống dòng */
+    align-items: flex-start;
     gap: 14px;
     box-sizing: border-box;
     
-    /* Hiệu ứng trượt vào mượt mà của hệ điều hành iOS */
+    /* Hiệu ứng trượt vào từ bên phải */
     animation: euroSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Các ký hiệu chỉ thị trạng thái siêu nhỏ bằng chấm tròn ẩn màu thay vì viền dày */
-.toast-item::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 4px; /* Chỉ một dải màu cực mảnh ở rìa trái */
-    border-radius: 16px 0 0 16px;
-}
+/* Định dạng màu sắc điểm nhấn trạng thái */
+.toast-item.success { border-left: 4px solid #16a34a; }
+.toast-item.success span { color: #16a34a; }
 
-/* ĐỊNH DẠNG MÀU SẮC ĐIỂM NHẤN (TẬP TRUNG VÀO ICON VÀ VIỀN MẢNH) */
-.toast-item.success { 
-    border-left: 4px solid #16a34a; /* Xanh lá lá cây Thụy Sĩ */
-}
-.toast-item.success span {
-    color: #16a34a;
-}
+.toast-item.error { border-left: 4px solid #dc2626; }
+.toast-item.error span { color: #dc2626; }
 
-.toast-item.error { 
-    border-left: 4px solid #dc2626; /* Đỏ lạnh Bắc Âu */
-}
-.toast-item.error span {
-    color: #dc2626;
-}
+.toast-item.info { border-left: 4px solid #2563eb; }
+.toast-item.info span { color: #2563eb; }
 
-.toast-item.info { 
-    border-left: 4px solid #2563eb; /* Xanh hoàng gia */
-}
-.toast-item.info span {
-    color: #2563eb;
-}
-
-/* Định dạng cho Icon */
 .toast-item span {
     font-size: 16px;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-top: 2px; /* Cân bằng trục ngang với dòng chữ đầu */
-}
-
-/* Hiệu ứng biến mất: Trượt nhẹ lên trên và mờ dần */
-.toast-item.fade-out {
-    opacity: 0;
-    transform: translateY(-16px) scale(0.95);
-}
-
-/* Animation trượt mượt từ phải qua trái trên PC */
-@keyframes euroSlideIn {
-    from { 
-        opacity: 0; 
-        transform: translateX(40px) translateY(0) scale(0.96); 
-    }
-    to { 
-        opacity: 1; 
-        transform: translateX(0) translateY(0) scale(1); 
-    }
+    margin-top: 2px;
 }
 
 /* ==========================================================================
-   RESPONSIVE TỐI ƯU CHO MOBILE (HIỂN THỊ DẠNG BANNER ĐỈNH MÀN HÌNH)
+   ✨ HIỆU ỨNG BIẾN MẤT: RÚT SANG PHẢI VÀ MỜ DẦN (FADE OUT RIGHT)
+   ========================================================================== */
+.toast-item.fade-out {
+    animation: euroSlideOut 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+/* Animation trượt VÀO mượt mà */
+@keyframes euroSlideIn {
+    from { opacity: 0; transform: translateX(60px) scale(0.95); }
+    to { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+/* Animation biến mất RÚT SANG PHẢI xịn sò */
+@keyframes euroSlideOut {
+    from { opacity: 1; transform: translateX(0) scale(1); }
+    to { opacity: 0; transform: translateX(80px) scale(0.95); } /* Đẩy mạnh sang phải 80px và mờ dần */
+}
+
+/* ==========================================================================
+   RESPONSIVE TỐI ƯU CHO MOBILE (Hiển thị rớt từ đỉnh và trượt lên biến mất)
    ========================================================================== */
 @media (max-width: 768px) {
     #toast-container {
-        top: 16px;
-        right: 16px;
-        left: 16px;
-        max-width: none;
-        width: auto;
+        top: 16px; right: 16px; left: 16px; max-width: none; width: auto;
     }
-    
     .toast-item {
-        font-size: 13px;
-        padding: 14px 16px;
-        border-radius: 14px;
-        /* Trên mobile đổi sang animation rớt từ trên đỉnh xuống giống thông báo iPhone */
+        font-size: 13px; padding: 14px 16px; border-radius: 14px;
         animation: mobileSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    .toast-item.fade-out {
+        animation: mobileSlideOut 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
     }
 }
 
 @keyframes mobileSlideIn {
-    from { 
-        opacity: 0; 
-        transform: translateY(-30px) scale(0.95); 
-    }
-    to { 
-        opacity: 1; 
-        transform: translateY(0) scale(1); 
-    }
+    from { opacity: 0; transform: translateY(-30px) scale(0.95); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes mobileSlideOut {
+    from { opacity: 1; transform: translateY(0) scale(1); }
+    to { opacity: 0; transform: translateY(-30px) scale(0.95); } /* Trên mobile rút ngược lên trên đỉnh */
 }
