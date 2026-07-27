@@ -1,41 +1,167 @@
-.list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+/* ==========================================================================
+   G199K.CSS - GIAO DIỆN PC 2 CỘT TỐI ƯU (ĐÃ SỬA)
+   ========================================================================== */
+
+.r199k-workspace {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+    width: 100%;
+    max-width: 1200px;
+    margin: auto;
+    height: calc(100vh - 160px);
+    box-sizing: border-box;
 }
-.item {
+
+/*==============================
+ FORM BÊN TRÁI
+===============================*/
+#p-g .card {
     background: var(--sf);
-    padding: 14px;
-    border-radius: var(--r);
     border: 1px solid var(--b);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    border-radius: var(--r);
+    padding: 18px;
+    
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Chia form thành 2 cột đều nhau */
+    column-gap: 18px;
+    row-gap: 12px; /* Tăng nhẹ khoảng cách hàng để thoáng hơn */
+    align-content: start;
+    height: 100%;
+    box-sizing: border-box;
 }
-.it-id {
-    font-size: 11px;
-    font-weight: 700;
-    color: var(--ts);
+
+/*==============================
+ TAB ĐĂNG KÝ (Chiếm hết 2 cột)
+===============================*/
+#p-g .card .seg {
+    grid-column: span 2; /* Sửa thành span 2 để chiếm trọn hàng đầu tiên */
+    display: inline-grid;
+    grid-template-columns: 1fr 1fr;
+    width: 360px;
+    max-width: 100%;
+    background: #f4f4f5;
+    padding: 4px;
+    border-radius: 10px;
+    margin-bottom: 4px;
 }
-.it-t {
-    font-size: 14px;
-    font-weight: 600;
-    margin: 2px 0;
+
+/*==============================
+ ĐIỀU CHỈNH VỊ TRÍ CÁC PHẦN TỬ LẺ/ĐẶC BIỆT
+===============================*/
+/* Mã GID cần chiếm trọn 1 dòng rộng ở đầu */
+#p-g .card .gr:has(#r-gid) {
+    grid-column: span 2;
 }
-.it-m {
-    font-size: 12px;
-    color: var(--ts);
+
+/* Nút nhập dữ liệu chiếm trọn 1 dòng rộng ở cuối */
+#p-g .card .gr:has(#btn-add-r199k) {
+    grid-column: span 2;
 }
-.it-r {
-    text-align: right;
+
+/*==============================
+ NHÓM INPUT
+===============================*/
+.gr {
     display: flex;
     flex-direction: column;
-    align-items: flex-end;
-    gap: 4px;
+    width: 100%;
 }
-.it-a {
-    font-size: 15px;
+
+.gr label {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--ts);
+    text-transform: uppercase;
+    letter-spacing: .4px;
+    margin-bottom: 4px;
+}
+
+/*==============================
+ INPUT
+===============================*/
+.gr input,
+.gr select {
+    width: 100%;
+    height: 38px;
+    padding: 6px 10px;
+    border: 1px solid var(--b);
+    border-radius: 8px;
+    background: #fafafa;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--t);
+    outline: none;
+    box-sizing: border-box;
+}
+
+.gr input[readonly] {
+    background: #f5f5f5;
+    color: var(--ts);
+    cursor: not-allowed;
+}
+
+/*==============================
+ NÚT
+===============================*/
+#p-g .card .btn-sm {
+    width: 100%;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
     font-weight: 700;
+    margin: 0;
+    box-sizing: border-box;
 }
-.it-a.thu { color: var(--s); }
-.it-a.chi { color: var(--d); }
+
+/*==============================
+ SIDEBAR
+===============================*/
+.r199k-sidebar {
+    background: var(--sf);
+    border: 1px solid var(--b);
+    border-radius: var(--r);
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    height: 100%;
+    box-sizing: border-box;
+}
+
+/*==============================
+ MOBILE (Responsive)
+===============================*/
+@media (max-width: 768px) {
+    .r199k-workspace {
+        grid-template-columns: 1fr;
+        height: auto;
+        gap: 16px;
+    }
+
+    #p-g .card {
+        grid-template-columns: 1fr; /* Trở về 1 cột trên điện thoại */
+        padding: 16px;
+        row-gap: 10px;
+        height: auto;
+    }
+
+    /* Đưa tất cả phần tử đặc biệt về mặc định trên mobile */
+    #p-g .card .seg,
+    #p-g .card .gr:has(#r-gid),
+    #p-g .card .gr:has(#btn-add-r199k) {
+        grid-column: span 1;
+        width: 100%;
+    }
+
+    #p-g .card .btn-sm {
+        height: 42px;
+    }
+
+    .r199k-sidebar {
+        height: auto;
+        margin-bottom: 50px;
+    }
+}
