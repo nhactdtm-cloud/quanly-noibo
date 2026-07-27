@@ -290,10 +290,9 @@ guiThuChi: function(hoaDon, name, goi, tien) {
             body: JSON.stringify(payload)
         })
         .then(response => response.json())
-        .then(res => {
-            if (res.status === "success") {
+.then(res => {
+    if (res.status === "success") {
 
-        // Ghi thêm vào Thu Chi
         this.guiThuChi(
             hoaDon,
             name,
@@ -301,20 +300,20 @@ guiThuChi: function(hoaDon, name, goi, tien) {
             tien
         );
 
-                NotiModule.show(`Đã đồng bộ thành viên vào bảng R-199K thành công!`, "success");
-                document.getElementById('r-name').value = "";
-                document.getElementById('r-gmail').value = "";
-                this.init();
-            } else {
-                NotiModule.show("Lỗi từ Sheets: " + res.message, "error");
-            }
-        })
-        .catch(() => {
-            NotiModule.show("Đã gửi yêu cầu đăng ký lên hệ thống trực tuyến!", "info");
-            document.getElementById('r-name').value = "";
-            document.getElementById('r-gmail').value = "";
-            this.init();
-        })
+        NotiModule.show(`Đã đồng bộ thành viên vào bảng R-199K thành công!`, "success");
+
+        // Reset form
+        document.getElementById("r-name").value = "";
+        document.getElementById("r-gmail").value = "";
+
+        const today = new Date().toISOString().split("T")[0];
+        document.getElementById("r-start").value = today;
+
+        this.setMode("NEW");
+        this.tựĐộngSinhGid();
+        this.tínhNgàyKếtThúc();
+    }
+})
         .finally(() => {
             btn.innerText = "NHẬP DỮ LIỆU BẢNG";
             btn.disabled = false;
