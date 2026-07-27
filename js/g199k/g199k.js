@@ -2,6 +2,7 @@ const R199kModule = {
     // ⚠️ SAU NÀY BẠN SẼ ĐỔI ĐOẠN LINK APPS SCRIPT RIÊNG CỦA GOOGLE SHEET R199K VÀO ĐÂY
     WEB_APP_URL: "https://script.google.com/macros/s/AKfycbzhh5Dzq2fuWK3zQPFB67DHf4QZE9efj0b2g6jQzsqUsXGK5hLnFgMSfdMt33hiyrAc/exec",
     mode: 'NEW', // Mặc định là Đăng ký mới
+    searchId: 0,
 
     init: function() {
         // Đặt ngày bắt đầu mặc định là ngày hôm nay dạng YYYY-MM-DD
@@ -90,25 +91,32 @@ const R199kModule = {
     },
 
 
-    tựĐộngSinhGid: function() {
-        if (this.mode !== 'NEW') return;
+tựĐộngSinhGid: function () {
+    if (this.mode !== "NEW") return;
 
-        const nameInput = document.getElementById('r-name').value.trim();
-        const inputGid = document.getElementById('r-gid');
+    const nameInput = document.getElementById("r-name").value.trim();
+    const inputGid = document.getElementById("r-gid");
 
-        if (nameInput === "") {
-            inputGid.value = "TỰ ĐỘNG SINH";
-            return;
-        }
+    if (nameInput === "") {
+        inputGid.value = "TỰ ĐỘNG SINH";
+        return;
+    }
 
-        const d = new Date();
-        const yy = String(d.getFullYear()).slice(-2);
-        const mm = String(d.getMonth() + 1).padStart(2, '0');
-        const dd = String(d.getDate()).padStart(2, '0');
-        
-        const randomChar = Math.random().toString(36).substring(2, 4).toUpperCase();
-        inputGid.value = `G${yy}${mm}${dd}-${randomChar}`;
-    },
+    const now = new Date();
+
+    const yy = String(now.getFullYear()).slice(-2);
+    const mm = String(now.getMonth() + 1).padStart(2, "0");
+
+    // 6 số cuối của thời gian hiện tại (mili giây)
+    const seq = Date.now().toString().slice(-6);
+
+    // 2 số ngẫu nhiên
+    const rand = Math.floor(Math.random() * 100)
+        .toString()
+        .padStart(2, "0");
+
+    inputGid.value = `G${yy}${mm}${seq}${rand}`;
+},
 
     tựĐộngTìmKiếmKháchHàng: function(type = 'GID') {
         if (this.mode !== 'RENEW') return; // Chỉ chạy ở tab Gia hạn / Hủy
@@ -122,19 +130,23 @@ const R199kModule = {
         const inputGmail = document.getElementById('r-gmail');
         const selectGoi = document.getElementById('r-goi');
         
-        if (type === 'GID') {
-            const gid = inputGid.value.trim().toUpperCase();
-            if (gid.length < 5) return; // Mã ngắn quá thì bỏ qua
-            url += `&gid=${encodeURIComponent(gid)}`;
-        } else {
-            const name = inputName.value.trim();
-            if (name.length < 3) return; // Tên ngắn quá thì bỏ qua không gửi API
-            url += `&name=${encodeURIComponent(name)}`;
-        }
+let keyword = "";
+if (type === 'GID') {
+    keyword = inputGid.value.trim().toUpperCase();
+    if (keyword.length < 5) return; 
+    url += `&gid=${encodeURIComponent(keyword)}`;
+} else {
+    keyword = inputName.value.trim();
+    if (keyword.length < 3) return; 
+    url += `&name=${encodeURIComponent(keyword)}`;
+}
+
+const currentSearchId = ++this.searchId;
 
         fetch(url)
         .then(response => response.json())
         .then(res => {
+            if (currentSearchId !== this.searchId) return;
             if (res.status === "success") {
                 // Bật khóa bảo vệ trước khi gán giá trị vào các ô input
                 this.isAutofilling = true;
@@ -153,13 +165,17 @@ const R199kModule = {
                      this.tínhNgàyKếtThúc(); 
                 }
                 
-                NotiModule.show(`Đã tìm thấy khách hàng: ${res.data.name}!`, "success");
-                
-                // Giải phóng khóa bảo vệ sau khi điền xong dữ liệu
-                setTimeout(() => { this.isAutofilling = false; }, 100);
-            }
-        })
-        .catch(err => {
+            NotiModule.show(`Đã tìm thấy khách hàng: ${res.data.name}!`, "success");
+
+            // Giải phóng khóa bảo vệ sau khi điền xong dữ liệu
+            setTimeout(() => { this.isAutofilling = false; }, 100);
+        } else if (res.status === "not_found") {
+            // Bắn thông báo nếu Google Sheets phản hồi không có dữ liệu trùng khớp
+            NotiModule.show(`Không tìm thấy khách hàng với thông tin: ${keyword}`, "error");
+        }
+    })
+    .catch(err => {
+
             console.log("Lỗi tìm kiếm ngầm: ", err);
             this.isAutofilling = false; // Đảm bảo mở khóa nếu lỗi mạng
         });

@@ -1,7 +1,28 @@
 const UserModule = {
     uName: 'ADMIN',
 
-    // 1. Logic Đăng nhập (Đọc file JSON)
+    // Hàm kiểm tra trạng thái khi vừa tải trang (Gọi hàm này khi ứng dụng vừa chạy)
+    checkLoginStatus: function() {
+        const savedUser = localStorage.getItem('loggedUser');
+        if (savedUser) {
+            this.uName = savedUser;
+            this.applyLoginUI();
+        }
+    },
+
+    // Hàm phụ trợ để áp dụng giao diện đã đăng nhập
+    applyLoginUI: function() {
+        document.getElementById('usr-disp').innerText = `👤 Tài khoản: ${this.uName}`;
+        document.getElementById('lg-sc').style.display = 'none';
+        document.getElementById('ap').classList.add('auth');
+        
+        if (typeof ThuChiModule !== 'undefined') {
+            ThuChiModule.iId();
+            ThuChiModule.sm('THU');
+        }
+    },
+
+    // 1. Logic Đăng nhập
     handleLogin: async function() {
         const uInput = document.getElementById('un').value.trim();
         const pInput = document.getElementById('pw').value.trim();
@@ -13,14 +34,10 @@ const UserModule = {
 
         try {
             const response = await fetch('data/user.json');
-            if (!response.ok) {
-                throw new Error("Không thể kết nối đến file dữ liệu tài khoản!");
-            }
+            if (!response.ok) throw new Error("Không thể kết nối đến file dữ liệu!");
             
             const data = await response.json();
-            const userList = data.users;
-
-            const matchedUser = userList.find(user => 
+            const matchedUser = data.users.find(user => 
                 user.username.toLowerCase() === uInput.toLowerCase() && 
                 user.password === pInput
             );
@@ -28,41 +45,29 @@ const UserModule = {
             if (matchedUser) {
                 this.uName = matchedUser.username.toUpperCase();
                 
-                // Hiển thị tên tài khoản lên giao diện chính
-                document.getElementById('usr-disp').innerText = `👤 Tài khoản: ${this.uName}`;
+                // LƯU TRẠNG THÁI VÀO LOCALSTORAGE
+                localStorage.setItem('loggedUser', this.uName);
                 
-                // Mở khóa màn hình ứng dụng
-                document.getElementById('lg-sc').style.display = 'none';
-                document.getElementById('ap').classList.add('auth');
-                
-                // Khởi tạo luồng Thu Chi
-                ThuChiModule.iId();
-                ThuChiModule.sm('THU');
-                
-                NotiModule.show(`Chào mừng ${this.uName} quay trở lại hệ thống!`, "success");
+                this.applyLoginUI();
+                NotiModule.show(`Chào mừng ${this.uName} quay trở lại!`, "success");
             } else {
                 NotiModule.show("Mật khẩu hoặc tài khoản không chính xác!", "error");
             }
-
         } catch (error) {
             NotiModule.show("Lỗi hệ thống: " + error.message, "error");
         }
     },
 
-    // 2. Logic Đăng xuất (Đẩy từ ap.js về đây)
+    // 2. Logic Đăng xuất
     handleLogout: function() {
-        // Xóa mật khẩu cũ trong ô nhập liệu để bảo mật
+        // XÓA TRẠNG THÁI TRONG LOCALSTORAGE
+        localStorage.removeItem('loggedUser');
+
         document.getElementById('pw').value = '';
-        
-        // Ẩn ứng dụng chính và hiện lại màn hình khóa đăng nhập
         document.getElementById('ap').classList.remove('auth');
         document.getElementById('lg-sc').style.display = 'flex';
         
-        // Gọi hàm chuyển tab về mặc định "THU CHI" (nằm bên file ap.js)
-        if (typeof st === 'function') {
-            st('t');
-        }
-        
+        if (typeof st === 'function') st('t');
         NotiModule.show("Đã đăng xuất tài khoản an toàn!", "info");
     }
 };

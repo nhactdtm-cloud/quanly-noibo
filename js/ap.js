@@ -11,7 +11,11 @@ function st(t) {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
-    // Gọi hàm từ UserModule mới gộp
+
+    if (typeof UserModule !== 'undefined' && typeof UserModule.checkLoginStatus === 'function') {
+        UserModule.checkLoginStatus();
+    }
+
     document.getElementById('btn-login-submit').addEventListener('click', () => UserModule.handleLogin());
     document.getElementById('btn-logout').addEventListener('click', () => UserModule.handleLogout());
     
