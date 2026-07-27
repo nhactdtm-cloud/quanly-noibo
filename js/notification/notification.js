@@ -26,6 +26,6 @@ const NotiModule = {
                 if (toast) toast.remove();
             }, 350);
             
-        }, 1500); 
+        }, 3000); 
     }
 };

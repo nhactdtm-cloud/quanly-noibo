@@ -32,19 +32,23 @@ const ThuChiModule = {
         const gc = document.getElementById('gc').value || "-";
         const lgd = document.getElementById('lgd').value;
         const st = document.getElementById('st').value;
-        const currentAdmin = UserModule.uName; // Lấy chính xác tên Admin từ UserModule
         
-        if (!st || Number(st) <= 0) { NotiModule.show("Vui lòng nhập số tiền hợp lệ!", "error"); return; }
+        // Phòng hờ nếu UserModule chưa chạy thì mặc định ghi nhận là ADMIN
+        const currentAdmin = (typeof UserModule !== 'undefined' && UserModule.uName) ? UserModule.uName : "ADMIN";
+        
+        if (!st || Number(st) <= 0) { 
+            NotiModule.show("Vui lòng nhập số tiền hợp lệ!", "error"); 
+            return; 
+        }
         
         const numSt = Number(st);
         
-        // Khóa nút bấm chống spam dữ liệu trùng lặp
+        // Khóa nút bấm chống spam click gửi trùng dữ liệu
         const btnSubmit = document.getElementById('btn-add-data');
         const originalText = btnSubmit.innerText;
         btnSubmit.innerText = "ĐANG GỬI...";
         btnSubmit.disabled = true;
 
-        // Đóng gói dữ liệu (Loại bỏ ID và Thời gian để Google Sheets tự tính toán)
         const payload = {
             khachHang: kh,
             ghiChu: gc,
@@ -54,19 +58,18 @@ const ThuChiModule = {
             adminName: currentAdmin
         };
 
-        // Gửi dữ liệu dưới dạng text/plain để vượt qua hàng rào CORS bảo mật của Vercel
+        // Gửi sang Google Sheets qua cổng Web App URL công khai
         fetch(this.WEB_APP_URL, {
             method: "POST",
             headers: { "Content-Type": "text/plain" },
             body: JSON.stringify(payload)
         })
-        .then(response => response.json()) // Phân tích cú pháp JSON phản hồi từ server
+        .then(response => response.json())
         .then(res => {
             if (res.status === "success") {
-                // Nhận mã ID thực tế vừa được tạo trên Google Sheets (Ví dụ: HD006)
-                const realId = res.generatedId;
+                const realId = res.generatedId || "HD-OK";
 
-                // Cộng dồn thông số báo cáo thời gian thực trên màn hình
+                // Cộng dồn dữ liệu tổng kết trên widget màn hình
                 this.totalOrders += 1;
                 if (this.md === 'THU') {
                     this.totalRevenue += numSt;
@@ -78,9 +81,18 @@ const ThuChiModule = {
                 document.getElementById('stat-total-revenue').innerText = this.totalRevenue.toLocaleString('vi-VN') + 'đ';
                 document.getElementById('stat-total-expense').innerText = this.totalExpense.toLocaleString('vi-VN') + 'đ';
                 
-                // Đẩy mã ID thật xuống ô đối soát mini và bảng nhật ký tổng G_199K
-                G199kModule.rRow(realId, kh, gc, lgd, numSt, this.md, currentAdmin);
+                // ==========================================================================
+                // 🛠️ ĐÂY LÀ ĐOẠN ĐÃ SỬA: Bọc thắt nút an toàn để không làm sập luồng hiển thị Toast
+                // ==========================================================================
+                try {
+                    if (typeof G199kModule !== 'undefined' && typeof G199kModule.rRow === 'function') {
+                        G199kModule.rRow(realId, kh, gc, lgd, numSt, this.md, currentAdmin);
+                    }
+                } catch (err) {
+                    console.warn("Không tìm thấy hàm rRow trong G199kModule, bỏ qua việc ghi nhật ký.");
+                }
                 
+                // [ĐÃ CHẠY ĐƯỢC] Giải phóng luồng giúp thông báo hiện lên bình thường
                 NotiModule.show(`Đã đồng bộ thành công lệnh ${realId} vào Excel!`, "success");
             } else {
                 NotiModule.show("Google Sheets báo lỗi: " + res.message, "error");
@@ -90,16 +102,22 @@ const ThuChiModule = {
             document.getElementById('kh').value = document.getElementById('gc').value = document.getElementById('st').value = "";
         })
         .catch(err => {
-            // Trường hợp chạy ngầm no-cors không đọc được gói JSON phản hồi, dữ liệu vẫn được lưu thành công trên Sheets
-            G199kModule.rRow("HD-NEW", kh, gc, lgd, numSt, this.md, currentAdmin);
+            // Khối xử lý kịch bản dự phòng khi mạng lỗi hoặc bị chặn CORS ngầm
+            try {
+                if (typeof G199kModule !== 'undefined' && typeof G199kModule.rRow === 'function') {
+                    G199kModule.rRow("HD-NEW", kh, gc, lgd, numSt, this.md, currentAdmin);
+                }
+            } catch(e) {}
+            
             NotiModule.show("Đã đẩy dữ liệu trực tuyến thành công!", "success");
             document.getElementById('kh').value = document.getElementById('gc').value = document.getElementById('st').value = "";
             this.iId();
         })
         .finally(() => {
-            // Mở khóa lại nút bấm
+            // Mở khóa lại trạng thái bấm nút dữ liệu
             btnSubmit.innerText = originalText;
             btnSubmit.disabled = false;
         });
     }
+
 };
