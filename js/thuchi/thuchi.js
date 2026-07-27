@@ -33,7 +33,7 @@ const ThuChiModule = {
         const gc = document.getElementById('gc').value || "-";
         const lgd = document.getElementById('lgd').value;
         const st = document.getElementById('st').value;
-        const currentAdmin = LoginModule.uName; // Lấy tên Admin đang đăng nhập hiện tại
+        const currentAdmin = UserModule.uName; // Lấy tên Admin đang đăng nhập hiện tại
         
         if (!st || Number(st) <= 0) { NotiModule.show("Vui lòng nhập số tiền hợp lệ!", "error"); return; }
         
