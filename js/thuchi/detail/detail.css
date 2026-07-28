@@ -29,13 +29,31 @@
     padding: 24px;
     border-radius: 16px;
     box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-    position: relative;
+    position: relative; /* Giữ vị trí cố định để làm tâm căn góc cho nút X */
     transform: translateY(-20px);
     transition: transform 0.3s ease;
 }
 
 .detail-modal.active .detail-content {
     transform: translateY(0);
+}
+
+/* NÚT [X] ĐỎ Ở GÓC TRÊN CÙNG BÊN PHẢI */
+.detail-modal-close-x {
+    position: absolute;
+    top: 16px;
+    right: 20px;
+    font-size: 24px;
+    color: #dc2626;
+    cursor: pointer;
+    font-weight: bold;
+    line-height: 1;
+    user-select: none;
+    transition: transform 0.2s;
+}
+
+.detail-modal-close-x:hover {
+    transform: scale(1.15); /* Phóng to nhẹ khi di chuột vào tạo độ nhạy UI */
 }
 
 /* Tiêu đề Modal */
@@ -59,7 +77,7 @@
 
 .detail-row:last-of-type {
     border-bottom: none;
-    margin-bottom: 16px;
+    margin-bottom: 20px; /* Tăng khoảng cách một chút để không dính sát vào nút bấm dưới */
 }
 
 .detail-label {
@@ -72,20 +90,21 @@
     font-weight: 600;
 }
 
-/* Nút đóng hộp thoại */
-.detail-close-btn {
+/* NÚT XÓA HÓA ĐƠN MÀU ĐỎ PHÍA DƯỚI (Thay thế hoàn toàn css cũ của .detail-close-btn) */
+.detail-delete-btn {
     width: 100%;
-    height: 40px;
-    background: #f4f4f5;
+    height: 44px;
+    background: #ef4444;
     border: none;
-    border-radius: 8px;
-    color: #4b5563;
-    font-weight: 600;
+    border-radius: 10px;
+    color: #ffffff;
+    font-weight: 700;
     font-size: 14px;
     cursor: pointer;
+    box-sizing: border-box;
     transition: background 0.2s;
 }
 
-.detail-close-btn:hover {
-    background: #e4e4e7;
+.detail-delete-btn:hover {
+    background: #b91c1c; /* Đổi sang màu đỏ sẫm khi nhân viên rê chuột vào */
 }
