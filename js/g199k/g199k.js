@@ -68,11 +68,19 @@ const R199kModule = {
         const optCancel = document.getElementById('opt-cancel'); 
         const selectGoi = document.getElementById('r-goi');
 
+        // Các phần tử bọc cột bên phải
+        const cskhGroup = document.getElementById('cskh-group');
+        const memberListGroup = document.getElementById('member-list-group');
+
         bNew.className = bRenew.className = 'seg-btn';
         
         if (action === 'NEW') {
             bNew.classList.add('active', 'thu');
             inputGid.readOnly = true;
+            
+            // Hiện Chăm sóc khách hàng - Ẩn danh sách thành viên
+            if (cskhGroup) cskhGroup.classList.remove('d-none');
+            if (memberListGroup) memberListGroup.classList.add('d-none');
             
             if (optCancel) optCancel.style.display = 'none';
             if (selectGoi.value === 'Hủy ĐK') {
@@ -85,10 +93,18 @@ const R199kModule = {
             inputGid.placeholder = "Nhập GID cần gia hạn (Ví dụ: G2603060)";
             inputGid.readOnly = false;
             
+            // Ẩn Chăm sóc khách hàng - Hiện danh sách thành viên
+            if (cskhGroup) cskhGroup.classList.add('d-none');
+            if (memberListGroup) memberListGroup.classList.remove('d-none');
+            
             if (optCancel) optCancel.style.display = 'block';
+
+            // Kích hoạt gọi nạp dữ liệu danh sách thành viên của nhân viên này
+            this.taiDanhSachThanhVienTheoUser();
         }
         this.tínhNgàyKếtThúc(); 
     },
+
 
     tựĐộngSinhGid: function () {
         if (this.mode !== "NEW") return;
@@ -176,6 +192,53 @@ const R199kModule = {
             this.isAutofilling = false; 
         });
     },
+
+
+    taiDanhSachThanhVienTheoUser: function() {
+        const adminName = (typeof UserModule !== 'undefined' && UserModule.uName) ? UserModule.uName : "ADMIN";
+        document.getElementById('lbl-current-admin').innerText = adminName;
+        
+        const container = document.getElementById('r199k-member-container');
+        container.innerHTML = '<div class="member-empty-state">🔄 Đang tải dữ liệu...</div>';
+
+        // Gọi API Apps Script lấy danh sách user. Nhớ xử lý Backend Apps Script của bạn để nhận action=GET_MEMBERS
+        const url = `${this.WEB_APP_URL}?action=GET_MEMBERS&adminName=${encodeURIComponent(adminName)}`;
+
+        fetch(url)
+        .then(response => response.json())
+        .then(res => {
+            if (res.status === "success" && res.data && res.data.length > 0) {
+                container.innerHTML = ''; // Xóa dòng trạng thái chờ
+                
+                res.data.forEach(item => {
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'member-item';
+                    itemDiv.innerHTML = `
+                        <div class="member-item-info">
+                            <span class="member-item-name">${item.name}</span>
+                            <span class="member-item-gid">${item.gid}</span>
+                        </div>
+                        <span class="member-item-badge">${item.goi}</span>
+                    `;
+                    
+                    // Sự kiện tương tác tiện ích: Click vào khách hàng trong danh sách sẽ tự điền nhanh vào form để gia hạn luôn
+                    itemDiv.addEventListener('click', () => {
+                        document.getElementById('r-gid').value = item.gid;
+                        this.tựĐộngTìmKiếmKháchHàng('GID');
+                    });
+                    
+                    container.appendChild(itemDiv);
+                });
+            } else {
+                container.innerHTML = '<div class="member-empty-state">Bạn chưa đăng ký thành viên nào.</div>';
+            }
+        })
+        .catch(err => {
+            console.error("Lỗi tải danh sách thành viên:", err);
+            container.innerHTML = '<div class="member-empty-state">❌ Không thể tải danh sách.</div>';
+        });
+    },
+
 
 
     
