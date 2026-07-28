@@ -195,14 +195,15 @@ const R199kModule = {
 
 
     taiDanhSachThanhVienTheoUser: function() {
-        const adminName = (typeof UserModule !== 'undefined' && UserModule.uName) ? UserModule.uName : "ADMIN";
-        document.getElementById('lbl-current-admin').innerText = adminName;
+        // Thay đổi hiển thị tiêu đề để nhân viên biết đây là danh sách tổng của toàn bộ hệ thống
+        const lblAdmin = document.getElementById('lbl-current-admin');
+        if (lblAdmin) lblAdmin.innerText = "TẤT CẢ THÀNH VIÊN";
         
         const container = document.getElementById('r199k-member-container');
         container.innerHTML = '<div class="member-empty-state">🔄 Đang tải dữ liệu...</div>';
 
-        // Gọi API Apps Script lấy danh sách user. Nhớ xử lý Backend Apps Script của bạn để nhận action=GET_MEMBERS
-        const url = `${this.WEB_APP_URL}?action=GET_MEMBERS&adminName=${encodeURIComponent(adminName)}`;
+        // [ĐÃ SỬA] Loại bỏ tham số lọc &adminName để Backend Apps Script quét và trả về toàn bộ dữ liệu bảng
+        const url = `${this.WEB_APP_URL}?action=GET_MEMBERS`;
 
         fetch(url)
         .then(response => response.json())
@@ -230,7 +231,7 @@ const R199kModule = {
                     container.appendChild(itemDiv);
                 });
             } else {
-                container.innerHTML = '<div class="member-empty-state">Bạn chưa đăng ký thành viên nào.</div>';
+                container.innerHTML = '<div class="member-empty-state">Chưa có thành viên nào trong hệ thống.</div>';
             }
         })
         .catch(err => {
@@ -238,7 +239,6 @@ const R199kModule = {
             container.innerHTML = '<div class="member-empty-state">❌ Không thể tải danh sách.</div>';
         });
     },
-
 
 
     

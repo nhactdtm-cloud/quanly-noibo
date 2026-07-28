@@ -1,131 +1,98 @@
 const ThuChiModule = {
-    // ⚠️ ĐỐI ĐOẠN LINK GOOGLE APPS SCRIPT MỚI NHẤT CỦA BẠN VÀO ĐÂY
     WEB_APP_URL: "https://script.google.com/macros/s/AKfycbwNA4KT2HEPkCCeQu8ZHLhapDREaNyOUHh9UcleiA6HrxVzLOfNRLpkEDj7zLRJ79kYsQ/exec",
+    md: 'THU', totalOrders: 0, totalRevenue: 0, totalExpense: 0,
+    oT: ['NHẠC LẺ', 'R-199', 'DOANH THU KHÁC'], oC: ['ADS', 'MUA PIN', 'CHI PHÍ VẬN HÀNH'], isSyncing: false, 
     
-    md: 'THU',
-    totalOrders: 0,
-    totalRevenue: 0,
-    totalExpense: 0,
-    oT: ['NHẠC LẺ', 'R-199', 'DOANH THU KHÁC'],
-    oC: ['ADS', 'MUA PIN', 'CHI PHÍ VẬN HÀNH'],
-    
-    iId: function() {
-        // Giao diện sẽ hiển thị trạng thái chờ, Google Sheets sẽ trả số ID thực về sau khi lưu
-        document.getElementById('id').value = "CHỜ TỰ ĐỘNG";
+    init() { this.iId(); this.taiHoatDongHomNay(); setInterval(() => this.processQueue(), 5000); },
+
+    taiHoatDongHomNay() {
+        const admin = (typeof UserModule !== 'undefined' && UserModule.uName) ? UserModule.uName : "ADMIN";
+        fetch(`${this.WEB_APP_URL}?adminName=${encodeURIComponent(admin)}`).then(r => r.json()).then(res => {
+            if (res.status !== "success" || !res.data) return;
+            this.totalOrders = 0; this.totalRevenue = 0; this.totalExpense = 0;
+            this.capNhatKhoiDoiSoat(res.data);
+            
+            // Xóa sạch dòng cũ trên bảng HTML trước khi vẽ lại để tránh bị nhân đôi dữ liệu [1]
+            if (typeof G199kModule !== 'undefined' && document.getElementById('bảng-giao-dịch')) { document.getElementById('bảng-giao-dịch').innerHTML = ''; }
+
+            res.data.forEach(item => {
+                this.totalOrders++;
+                const mode = item.mode === 'THU TIỀN' ? 'THU' : 'CHI';
+                mode === 'THU' ? this.totalRevenue += item.soTien : this.totalExpense += item.soTien;
+                try { if (typeof G199kModule !== 'undefined' && typeof G199kModule.rRow === 'function') G199kModule.rRow(item.hoaDon, item.khachHang, item.ghiChu, item.loaiGd, item.soTien, mode, admin); } catch (e) {}
+            });
+            this.uSt();
+        });
     },
+
+    capNhatKhoiDoiSoat(arr) {
+        const box = document.getElementById('mini-rows'); if (!box) return;
+        box.innerHTML = [...arr].reverse().map(i => {
+            const isThu = i.mode === 'THU TIỀN';
+            return `<div style="display:flex;justify-content:space-between;font-size:13px;padding:3px 0;border-bottom:1px dashed #eee;">
+                <span style="font-weight:bold;color:#333;">📌 ${i.hoaDon}</span>
+                <span style="color:${isThu?'green':'red'};font-weight:bold;">${isThu?'+':'-'}${i.soTien.toLocaleString('vi-VN')}đ</span>
+            </div>`;
+        }).join('') || '<div style="color:#888;font-size:12px;">Chưa có dữ liệu.</div>';
+    },
+
+    uSt() {
+        if(document.getElementById('stat-total-orders')) document.getElementById('stat-total-orders').innerText = this.totalOrders;
+        if(document.getElementById('stat-total-revenue')) document.getElementById('stat-total-revenue').innerText = this.totalRevenue.toLocaleString('vi-VN') + 'đ';
+        if(document.getElementById('stat-total-expense')) document.getElementById('stat-total-expense').innerText = this.totalExpense.toLocaleString('vi-VN') + 'đ';
+    },
+
+    iId() { document.getElementById('id').value = "CHỜ TỰ ĐỘNG"; },
     
-    sm: function(m) {
-        this.md = m;
-        const bT = document.getElementById('s-thu'), bC = document.getElementById('s-chi'), sel = document.getElementById('lgd');
+    sm(m) {
+        this.md = m; const bT = document.getElementById('s-thu'), bC = document.getElementById('s-chi'), sel = document.getElementById('lgd');
         bT.className = bC.className = 'seg-btn'; sel.innerHTML = '';
-        if (m === 'THU') {
-            bT.classList.add('active', 'thu');
-            this.oT.forEach(o => sel.add(new Option(o, o)));
-        } else {
-            bC.classList.add('active', 'chi');
-            this.oC.forEach(o => sel.add(new Option(o, o)));
-        }
+        m === 'THU' ? (bT.classList.add('active', 'thu'), this.oT.forEach(o => sel.add(new Option(o, o)))) : (bC.classList.add('active', 'chi'), this.oC.forEach(o => sel.add(new Option(o, o))));
     },
     
-    taoHoaDon: function () {
-    return "HD" +
-        Date.now().toString(36).toUpperCase() +
-        Math.random().toString(36).substring(2, 6).toUpperCase();
-    },
+    taoHoaDon() { return "HD" + Date.now().toString(36).toUpperCase() + Math.random().toString(36).substring(2, 6).toUpperCase(); },
     
-    subData: function() {
-        const kh = document.getElementById('kh').value || "-";
-        const gc = document.getElementById('gc').value || "-";
-        const lgd = document.getElementById('lgd').value;
-        const st = document.getElementById('st').value;
-        const hoaDon = this.taoHoaDon();
+    subData() {
+        const kh = document.getElementById('kh').value || "-", gc = document.getElementById('gc').value || "-", lgd = document.getElementById('lgd').value, st = document.getElementById('st').value;
+        if (!st || Number(st) <= 0) return NotiModule.show("Vui lòng nhập số tiền hợp lệ!", "error");
         
-        // Phòng hờ nếu UserModule chưa chạy thì mặc định ghi nhận là ADMIN
-        const currentAdmin = (typeof UserModule !== 'undefined' && UserModule.uName) ? UserModule.uName : "ADMIN";
+        const numSt = Number(st), hoaDon = this.taoHoaDon(), admin = (typeof UserModule !== 'undefined' && UserModule.uName) ? UserModule.uName : "ADMIN";
         
-        if (!st || Number(st) <= 0) { 
-            NotiModule.show("Vui lòng nhập số tiền hợp lệ!", "error"); 
-            return; 
-        }
+        // Hiển thị trực tiếp tạm thời lên giao diện web để tạo cảm giác mượt mà [1]
+        this.totalOrders++; this.md === 'THU' ? this.totalRevenue += numSt : this.totalExpense += numSt; this.uSt();
+        try { if (typeof G199kModule !== 'undefined' && typeof G199kModule.rRow === 'function') G199kModule.rRow(hoaDon, kh, gc, lgd, numSt, this.md, admin); } catch (e) {}
         
-        const numSt = Number(st);
-        
-        // Khóa nút bấm chống spam click gửi trùng dữ liệu
-        const btnSubmit = document.getElementById('btn-add-data');
-        const originalText = btnSubmit.innerText;
-        btnSubmit.innerText = "ĐANG GỬI...";
-        btnSubmit.disabled = true;
+        NotiModule.show(`Đã lưu đơn ${hoaDon}! Đang đồng bộ...`, "success");
+        document.getElementById('kh').value = document.getElementById('gc').value = document.getElementById('st').value = ""; this.iId();
 
-        const payload = {
-            hoaDon: hoaDon,
-            khachHang: kh,
-            ghiChu: gc,
-            loaiGd: lgd,
-            soTien: numSt,
-            mode: this.md === 'THU' ? 'THU TIỀN' : 'CHI TIỀN',
-            adminName: currentAdmin
-        };
+        let queue = JSON.parse(localStorage.getItem('thuchi_queue')) || [];
+        queue.push({ hoaDon, khachHang: kh, ghiChu: gc, loaiGd: lgd, soTien: numSt, mode: this.md === 'THU' ? 'THU TIỀN' : 'CHI TIỀN', adminName: admin });
+        localStorage.setItem('thuchi_queue', JSON.stringify(queue));
+        
+        // Không gọi cập nhật trực tiếp tại đây để tránh tạo ra dòng trùng lặp khi chưa sync xong [1]
+        this.processQueue(); 
+    },
 
-        // Gửi sang Google Sheets qua cổng Web App URL công khai
-        fetch(this.WEB_APP_URL, {
-            method: "POST",
-            headers: { "Content-Type": "text/plain" },
-            body: JSON.stringify(payload)
-        })
-        .then(response => response.json())
+    processQueue() {
+        if (this.isSyncing) return;
+        let queue = JSON.parse(localStorage.getItem('thuchi_queue')) || []; if (queue.length === 0) return;
+        
+        this.isSyncing = true; 
+        const currentItem = queue[0]; // FIX LỖI: Lấy chính xác phần tử đầu tiên thay vì lấy cả mảng [1]
+
+        fetch(this.WEB_APP_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(currentItem) })
+        .then(r => r.ok ? r.json() : Promise.reject())
         .then(res => {
-            if (res.status === "success") {
-                const realId = res.generatedId || hoaDon;
-
-                // Cộng dồn dữ liệu tổng kết trên widget màn hình
-                this.totalOrders += 1;
-                if (this.md === 'THU') {
-                    this.totalRevenue += numSt;
-                } else {
-                    this.totalExpense += numSt;
-                }
-                
-                document.getElementById('stat-total-orders').innerText = this.totalOrders;
-                document.getElementById('stat-total-revenue').innerText = this.totalRevenue.toLocaleString('vi-VN') + 'đ';
-                document.getElementById('stat-total-expense').innerText = this.totalExpense.toLocaleString('vi-VN') + 'đ';
-                
-                // ==========================================================================
-                // 🛠️ ĐÂY LÀ ĐOẠN ĐÃ SỬA: Bọc thắt nút an toàn để không làm sập luồng hiển thị Toast
-                // ==========================================================================
-                try {
-                    if (typeof G199kModule !== 'undefined' && typeof G199kModule.rRow === 'function') {
-                        G199kModule.rRow(realId, kh, gc, lgd, numSt, this.md, currentAdmin);
-                    }
-                } catch (err) {
-                    console.warn("Không tìm thấy hàm rRow trong G199kModule, bỏ qua việc ghi nhật ký.");
-                }
-                
-                // [ĐÃ CHẠY ĐƯỢC] Giải phóng luồng giúp thông báo hiện lên bình thường
-                NotiModule.show(`Đã đồng bộ thành công lệnh ${realId} vào Excel!`, "success");
-            } else {
-                NotiModule.show("Google Sheets báo lỗi: " + res.message, "error");
+            if (res && res.status === "success") {
+                let uQ = JSON.parse(localStorage.getItem('thuchi_queue')) || []; uQ.shift();
+                localStorage.setItem('thuchi_queue', JSON.stringify(uQ)); 
+                this.taiHoatDongHomNay(); // Sync thành công lên Sheets mới cho tải lại dữ liệu thực tế [1]
             }
-            
-            this.iId();
-            document.getElementById('kh').value = document.getElementById('gc').value = document.getElementById('st').value = "";
-        })
-        .catch(err => {
-            // Khối xử lý kịch bản dự phòng khi mạng lỗi hoặc bị chặn CORS ngầm
-            try {
-                if (typeof G199kModule !== 'undefined' && typeof G199kModule.rRow === 'function') {
-                    G199kModule.rRow("HD-NEW", kh, gc, lgd, numSt, this.md, currentAdmin);
-                }
-            } catch(e) {}
-            
-            NotiModule.show("Đã đẩy dữ liệu trực tuyến thành công!", "success");
-            document.getElementById('kh').value = document.getElementById('gc').value = document.getElementById('st').value = "";
-            this.iId();
-        })
+        }).catch(() => console.warn(`Đơn ${currentItem.hoaDon} đợi mạng.`))
         .finally(() => {
-            // Mở khóa lại trạng thái bấm nút dữ liệu
-            btnSubmit.innerText = originalText;
-            btnSubmit.disabled = false;
+            this.isSyncing = false;
+            if ((JSON.parse(localStorage.getItem('thuchi_queue')) || []).length > 0) setTimeout(() => this.processQueue(), 500);
         });
     }
-
 };
+ThuChiModule.init();
