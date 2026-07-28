@@ -112,13 +112,11 @@
             
             <div class="gr">
                 <label>Gói Đăng Ký</label>
-<select id="r-goi">
-    <option value="3 THÁNG">3 THÁNG</option>
-    <option value="1 THÁNG">1 THÁNG (Gói chuẩn)</option>
-    <!-- Thêm id="opt-cancel" vào đây -->
-    <option value="Hủy ĐK" id="opt-cancel">HỦY ĐĂNG KÝ</option>
-</select>
-
+                <select id="r-goi">
+                    <option value="1 THÁNG">1 THÁNG</option>
+                    <option value="3 THÁNG">3 THÁNG</option>
+                    <option value="Hủy ĐK" id="opt-cancel">HỦY ĐĂNG KÝ</option>
+                </select>
             </div>
             
             <!-- ĐÃ ĐỔI: Đơn Tiền lên trước -->
@@ -134,23 +132,51 @@
             </div>
         </div>
 
-        <!-- CỘT PHẢI: THÔNG SỐ (CHIẾM 1/3) -->
-        <div class="r199k-sidebar">
-            <div class="stat-box-title">📊 QUY CHUẨN ĐỒNG BỘ</div>
-            <div class="stat-card">
-                <span class="stat-label">Đơn tiền gói 3 Tháng</span>
-                <span class="stat-val thu">500.000đ</span>
+<!-- CỘT PHẢI: CHĂM SÓC KHÁCH HÀNG (CHIẾM 1/3) -->
+<div class="r199k-sidebar r199k-sidebar-clean">
+    <div class="stat-box-title">🎧 CHĂM SÓC KHÁCH HÀNG</div>
+    
+    <!-- Dòng 1: Mã GID (Tên Khách Hàng) -->
+    <div class="cskh-card" id="copy-gid-box" title="Click để sao chép nhanh">
+        <span class="cskh-label">Mã GID</span>
+        <span class="cskh-value" id="display-customer-info">TỰ ĐỘNG SINH (Chưa nhập tên)</span>
+    </div>
+    
+    <!-- Dòng 2: Chi tiết Gia Hạn -->
+    <div class="cskh-card-block" id="copy-text-box" title="Click để copy mẫu văn bản gửi khách">
+        
+        <div class="cskh-header-row">
+            <span class="cskh-title-text">🔄 GIA HẠN THANH TOÁN NHÓM</span>
+            <span class="cskh-badge-copy">📋 Click để Copy</span>
+        </div>
+        
+        <div id="display-payment-details" class="cskh-data-list">
+            <div class="cskh-data-row">
+                <span class="cskh-label">Gói đăng ký:</span>
+                <span id="lbl-goi" class="cskh-value">1 THÁNG</span>
             </div>
-            <div class="stat-card">
-                <span class="stat-label">Đơn tiền gói 1 Tháng</span>
-                <span class="stat-val" style="color: var(--p);">200.000đ</span>
+            <div class="cskh-data-row">
+                <span class="cskh-label">Thời gian:</span>
+                <span id="lbl-time" class="cskh-value mono">28/07/2026 → 28/08/2026</span>
             </div>
-            <div class="helper-text">
-                Hệ thống tự động quét mã GID lớn nhất trên Google Sheets để tăng tiến liên tục, chống trùng lặp dữ liệu giữa các máy.
+            <div class="cskh-data-row">
+                <span class="cskh-label">Thời gian còn lại:</span>
+                <span id="lbl-days" class="cskh-value danger">31 ngày</span>
+            </div>
+            <div class="cskh-data-row">
+                <span class="cskh-label">Tổng số tiền:</span>
+                <span id="lbl-tien" class="cskh-value success">199.000đ</span>
             </div>
         </div>
+        
     </div>
 </div>
+
+
+
+    </div>
+</div>
+
 
 
     <script src="js/notification/notification.js"></script>
