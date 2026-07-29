@@ -85,11 +85,9 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
 }
 
-/* Kiểu riêng cho các đơn Hủy Đăng Ký */
 .renewal-history-item.cancelled {
-    background-color: #fff1f0;
-    border-color: #ffa39e;
-    /* 🌟 ĐÃ XÓA: border-left-color: #ff4d4f; (Bỏ vạch đứng đỏ) */
+    background-color: #ffffff;
+    border-color: #f0f2f5;
 }
 
 /* Header dòng lịch sử */
