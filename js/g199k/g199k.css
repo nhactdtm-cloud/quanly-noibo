@@ -263,7 +263,7 @@
 }
 
 /*==========================================================================
- MOBILE (Responsive) - BẢN SỬA ĐỔI AN TOÀN CHỐNG VỠ GIAO DIỆN
+ MOBILE (Responsive) - BẢN SỬA ĐÍCH DANH THEO ID JS
  ========================================================================== */
 @media (max-width: 768px) {
     .r199k-workspace {
@@ -303,7 +303,7 @@
         margin: 0 auto 4px auto !important;
     }
 
-    /* Định cấu hình chung cho các ô nhập liệu chuẩn */
+    /* Định cấu hình chung cho các ô nhập liệu */
     .gr input, 
     .gr select,
     .gr input[readonly] {
@@ -323,19 +323,25 @@
         border-radius: 6px !important;
     }
 
-    /* 🌟 BẢN VÁ AN TOÀN CHO NGÀY BẮT ĐẦU: CHỈ CĂN CHỮ VÀ KHỐNG CHẾ RỘNG, KHÔNG PHÁ VỠ DISPLAY 🌟 */
-    .gr:has(#r-start) input,
-    #r-start,
-    [class*="flatpickr-input"] {
+    /* 🌟 BẬT ĐÈ BẸP LỖI RIÊNG CHO Ô NGÀY BẮT ĐẦU THEO ID TRONG JS 🌟 */
+    #r-start {
+        display: block !important;
         width: 100% !important;
         max-width: 100% !important;
         box-sizing: border-box !important;
-        text-align: center !important; /* Ép chữ ra giữa */
+        height: 34px !important;
+        line-height: 24px !important; 
+        padding: 4px 10px !important;
+        background: #fafafa !important;
+        border: 1px solid var(--b) !important;
+        border-radius: 6px !important;
+        text-align: center !important;
     }
 
-    /* Nếu thư viện tự sinh thẻ giả lập hiển thị text, ép căn giữa text toàn cục trong khay đó */
-    .gr:has(#r-start) {
-        text-align: center !important;
+    /* Đẩy icon lịch mặc định của trình duyệt điện thoại (nếu có) sang góc phải */
+    #r-start::-webkit-calendar-picker-indicator {
+        position: absolute !important;
+        right: 12px !important;
     }
 
     #p-g .card .btn-sm {
