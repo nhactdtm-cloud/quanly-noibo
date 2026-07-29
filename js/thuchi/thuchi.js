@@ -20,27 +20,67 @@ const ThuChiModule = {
     },
 
     taiHoatDongHomNay() {
-        const admin = (typeof UserModule !== 'undefined' && UserModule.uName) ? UserModule.uName : "ADMIN";
-        fetch(`${this.WEB_APP_URL}?adminName=${encodeURIComponent(admin)}`).then(r => r.json()).then(res => {
-            if (res.status !== "success" || !res.data) return;
-            
-            // LƯU DỮ LIỆU VÀO BỘ NHỚ ĐỆM ĐỂ FILE DETAIL.JS DÙNG SIÊU TỐC
-            this.duLieuGiaoDichHomNay = res.data;
+        // 1. CƯỠNG BỨC RESET GIAO DIỆN VỀ 0Đ NGAY LẬP TỨC
+        this.totalOrders = 0; this.totalRevenue = 0; this.totalExpense = 0;
+        this.uSt();
+        this.capNhatKhoiDoiSoat([]);
 
-            this.totalOrders = 0; this.totalRevenue = 0; this.totalExpense = 0;
-            this.capNhatKhoiDoiSoat(res.data);
+        // 2. CƠ CHẾ BẪY BẮT TÊN USER ĐỘNG CHUẨN XÁC
+        let countAttempts = 0;
+        const checkUserInterval = setInterval(() => {
+            countAttempts++;
             
-            if (typeof G199kModule !== 'undefined' && document.getElementById('bảng-giao-dịch')) { document.getElementById('bảng-giao-dịch').innerHTML = ''; }
+            // Tìm chữ viết sau cụm từ "Tài khoản:" trên toàn bộ nội dung trang web
+            let admin = "ADMIN";
+            const bodyText = document.body.innerText || "";
+            const match = bodyText.match(/Tài\s*khoản:\s*([A-Za-z0-9_.-]+)/i);
+            
+            if (match && match[1]) {
+                admin = match[1].trim().toUpperCase();
+            } else if (typeof UserModule !== 'undefined' && UserModule.uName) {
+                admin = UserModule.uName.trim().toUpperCase();
+            }
 
-            res.data.forEach(item => {
-                this.totalOrders++;
-                const mode = item.mode === 'THU TIỀN' ? 'THU' : 'CHI';
-                mode === 'THU' ? this.totalRevenue += item.soTien : this.totalExpense += item.soTien;
-                try { if (typeof G199kModule !== 'undefined' && typeof G199kModule.rRow === 'function') G199kModule.rRow(item.hoaDon, item.khachHang, item.ghiChu, item.loaiGd, item.soTien, mode, admin); } catch (e) {}
-            });
-            this.uSt();
-        });
+            // ĐIỀU KIỆN CHẠY: Nếu đã tìm thấy tên tài khoản khác ADMIN (ví dụ TUNG) HOẶC đã đợi quá lâu (sau 1.5 giây)
+            if (admin !== "ADMIN" || countAttempts > 15) {
+                clearInterval(checkUserInterval); // Hủy vòng lặp kiểm tra ngay lập tức
+                
+                console.log("=> CHÍNH THỨC BẮT ĐƯỢC TÊN USER GỬI LÊN GOOGLE SHEETS:", admin);
+
+                // 3. TIẾN HÀNH GỌI GOOGLE SHEETS KHI ĐÃ CÓ TÊN USER CHUẨN
+                fetch(`${this.WEB_APP_URL}?adminName=${encodeURIComponent(admin)}&admin=${encodeURIComponent(admin)}`)
+                .then(r => r.ok ? r.json() : Promise.reject())
+                .then(res => {
+                    if (!res || res.status !== "success" || !Array.isArray(res.data) || res.data.length === 0) {
+                        this.duLieuGiaoDichHomNay = [];
+                        this.capNhatKhoiDoiSoat([]);
+                        return; 
+                    }
+                    
+                    this.duLieuGiaoDichHomNay = res.data;
+                    this.capNhatKhoiDoiSoat(res.data);
+                    
+                    if (typeof G199kModule !== 'undefined' && document.getElementById('bảng-giao-dịch')) { 
+                        document.getElementById('bảng-giao-dịch').innerHTML = ''; 
+                    }
+
+                    res.data.forEach(item => {
+                        this.totalOrders++;
+                        const mode = item.mode === 'THU TIỀN' || item.mode === 'THU' ? 'THU' : 'CHI';
+                        mode === 'THU' ? this.totalRevenue += Number(item.soTien || 0) : this.totalExpense += Number(item.soTien || 0);
+                        try { if (typeof G199kModule !== 'undefined' && typeof G199kModule.rRow === 'function') G199kModule.rRow(item.hoaDon, item.khachHang, item.ghiChu, item.loaiGd, item.soTien, mode, admin); } catch (e) {}
+                    });
+                    this.uSt();
+                }).catch(err => {
+                    console.error("Lỗi kết nối API Google Sheets:", err);
+                    this.duLieuGiaoDichHomNay = [];
+                    this.capNhatKhoiDoiSoat([]);
+                });
+            }
+        }, 100); // Cứ mỗi 100ms quét lại hệ thống 1 lần để bẫy tên tài khoản
     },
+
+
 
     capNhatKhoiDoiSoat(arr) {
         const box = document.getElementById('mini-rows'); if (!box) return;
