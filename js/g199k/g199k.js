@@ -367,12 +367,12 @@ tínhNgàyKếtThúc: function() {
     },
 
 
-    capNhatKhungChamSocKhachHang: function() {
+capNhatKhungChamSocKhachHang: function() {
         const gid = document.getElementById('r-gid').value || 'TỰ ĐỘNG SINH';
         const name = document.getElementById('r-name').value.trim() || 'Chưa nhập tên';
         const goi = document.getElementById('r-goi').value;
-        const startVal = document.getElementById('r-start').value;
-        const endVal = document.getElementById('r-end').value;
+        const startVal = document.getElementById('r-start').value; // Định dạng HTML5: YYYY-MM-DD
+        const endVal = document.getElementById('r-end').value;     // Đã đổi thành định dạng: DD/MM/YYYY
         const tienVal = document.getElementById('r-tien').value || 0;
 
         // Cập nhật Dòng 1: Mã GID ( Tên Khách Hàng )
@@ -385,22 +385,34 @@ tínhNgàyKếtThúc: function() {
             startFormatted = `${d}/${m}/${y}`;
         }
 
-        // Định dạng ngày kết thúc từ YYYY-MM-DD sang DD/MM/YYYY để hiển thị đẹp mắt
+        // 🌟 FIX TẠI ĐÂY: Vì endVal hiện tại đã là DD/MM/YYYY, không cần convert lại nữa
         let endFormatted = '--/--/----';
+        let endDateObj = null;
+
         if (endVal && endVal !== "HỦY NGAY") {
-            const [y, m, d] = endVal.split('-');
-            endFormatted = `${d}/${m}/${y}`;
+            endFormatted = endVal; // Lấy trực tiếp chuỗi DD/MM/YYYY để hiển thị luôn
+            
+            // Tách chuỗi DD/MM/YYYY để tạo đối tượng Date phục vụ tính toán số ngày còn lại
+            const parts = endVal.split('/');
+            const d = parseInt(parts[0], 10);
+            const m = parseInt(parts[1], 10) - 1; // Tháng trong JS chạy từ 0 - 11
+            const y = parseInt(parts[2], 10);
+            endDateObj = new Date(y, m, d);
         } else if (endVal === "HỦY NGAY") {
             endFormatted = "HỦY NGAY";
         }
 
-        // [ĐÃ SỬA LỖI TÍNH NGÀY] Tính số ngày còn lại thực tế giữa ngày kết thúc và bắt đầu
+        // 🌟 FIX TẠI ĐÂY: Tính số ngày còn lại thực tế từ HÔM NAY đến NGÀY KẾT THÚC
         let diffDays = 0;
-        if (startVal && endVal && endVal !== "HỦY NGAY") {
-            const date1 = new Date(startVal);
-            const date2 = new Date(endVal);
-            const diffTime = Math.abs(date2 - date1);
+        if (endDateObj) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0); // Đưa mốc hôm nay về 00:00:00 để tính chính xác theo ngày
+            
+            // Tính khoảng cách thời gian giữa ngày kết thúc và hôm nay
+            const diffTime = endDateObj - today;
+            // Đổi ra số ngày (nếu âm tức là đã quá hạn)
             diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            if (diffDays < 0) diffDays = 0; 
         }
 
         // Cập nhật Dòng 2: Khung thông tin gia hạn thanh toán nhóm
@@ -409,6 +421,7 @@ tínhNgàyKếtThúc: function() {
         document.getElementById('lbl-days').innerText = (goi === 'Hủy ĐK' || endVal === "HỦY NGAY") ? '0 ngày' : `${diffDays} ngày`;
         document.getElementById('lbl-tien').innerText = Number(tienVal).toLocaleString('vi-VN') + 'đ';
     },
+
 
     // HÀM MỚI: Đăng ký sự kiện Click là tự động sao chép văn bản
     dangKySuKienCopy: function() {
