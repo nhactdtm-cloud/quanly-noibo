@@ -323,46 +323,46 @@ taiDanhSachThanhVienTheoUser: function() {
 
     
 tínhNgàyKếtThúc: function() {
-        const ngàyBắtĐầuValue = document.getElementById('r-start').value;
-        const gói = document.getElementById('r-goi').value;
-        const inputEnd = document.getElementById('r-end');
-        const inputTien = document.getElementById('r-tien');
+    const ngàyBắtĐầuValue = document.getElementById('r-start').value;
+    const gói = document.getElementById('r-goi').value;
+    const inputEnd = document.getElementById('r-end');
+    const inputTien = document.getElementById('r-tien');
 
-        if (!ngàyBắtĐầuValue) {
-            inputEnd.value = "";
-            return;
-        }
+    if (!ngàyBắtĐầuValue) {
+        inputEnd.value = "";
+        return;
+    }
 
-        let date = new Date(ngàyBắtĐầuValue);
+    // Hàm phụ trợ định dạng ngày thành: "ngày DD thg MM, YYYY" giống Ngày bắt đầu
+    const địnhDạngKiểuLịch = (dateObj) => {
+        let day = dateObj.getDate();
+        let month = dateObj.getMonth() + 1;
+        let year = dateObj.getFullYear();
+        return `ngày ${day} thg ${month}, ${year}`;
+    };
+
+    let date = new Date(ngàyBắtĐầuValue);
+    
+    if (gói === '1 THÁNG') {
+        date.setMonth(date.getMonth() + 1);
         
-        if (gói === '1 THÁNG') {
-            date.setMonth(date.getMonth() + 1);
-            
-            // ĐỔI SỬA Ở ĐÂY: Định dạng thành DD/MM/YYYY
-            let day = String(date.getDate()).padStart(2, '0');
-            let month = String(date.getMonth() + 1).padStart(2, '0');
-            let year = date.getFullYear();
-            inputEnd.value = `${day}/${month}/${year}`; 
-            
-            inputTien.value = "199000"; 
-        } else if (gói === '3 THÁNG') {
-            date.setMonth(date.getMonth() + 3);
-            
-            // ĐỔI SỬA Ở ĐÂY: Định dạng thành DD/MM/YYYY
-            let day = String(date.getDate()).padStart(2, '0');
-            let month = String(date.getMonth() + 1).padStart(2, '0');
-            let year = date.getFullYear();
-            inputEnd.value = `${day}/${month}/${year}`;
-            
-            inputTien.value = "500000";
-        } else {
-            inputEnd.value = "HỦY NGAY";
-            inputTien.value = "0";
-        }
+        // ĐÃ ĐỔI: Sử dụng định dạng lịch tiếng Việt
+        inputEnd.value = địnhDạngKiểuLịch(date); 
+        inputTien.value = "199000"; 
+    } else if (gói === '3 THÁNG') {
+        date.setMonth(date.getMonth() + 3);
+        
+        // ĐÃ ĐỔI: Sử dụng định dạng lịch tiếng Việt
+        inputEnd.value = địnhDạngKiểuLịch(date);
+        inputTien.value = "500000";
+    } else {
+        inputEnd.value = "HỦY NGAY";
+        inputTien.value = "0";
+    }
 
-        // KÍCH HOẠT ĐỒNG BỘ: Cập nhật real-time sang cột bên phải ngay khi tính xong ngày
-        this.capNhatKhungChamSocKhachHang();
-    },
+    // KÍCH HOẠT ĐỒNG BỘ: Cập nhật real-time sang cột bên phải ngay khi tính xong ngày
+    this.capNhatKhungChamSocKhachHang();
+},
 
 
 capNhatKhungChamSocKhachHang: function() {
