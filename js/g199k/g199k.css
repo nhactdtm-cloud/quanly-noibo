@@ -263,7 +263,7 @@
 }
 
 /*==========================================================================
- MOBILE (Responsive) - BẢN BAO VÂY TOÀN BỘ KHAY NGÀY BẮT ĐẦU
+ MOBILE (Responsive) - BẢN SỬA ĐỔI AN TOÀN CHỐNG VỠ GIAO DIỆN
  ========================================================================== */
 @media (max-width: 768px) {
     .r199k-workspace {
@@ -303,7 +303,7 @@
         margin: 0 auto 4px auto !important;
     }
 
-    /* Định cấu hình chung cho các ô nhập liệu tiêu chuẩn */
+    /* Định cấu hình chung cho các ô nhập liệu chuẩn */
     .gr input, 
     .gr select,
     .gr input[readonly] {
@@ -323,25 +323,18 @@
         border-radius: 6px !important;
     }
 
-    /* 🌟 THẦN CHÚ SỬA LỖI: ÉP BẤT KỲ THẺ LẠ NÀO CỦA THƯ VIỆN CHỌN NGÀY VÀO TÂM 🌟 */
-    .gr:has(#r-start) *, 
-    .gr:has([id*="start"]) *, 
-    [class*="flatpickr-input"],
-    [class*="picker"] {
-        display: block !important;
+    /* 🌟 BẢN VÁ AN TOÀN CHO NGÀY BẮT ĐẦU: CHỈ CĂN CHỮ VÀ KHỐNG CHẾ RỘNG, KHÔNG PHÁ VỠ DISPLAY 🌟 */
+    .gr:has(#r-start) input,
+    #r-start,
+    [class*="flatpickr-input"] {
         width: 100% !important;
         max-width: 100% !important;
-        box-sizing: border-box !important; /* Ép thu viền */
-        
-        /* Đồng bộ khay viền xám giống các ô khác */
-        height: 34px !important;
-        line-height: 24px !important;
-        padding: 4px 10px !important;
-        background: #fafafa !important;
-        border: 1px solid var(--b) !important;
-        border-radius: 6px !important;
-        
-        /* Ép dòng chữ ra chính giữa */
+        box-sizing: border-box !important;
+        text-align: center !important; /* Ép chữ ra giữa */
+    }
+
+    /* Nếu thư viện tự sinh thẻ giả lập hiển thị text, ép căn giữa text toàn cục trong khay đó */
+    .gr:has(#r-start) {
         text-align: center !important;
     }
 
