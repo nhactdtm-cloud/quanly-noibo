@@ -263,48 +263,78 @@
 }
 
 /*==============================
- MOBILE (Responsive) - ĐÃ FIX LỖI LỆCH NGÀY
+ MOBILE (Responsive) - FIX TRIỆT ĐỂ LỖI LỆCH KHAY NHẬP LIỆU
 ===============================*/
 @media (max-width: 768px) {
+    /* Ép không gian làm việc chính không được phép tràn khung */
     .r199k-workspace {
-        grid-template-columns: 1fr;
-        height: auto;
+        display: flex !important;
+        flex-direction: column !important;
+        width: 100% !important;
+        max-width: 100% !important;
         gap: 16px;
+        padding: 0 8px; /* Tạo khoảng cách an toàn với viền màn hình điện thoại */
+        box-sizing: border-box !important;
     }
 
+    /* Đập tan cấu hình Grid 2 cột trên PC, chuyển hẳn sang Flexbox dọc cho Mobile */
     #p-g .card {
-        grid-template-columns: 1fr; 
-        padding: 12px;
-        row-gap: 8px;
-        height: auto;
+        display: flex !important;
+        flex-direction: column !important;
+        width: 100% !important;
+        padding: 16px 14px !important;
+        row-gap: 12px !important; /* Khoảng cách đều đặn giữa các khay nhập liệu */
+        height: auto !important;
+        box-sizing: border-box !important;
     }
 
+    /* Ép chặt TẤT CẢ các khay chứa (.gr) và thanh tab điều hướng (.seg) rộng đúng 100% */
+    #p-g .card .gr,
     #p-g .card .seg,
     #p-g .card .gr:has(#r-gid),
-    #p-g .card .gr:has(#btn-add-r199k) {
-        grid-column: span 1;
-        width: 100%;
+    #p-g .card .gr:has(#btn-add-r199k),
+    .gr {
+        grid-column: unset !important; /* Hủy bỏ cấu hình Grid cột trên PC */
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 0 4px 0 !important;
+        box-sizing: border-box !important;
     }
 
-    #p-g .card .btn-sm {
-        height: 38px;              /* GIẢM: Trên mobile hạ từ 42px xuống 38px */
+    /* Căn giữa thanh tab Đăng ký mới / Gia hạn */
+    #p-g .card .seg {
+        margin: 0 auto 8px auto !important;
     }
 
-    .r199k-sidebar {
-        height: auto;
-        margin-bottom: 30px;
-    }
-
-    /* 🌟 ĐOẠN FIX LỖI CĂN GIỮA VÀ SWELL FONT CHO Ô NGÀY KẾT THÚC TRÊN MOBILE 🌟 */
+    /* Đảm bảo toàn bộ ô nhập liệu và ô select thẳng hàng tăm tắp với nhãn chữ */
     .gr input, 
     .gr select,
     .gr input[readonly] {
-        text-align: center !important;     /* Ép chữ căn vào chính giữa ô như bản PC */
-        font-size: 13px !important;        /* Giữ nguyên size chữ 13px chuẩn, chống tự phóng to */
-        -webkit-text-fill-color: var(--t) !important; /* Fix lỗi chữ bị mờ màu xám trên iOS */
-        opacity: 1 !important;             /* Bỏ độ mờ mặc định của các dòng máy cảm ứng */
+        width: 100% !important;
+        max-width: 100% !important;
+        display: block !important;
+        text-align: center !important;     
+        font-size: 13px !important;        
+        -webkit-text-fill-color: var(--t) !important; 
+        opacity: 1 !important;             
+        box-sizing: border-box !important; /* Quan trọng: Ép viền thụt vào trong để không bị lệch phải */
+    }
+
+    /* Nút bấm Đăng xuất và Nhập dữ liệu bảng */
+    #p-g .card .btn-sm {
+        height: 40px !important;              
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+
+    .r199k-sidebar {
+        width: 100% !important;
+        height: auto !important;
+        margin-bottom: 30px;
+        box-sizing: border-box !important;
     }
 }
+
 
 /* Tiện ích ẩn hiện */
 .d-none {
