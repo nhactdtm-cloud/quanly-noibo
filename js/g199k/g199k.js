@@ -217,7 +217,7 @@ taiDanhSachThanhVienTheoUser: function() {
                 itemDiv.innerHTML = `
                     <div class="member-item-info">
                         <!-- Thêm class r-click-name và style pointer để người dùng biết có thể click -->
-                        <span class="member-item-name r-click-name" style="cursor: pointer; text-decoration: underline;">${item.name}</span>
+                        <span class="member-item-name r-click-name" style="cursor: pointer;">${item.name}</span>
                         <span class="member-item-gid">${item.gid}</span>
                     </div>
                     <span class="member-item-badge">${item.goi}</span>

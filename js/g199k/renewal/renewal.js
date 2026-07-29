@@ -1,11 +1,10 @@
 const RenewalModule = {
-    // ⚠️ Sử dụng chung URL Web App của bạn để đồng bộ cấu trúc
+    // ⚠️ Link App Script riêng của Google Sheet R199K quản lý thành viên
     WEB_APP_URL: "https://script.google.com/macros/s/AKfycbzhh5Dzq2fuWK3zQPFB67DHf4QZE9efj0b2g6jQzsqUsXGK5hLnFgMSfdMt33hiyrAc/exec",
+    
+    // ⚠️ Link App Script riêng của Google Sheet QL (Thu Chi)
+    THUCHI_WEB_APP_URL: "https://script.google.com/macros/s/AKfycbwNA4KT2HEPkCCeQu8ZHLhapDREaNyOUHh9UcleiA6HrxVzLOfNRLpkEDj7zLRJ79kYsQ/exec",
 
-    /**
-     * Hàm chính được gọi khi click vào tên khách hàng từ module R199kModule
-     * @param {string} gid - Mã GID của khách hàng cần xem lịch sử
-     */
     hienThiLichSuGiaHan: function(gid) {
         if (!gid) return;
         this.khoiTaoKhungGiaoDien();
@@ -35,7 +34,6 @@ const RenewalModule = {
                     const startFormatted = this.dinhDangNgay(item.start);
                     const endFormatted = (item.end === "01/01/1970" || item.end === "HỦY NGAY" || item.goi === 'Hủy ĐK') ? "HỦY NGAY" : this.dinhDangNgay(item.end);
 
-                    // HTML thuần túy không chứa mã độc hoặc nhồi style nội dòng
                     rowDiv.innerHTML = `
                         <div class="renewal-item-header">
                             <span class="renewal-badge-count">Lần ${item.lanGiaHan || 1}</span>
@@ -56,12 +54,12 @@ const RenewalModule = {
                     const deleteBtn = rowDiv.querySelector('.renewal-delete-item-btn');
                     if (deleteBtn) {
                         deleteBtn.addEventListener('click', () => {
-                            this.xoaGiaoDichLoiByHoaDon(item.hoaDon, item.lanGiaHan, rowDiv);
+                            // 🌟 Truyền hoaDon và adminName (Cột L) vào hàm xóa đồng bộ
+                            this.xoaGiaoDichLoiByHoaDon(item.hoaDon, item.lanGiaHan, rowDiv, item.adminName);
                         });
                     }
                     historyContainer.appendChild(rowDiv);
                 });
-
             } else {
                 titleContainer.innerText = `📜 Lịch Sử Gia Hạn: ${gid}`;
                 historyContainer.innerHTML = '<div class="renewal-empty">⚠️ Không tìm thấy lịch sử gia hạn nào cho khách hàng này.</div>';
@@ -74,8 +72,76 @@ const RenewalModule = {
     },
 
     /**
-     * Tự động sinh cấu trúc HTML của Popup nếu chưa có trên trang index.html
+     * Hàm xử lý xóa chính: Xóa thành viên ở G_199K trước, sau đó kích hoạt xóa Thu chi ngầm
      */
+    xoaGiaoDichLoiByHoaDon: function(hoaDon, lanGiaHan, elementDiv, adminName) {
+        if (!hoaDon) {
+            alert("Giao dịch này không có mã hóa đơn nên không thể xóa đích danh!");
+            return;
+        }
+        if (!confirm(`Bạn có chắc chắn muốn xóa lịch sử giao dịch [Lần ${lanGiaHan}] và ĐỒNG BỘ XÓA dòng tiền Thu Chi tương ứng không?`)) return;
+
+        elementDiv.style.opacity = "0.4";
+        elementDiv.style.pointerEvents = "none";
+
+        // 🌟 BƯỚC 1: Gửi yêu cầu POST xóa dòng trên Sheet G_199K
+        fetch(this.WEB_APP_URL, {
+            method: "POST",
+            headers: { "Content-Type": "text/plain" },
+            body: JSON.stringify({
+                action: "DELETE_HISTORY_ROW",
+                hoaDon: hoaDon
+            })
+        })
+        .then(response => response.json())
+        .then(res => {
+            if (res.status === "success") {
+                
+                // 🌟 BƯỚC 2: Xóa G_199K thành công -> Gọi hàm xóa đồng bộ Thu Chi theo định dạng GET của bạn
+                var targetAdmin = adminName ? adminName.toString().trim() : "ADMIN";
+                this.xoaDongTienThuChiByGet(hoaDon, targetAdmin);
+
+                if (typeof NotiModule !== 'undefined') {
+                    NotiModule.show("Đã dọn dẹp thành viên và dòng tiền thành công!", "success");
+                }
+                
+                elementDiv.remove();
+                
+                const container = document.getElementById('renewal-history-list');
+                if (container.children.length === 0) {
+                    container.innerHTML = '<div class="renewal-empty">⚠️ Không còn lịch sử gia hạn nào.</div>';
+                }
+            } else {
+                elementDiv.style.opacity = "1";
+                elementDiv.style.pointerEvents = "auto";
+                alert("Lỗi từ hệ thống G_199K: " + res.message);
+            }
+        })
+        .catch(err => {
+            elementDiv.style.opacity = "1";
+            elementDiv.style.pointerEvents = "auto";
+            alert("Không thể kết nối máy chủ để xử lý xóa!");
+        });
+    },
+
+    /**
+     * 🌟 HÀM ĐỒNG BỘ MỚI: Gọi lệnh GET khớp 100% với TÁC VỤ 1 (action=delete) trong hàm doGet của bảng Thu Chi
+     */
+    xoaDongTienThuChiByGet: function(hoaDon, adminName) {
+        // Build chuỗi URL tham số theo đúng định dạng Backend yêu cầu: action=delete&maId=...&adminName=...
+        const thuChiUrl = `${this.THUCHI_WEB_APP_URL}?action=delete&maId=${encodeURIComponent(hoaDon)}&adminName=${encodeURIComponent(adminName)}`;
+        console.log("[LOG THU CHI] Đang đồng bộ lệnh xóa sang URL:", thuChiUrl);
+
+        fetch(thuChiUrl)
+        .then(response => response.json())
+        .then(res => {
+            console.log("[LOG THU CHI KẾT QUẢ]:", res.message);
+        })
+        .catch(err => {
+            console.error("[LOG THU CHI ERROR] Lỗi truyền dữ liệu xóa ngầm:", err);
+        });
+    },
+
     khoiTaoKhungGiaoDien: function() {
         if (document.getElementById('renewal-history-popup')) {
             document.getElementById('renewal-history-popup').classList.add('show');
@@ -91,15 +157,12 @@ const RenewalModule = {
                     <h3 id="renewal-history-title">📜 Lịch Sử Gia Hạn</h3>
                     <button id="btn-close-renewal" class="renewal-close-btn">&times;</button>
                 </div>
-                <div id="renewal-history-list" class="renewal-popup-body">
-                    <!-- Danh sách lịch sử gia hạn render tại đây -->
-                </div>
+                <div id="renewal-history-list" class="renewal-popup-body"></div>
             </div>
         `;
 
         document.body.appendChild(popup);
 
-        // Đóng popup khi click nút X hoặc click ra ngoài vùng nền đen
         document.getElementById('btn-close-renewal').addEventListener('click', () => this.dongPopup());
         popup.addEventListener('click', (e) => {
             if (e.target === popup) this.dongPopup();
@@ -111,70 +174,10 @@ const RenewalModule = {
         if (popup) popup.classList.remove('show');
     },
 
-
-    xoaGiaoDichLoiByHoaDon: function(hoaDon, lanGiaHan, elementDiv) {
-        // [LOG CHẨN ĐOÁN] Kiểm tra giá trị hoaDon thực tế nhận từ thẻ HTML
-        console.log("%c[FRONTEND-DELETE] Bắt đầu gọi hàm xóa!", "color: #ff5f56; font-weight: bold;");
-        console.log("[FRONTEND-DELETE] Tham số hoaDon nhận được:", hoaDon);
-        console.log("[FRONTEND-DELETE] Tham số lanGiaHan nhận được:", lanGiaHan);
-
-        if (!hoaDon || hoaDon === "undefined" || hoaDon.trim() === "") {
-            console.error("[FRONTEND-DELETE] Thất bại! Mã hóa đơn bị rỗng hoặc undefined.");
-            alert("Lỗi: Giao dịch này không có mã hóa đơn hợp lệ trên giao diện Web. Vui lòng bấm Ctrl+F5 và mở lại!");
-            return;
-        }
-
-        if (!confirm(`Bạn có chắc chắn muốn xóa lịch sử giao dịch [Lần ${lanGiaHan}] có mã hóa đơn ${hoaDon} không?`)) return;
-
-        elementDiv.style.opacity = "0.4";
-        elementDiv.style.pointerEvents = "none";
-
-        const payload = {
-            action: "DELETE_HISTORY_ROW",
-            hoaDon: hoaDon.toString().trim()
-        };
-        
-        console.log("[FRONTEND-DELETE] Gói Payload gửi đi dạng chuỗi:", JSON.stringify(payload));
-
-        fetch(this.WEB_APP_URL, {
-            method: "POST",
-            headers: { "Content-Type": "text/plain" },
-            body: JSON.stringify(payload)
-        })
-        .then(response => {
-            console.log("[FRONTEND-DELETE] HTTP Status nhận về:", response.status);
-            return response.json();
-        })
-        .then(res => {
-            console.log("[FRONTEND-DELETE] Kết quả giải mã JSON từ Máy chủ:", res);
-            if (res.status === "success") {
-                if (typeof NotiModule !== 'undefined') NotiModule.show("Đã xóa giao dịch lỗi thành công!", "success");
-                elementDiv.remove();
-                
-                const container = document.getElementById('renewal-history-list');
-                if (container.children.length === 0) {
-                    container.innerHTML = '<div class="renewal-empty">⚠️ Không còn lịch sử gia hạn nào.</div>';
-                }
-            } else {
-                elementDiv.style.opacity = "1";
-                elementDiv.style.pointerEvents = "auto";
-                alert("Lỗi từ hệ thống: " + res.message);
-            }
-        })
-        .catch(err => {
-            elementDiv.style.opacity = "1";
-            elementDiv.style.pointerEvents = "auto";
-            console.error("[FRONTEND-DELETE] Lỗi đường truyền FETCH:", err);
-            alert("Không thể kết nối máy chủ để xóa dữ liệu!");
-        });
-    },
-
-
     dinhDangNgay: function(dateStr) {
         if (!dateStr) return '--/--/----';
-        if (dateStr.includes('/')) return dateStr; // Nếu backend đã định dạng sẵn dạng DD/MM/YYYY
+        if (dateStr.includes('/')) return dateStr; 
         const [y, m, d] = dateStr.split('-');
         return y && m && d ? `${d}/${m}/${y}` : dateStr;
     }
 };
-

@@ -77,18 +77,19 @@
 /* Thẻ bọc từng dòng lịch sử */
 .renewal-history-item {
     background-color: #ffffff;
-    border: 1px solid #f0f2f5;
-    border-left: 4px solid #52c41a; 
+    border: 1px solid #f0f2f5; /* Giữ nguyên khung viền xám mờ tinh tế quanh thẻ */
+    /* 🌟 ĐÃ XÓA: border-left: 4px solid #52c41a; (Bỏ vạch đứng xanh lá) */
     border-radius: 10px;
     padding: 14px;
     margin-bottom: 14px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
 }
 
+/* Kiểu riêng cho các đơn Hủy Đăng Ký */
 .renewal-history-item.cancelled {
-    border-left-color: #ff4d4f;
     background-color: #fff1f0;
     border-color: #ffa39e;
+    /* 🌟 ĐÃ XÓA: border-left-color: #ff4d4f; (Bỏ vạch đứng đỏ) */
 }
 
 /* Header dòng lịch sử */
@@ -149,7 +150,7 @@
     margin-top: 2px;
 }
 
-/* 🌟 NÚT XÓA PHONG CÁCH CHÂU ÂU (LIGHT MODE MODAL) */
+/* NÚT XÓA PHONG CÁCH CHÂU ÂU (LIGHT MODE MODAL) */
 .renewal-delete-item-btn {
     background-color: transparent;
     border: 1px solid #e0e4ec;
