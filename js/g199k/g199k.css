@@ -263,10 +263,9 @@
 }
 
 /*==========================================================================
- MOBILE (Responsive) - BẢN TỔNG HỢP TINH GỌN CHỐNG TRÀN VÀ CĂN TÂM CHỮ CHUẨN 100%
+ MOBILE (Responsive) - BẢN SỬA ĐÍCH DANH THEO ID JS
  ========================================================================== */
 @media (max-width: 768px) {
-    /* Khống chế toàn bộ không gian làm việc chính không tràn khung ngang */
     .r199k-workspace {
         display: flex !important;
         flex-direction: column !important;
@@ -275,10 +274,9 @@
         gap: 16px;
         padding: 0 4px; 
         box-sizing: border-box !important;
-        overflow-x: hidden; /* Chặn lăn chuột ngang toàn cục */
+        overflow-x: hidden;
     }
 
-    /* Đập tan Grid 2 cột của PC, chuyển hẳn sang xếp dọc Flexbox thẳng đều */
     #p-g .card {
         display: flex !important;
         flex-direction: column !important;
@@ -289,7 +287,6 @@
         box-sizing: border-box !important;
     }
 
-    /* Ép tất cả các khay chứa và tab điều hướng rộng sát 100% khung */
     #p-g .card .gr,
     #p-g .card .seg,
     #p-g .card .gr:has(#r-gid),
@@ -302,25 +299,22 @@
         box-sizing: border-box !important;
     }
 
-    /* Căn giữa thanh tab Đăng ký mới / Gia hạn */
     #p-g .card .seg {
         margin: 0 auto 4px auto !important;
     }
 
-    /* ĐỐI TƯỢNG CHÍNH: Ép khay vuông vắn, chống lệch phải và căn chữ vào chính giữa */
+    /* Định cấu hình chung cho các ô nhập liệu */
     .gr input, 
     .gr select,
     .gr input[readonly] {
         width: 100% !important;
         max-width: 100% !important;
-        display: block !important;         /* Giữ block chuẩn để không bị vỡ khay, mất viền */
-        text-align: center !important;     /* Căn giữa chữ theo chiều ngang */
+        display: block !important;         
+        text-align: center !important;     
         font-size: 13px !important;        
         -webkit-text-fill-color: var(--t) !important; 
         opacity: 1 !important;             
-        box-sizing: border-box !important; /* Ép viền thụt vào trong để không bao giờ bị tràn */
-        
-        /* Cố định chiều cao và dùng line-height để đẩy chữ vào chính giữa tâm ô */
+        box-sizing: border-box !important; 
         height: 34px !important;
         line-height: 24px !important; 
         padding: 4px 10px !important;
@@ -329,20 +323,33 @@
         border-radius: 6px !important;
     }
 
-    /* Bổ sung đẩy icon lịch mặc định (nếu có) sang góc phải để không đè lên chữ */
-    .gr input[type="date"]::-webkit-calendar-picker-indicator {
+    /* 🌟 BẬT ĐÈ BẸP LỖI RIÊNG CHO Ô NGÀY BẮT ĐẦU THEO ID TRONG JS 🌟 */
+    #r-start {
+        display: block !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        height: 34px !important;
+        line-height: 24px !important; 
+        padding: 4px 10px !important;
+        background: #fafafa !important;
+        border: 1px solid var(--b) !important;
+        border-radius: 6px !important;
+        text-align: center !important;
+    }
+
+    /* Đẩy icon lịch mặc định của trình duyệt điện thoại (nếu có) sang góc phải */
+    #r-start::-webkit-calendar-picker-indicator {
         position: absolute !important;
         right: 12px !important;
     }
 
-    /* Nút bấm Đăng xuất và Nhập dữ liệu bảng */
     #p-g .card .btn-sm {
         height: 40px !important;              
         width: 100% !important;
         box-sizing: border-box !important;
     }
 
-    /* Sidebar danh sách khách hàng bên dưới */
     .r199k-sidebar {
         width: 100% !important;
         height: auto !important;
@@ -350,6 +357,7 @@
         box-sizing: border-box !important;
     }
 }
+
 
 
 .r199k-workspace {
