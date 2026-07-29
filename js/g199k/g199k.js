@@ -6,7 +6,7 @@ const R199kModule = {
     searchId: 0,
 
     init: function() {
-
+        // Đặt ngày bắt đầu mặc định là ngày hôm nay dạng YYYY-MM-DD
         const today = new Date().toISOString().split('T')[0];
         document.getElementById('r-start').value = today;
         
@@ -32,6 +32,7 @@ const R199kModule = {
             this.tínhNgàyKếtThúc();
         });
 
+        // 3. Khi chọn lại ngày bắt đầu -> Tính toán lại và đồng bộ cột phải
         document.getElementById('r-start').addEventListener('change', () => {
             this.tínhNgàyKếtThúc();
         });
@@ -323,46 +324,46 @@ taiDanhSachThanhVienTheoUser: function() {
 
     
 tínhNgàyKếtThúc: function() {
-        const ngàyBắtĐầuValue = document.getElementById('r-start').value;
-        const gói = document.getElementById('r-goi').value;
-        const inputEnd = document.getElementById('r-end');
-        const inputTien = document.getElementById('r-tien');
+    const ngàyBắtĐầuValue = document.getElementById('r-start').value;
+    const gói = document.getElementById('r-goi').value;
+    const inputEnd = document.getElementById('r-end');
+    const inputTien = document.getElementById('r-tien');
 
-        if (!ngàyBắtĐầuValue) {
-            inputEnd.value = "";
-            return;
-        }
+    if (!ngàyBắtĐầuValue) {
+        inputEnd.value = "";
+        return;
+    }
 
-        let date = new Date(ngàyBắtĐầuValue);
+    let date = new Date(ngàyBắtĐầuValue);
+    
+    if (gói === '1 THÁNG') {
+        date.setMonth(date.getMonth() + 1);
         
-        if (gói === '1 THÁNG') {
-            date.setMonth(date.getMonth() + 1);
-            
-            // ĐỔI SỬA Ở ĐÂY: Định dạng thành DD/MM/YYYY
-            let day = String(date.getDate()).padStart(2, '0');
-            let month = String(date.getMonth() + 1).padStart(2, '0');
-            let year = date.getFullYear();
-            inputEnd.value = `${day}/${month}/${year}`; 
-            
-            inputTien.value = "199000"; 
-        } else if (gói === '3 THÁNG') {
-            date.setMonth(date.getMonth() + 3);
-            
-            // ĐỔI SỬA Ở ĐÂY: Định dạng thành DD/MM/YYYY
-            let day = String(date.getDate()).padStart(2, '0');
-            let month = String(date.getMonth() + 1).padStart(2, '0');
-            let year = date.getFullYear();
-            inputEnd.value = `${day}/${month}/${year}`;
-            
-            inputTien.value = "500000";
-        } else {
-            inputEnd.value = "HỦY NGAY";
-            inputTien.value = "0";
-        }
+        // ĐƠN GIẢN HÓA: Định dạng chuẩn Năm-Tháng-Ngày cho ô lịch hệ thống
+        let day = String(date.getDate()).padStart(2, '0');
+        let month = String(date.getMonth() + 1).padStart(2, '0');
+        let year = date.getFullYear();
+        inputEnd.value = `${year}-${month}-${day}`; 
+        
+        inputTien.value = "199000"; 
+    } else if (gói === '3 THÁNG') {
+        date.setMonth(date.getMonth() + 3);
+        
+        // ĐƠN GIẢN HÓA: Định dạng chuẩn Năm-Tháng-Ngày cho ô lịch hệ thống
+        let day = String(date.getDate()).padStart(2, '0');
+        let month = String(date.getMonth() + 1).padStart(2, '0');
+        let year = date.getFullYear();
+        inputEnd.value = `${year}-${month}-${day}`;
+        
+        inputTien.value = "500000";
+    } else {
+        inputEnd.value = ""; // Để trống khi hủy đăng ký
+        inputTien.value = "0";
+    }
 
-        // KÍCH HOẠT ĐỒNG BỘ: Cập nhật real-time sang cột bên phải ngay khi tính xong ngày
-        this.capNhatKhungChamSocKhachHang();
-    },
+    this.capNhatKhungChamSocKhachHang();
+},
+
 
 
 capNhatKhungChamSocKhachHang: function() {
@@ -376,6 +377,7 @@ capNhatKhungChamSocKhachHang: function() {
         // Cập nhật Dòng 1: Mã GID ( Tên Khách Hàng )
         document.getElementById('display-customer-info').innerText = `${gid} ( ${name} )`;
 
+        // Định dạng ngày bắt đầu từ YYYY-MM-DD sang DD/MM/YYYY để hiển thị đẹp mắt
         let startFormatted = '--/--/----';
         if (startVal) {
             const [y, m, d] = startVal.split('-');

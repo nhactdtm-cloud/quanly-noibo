@@ -1,435 +1,177 @@
-/* ==========================================================================
-   G199K.CSS - GIAO DIỆN PC 2 CỘT TỐI ƯU (ĐÃ ĐƯỢC THU GỌN CHIỀU CAO)
-   ========================================================================== */
-
-.r199k-workspace {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 20px;
+/* Khung nền mờ phủ toàn màn hình */
+.renewal-popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
     width: 100%;
-    max-width: 1200px;
-    margin: auto;
-    /* height: calc(100vh - 160px); */ /* Bỏ chiều cao cố định để khối tự co giãn theo nội dung ít dòng */
-    height: auto; 
-    box-sizing: border-box;
-}
-
-/*==============================
- FORM BÊN TRÁI
-===============================*/
-#p-g .card {
-    background: var(--sf);
-    border: 1px solid var(--b);
-    border-radius: var(--r);
-    padding: 12px 16px;            /* GIẢM: Giảm padding trên/dưới từ 18px xuống 12px */
-    
-    display: grid;
-    grid-template-columns: 1fr 1fr; 
-    column-gap: 18px;
-    row-gap: 8px;                  /* GIẢM: Giảm khoảng cách giữa các dòng từ 12px xuống 8px */
-    align-content: start;
-    height: fit-content;           /* SỬA: Cho khối ôm sát vừa vặn với nội dung bên trong */
-    box-sizing: border-box;
-}
-
-/*==============================
- TAB ĐĂNG KÝ (Chiếm hết 2 cột)
-===============================*/
-#p-g .card .seg {
-    grid-column: span 2; 
-    display: inline-grid;
-    grid-template-columns: 1fr 1fr;
-    width: 360px;
-    max-width: 100%;
-    background: #f4f4f5;
-    padding: 3px;                  /* GIẢM: Giảm nhẹ padding của tab điều hướng */
-    border-radius: 10px;
-    margin-bottom: 2px;            /* GIẢM: Giảm khoảng cách dưới tab xuống 2px */
-}
-
-/*==============================
- ĐIỀU CHỈNH VỊ TRÍ CÁC PHẦN TỬ LẺ/ĐẶC BIỆT
-===============================*/
-#p-g .card .gr:has(#r-gid) {
-    grid-column: span 2;
-}
-
-#p-g .card .gr:has(#btn-add-r199k) {
-    grid-column: span 2;
-    margin-top: 4px;               /* THÊM: Tạo khoảng cách nhỏ vừa phải cho nút bấm cuối cùng */
-}
-
-/*==============================
- NHÓM INPUT
-===============================*/
-.gr {
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
     display: flex;
-    flex-direction: column;
-    width: 100%;
-}
-
-.gr label {
-    font-size: 10px;
-    font-weight: 600;
-    color: var(--ts);
-    text-transform: uppercase;
-    letter-spacing: .4px;
-    margin-bottom: 2px;            /* GIẢM: Giảm khoảng cách giữa Nhãn và Ô nhập từ 4px xuống 2px */
-}
-
-/*==============================
- INPUT
-===============================*/
-.gr input,
-.gr select {
-    width: 100%;
-    height: 34px;                  /* GIẢM: Hạ chiều cao ô input từ 38px xuống 34px giúp form thanh thoát hơn */
-    padding: 4px 10px;             /* GIẢM: Giảm padding trên/dưới từ 6px xuống 4px */
-    border: 1px solid var(--b);
-    border-radius: 6px;            /* GIẢM: Bo góc nhỏ lại một chút cho cân đối với chiều cao mới */
-    background: #fafafa;
-    font-size: 13px;               /* GIẢM: Hạ size chữ xuống 13px cho vừa vặn ô input thấp */
-    font-weight: 500;
-    color: var(--t);
-    outline: none;
-    box-sizing: border-box;
-}
-
-.gr input[readonly] {
-    background: #f5f5f5;
-    color: var(--ts);
-    cursor: not-allowed;
-}
-
-/*==============================
- NÚT MÀU ĐEN (NHẬP DỮ LIỆU BẢNG)
-===============================*/
-#p-g .card .btn-sm {
-    width: 100%;
-    height: 36px;                  /* GIẢM: Hạ chiều cao nút bấm từ 38px xuống 36px */
-    display: flex;
-    align-items: center;
     justify-content: center;
-    font-size: 13px;
-    font-weight: 700;
+    align-items: center;
+    z-index: 9999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+}
+
+.renewal-popup-overlay.show {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Khung nội dung hộp thoại chuẩn Light Mode châu Âu */
+.renewal-popup-content {
+    background-color: #ffffff;
+    color: #333333;
+    width: 90%;
+    max-width: 440px;
+    border-radius: 16px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+    border: 1px solid #eef0f2;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    max-height: 80vh;
+}
+
+/* Tiêu đề Popup */
+.renewal-popup-header {
+    padding: 18px 24px;
+    border-bottom: 1px solid #f0f2f5;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #ffffff;
+}
+
+.renewal-popup-header h3 {
     margin: 0;
-    box-sizing: border-box;
-}
-
-/*==============================
- SIDEBAR BÊN PHẢI (CHĂM SÓC KHÁCH HÀNG)
-===============================*/
-.r199k-sidebar {
-    background: var(--sf);
-    border: 1px solid var(--b);
-    border-radius: var(--r);
-    padding: 14px;                 /* GIẢM: Giảm bớt padding từ 18px xuống 14px */
-    display: flex;
-    flex-direction: column;
-    gap: 12px;                     /* Đổi từ 8px sang 12px để khoảng cách các khối thoáng mắt hơn */
-    height: fit-content;           /* SỬA: Đổi từ 100% thành fit-content để chiều cao đi theo dòng, không bị thừa khoảng trắng */
-    box-sizing: border-box;
-}
-/* Giao diện Thẻ CSKH dạng Dòng Đơn (Mã GID) - ĐÃ THU NHỎ CHIỀU CAO VÀ CỠ CHỮ */
-.cskh-card {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 8px 12px;             /* GIẢM: Giảm padding trên/dưới từ 12px xuống 8px để bóp hẹp chiều cao */
-    background: #ffffff;
-    border: 1px solid var(--b);
-    border-radius: 8px;            /* GIẢM: Bo góc nhỏ lại một chút cho cân đối với khối thấp */
-    cursor: pointer;
-    transition: all 0.2s ease-in-out;
-    box-sizing: border-box;
-}
-
-/* Hạ kích thước chữ riêng cho nội dung Mã GID bên trong thẻ */
-#display-customer-info {
-    font-size: 11.5px !important;  /* THÊM: Hạ cỡ chữ xuống 11.5px giúp chuỗi không bị thô */
+    font-size: 16px;
     font-weight: 600;
+    color: #1a1a1a;
 }
 
-/* Giao diện Thẻ CSKH dạng Dòng Đơn (Mã GID) - ĐÃ ĐIỀU CHỈNH VỪA VẶN CÂN ĐỐI */
-.cskh-card {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 12px;            /* TĂNG: Nâng từ 8px lên 10px để khối không bị quá hẹp */
-    background: #ffffff;
-    border: 1px solid var(--b);
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.2s ease-in-out;
-    box-sizing: border-box;
+.renewal-popup-header {
+    position: relative;
 }
 
-/* Định cấu hình kích thước chữ hiển thị Mã GID */
-#display-customer-info {
-    font-size: 12.5px !important; /* TĂNG: Nâng lên 12.5px để chữ rõ nét, không bị nhỏ quá */
-    font-weight: 600;
+/* Vùng chứa danh sách */
+.renewal-popup-body {
+    padding: 20px 24px;
+    overflow-y: auto;
+    flex: 1;
 }
 
-/* Giao diện Thẻ CSKH dạng Khối Dữ Liệu (Gia Hạn Nhóm) */
-.cskh-card-block {
-    display: flex;
-    flex-direction: column;
-    padding: 14px;
-    background: #ffffff;
-    border: 1px solid var(--b);
+/* Thẻ bọc từng dòng lịch sử */
+.renewal-history-item {
+    background-color: #ffffff;
+    border: 1px solid #f0f2f5; /* Giữ nguyên khung viền xám mờ tinh tế quanh thẻ */
+    /* 🌟 ĐÃ XÓA: border-left: 4px solid #52c41a; (Bỏ vạch đứng xanh lá) */
     border-radius: 10px;
-    cursor: pointer;
-    transition: all 0.2s ease-in-out;
-    box-sizing: border-box;
+    padding: 14px;
+    margin-bottom: 14px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
 }
 
-/* Hiệu ứng tương tác chuẩn ứng dụng cao cấp */
-.cskh-card:hover, 
-.cskh-card-block:hover {
-    border-color: #cbd5e1;
-    background-color: #f8fafc;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+.renewal-history-item.cancelled {
+    background-color: #ffffff;
+    border-color: #f0f2f5;
 }
 
-
-/* Thanh đầu đề nằm trong thẻ khối gia hạn */
-.cskh-header-row {
+/* Header dòng lịch sử */
+.renewal-item-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid #f1f5f9;
+    border-bottom: 1px solid #f5f7fa;
     padding-bottom: 8px;
     margin-bottom: 10px;
 }
 
-.cskh-title-text {
-    font-weight: 700;
-    font-size: 12px;
-    color: #1e293b;
-    letter-spacing: 0.3px;
-}
-
-.cskh-badge-copy {
-    font-size: 10.5px;
-    color: #94a3b8;
+/* Badge số lần gia hạn */
+.renewal-badge-count {
+    background-color: #f0f2f5;
+    color: #666666;
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 20px;
     font-weight: 600;
-    background: #f8fafc;
-    padding: 3px 6px;
-    border-radius: 6px;
-    border: 1px solid var(--b);
 }
 
-/* Danh sách sắp xếp nhãn dữ liệu */
-.cskh-data-list {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.cskh-data-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+/* Tên gói đăng ký */
+.renewal-item-package {
+    font-weight: 700;
     font-size: 13px;
+    color: #1a1a1a;
 }
 
-.cskh-label {
-    color: #64748b;
-    font-weight: 500;
+.renewal-history-item.cancelled .renewal-item-package {
+    color: #ff4d4f;
 }
 
-.cskh-value {
-    font-weight: 600;
-    color: var(--t);
-}
-
-.cskh-value.mono {
-    font-variant-numeric: tabular-nums;
-}
-
-/* Định hình màu các điểm nhấn trạng thái đặc biệt */
-.cskh-value.danger {
-    font-weight: 700;
-    color: #ef4444;
-    background: #fef2f2;
-    padding: 2px 6px;
-    border-radius: 4px;
-}
-
-.cskh-value.success {
-    font-weight: 700;
-    color: #10b981;
-}
-
-/*==============================
- MOBILE (Responsive) - ĐÃ SỬA TRIỆT ĐỂ LỖI LỆCH KHUNG
-===============================*/
-@media (max-width: 768px) {
-    /* Khống chế toàn bộ workspace không cho phép tràn khung ngang */
-    .r199k-workspace {
-        grid-template-columns: 1fr;
-        height: auto;
-        gap: 16px;
-        width: 100% !important;
-        overflow-x: hidden; /* Chặn tràn khung ngang toàn cục */
-    }
-
-    #p-g .card {
-        grid-template-columns: 1fr !important; /* Ép TOÀN BỘ form thành 1 cột dọc duy nhất */
-        padding: 12px;
-        row-gap: 10px;                         /* Tăng nhẹ khoảng cách dọc cho dễ bấm */
-        height: auto;
-        width: 100% !important;
-        box-sizing: border-box;
-    }
-
-    /* Ép tất cả các nhóm input (.gr) chiếm trọn 100% chiều rộng, không bị chia đôi */
-    #p-g .card .gr,
-    #p-g .card .seg,
-    #p-g .card .gr:has(#r-gid),
-    #p-g .card .gr:has(#btn-add-r199k) {
-        grid-column: span 1 !important;
-        width: 100% !important;
-        max-width: 100% !important;
-        box-sizing: border-box;
-    }
-
-    /* Đảm bảo thanh tab điều hướng căn giữa đẹp mắt */
-    #p-g .card .seg {
-        margin: 0 auto 6px auto;
-    }
-
-    #p-g .card .btn-sm {
-        height: 38px;              
-        width: 100% !important;
-    }
-
-    .r199k-sidebar {
-        height: auto;
-        margin-bottom: 30px;
-        width: 100% !important;
-        box-sizing: border-box;
-    }
-
-    /* ĐOẠN FIX LỖI CĂN GIỮA VÀ CHỐNG PHÓNG TO TRÊN MOBILE */
-    .gr input, 
-    .gr select,
-    .gr input[readonly] {
-        text-align: center !important;     
-        font-size: 13px !important;        
-        -webkit-text-fill-color: var(--t) !important; 
-        opacity: 1 !important;             
-        width: 100% !important;            /* Đảm bảo input không nở to hơn thẻ cha */
-        box-sizing: border-box !important; /* Ép viền tính vào trong chiều rộng */
-    }
-}
-
-
-/* Tiện ích ẩn hiện */
-.d-none {
-    display: none !important;
-}
-
-.cskh-wrapper {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    width: 100%;
-}
-
-/* Thẻ bọc ngoài danh sách thành viên */
-.member-list-card {
-    display: flex;
-    flex-direction: column;
-    background: #ffffff;
-    border: 1px solid var(--b);
-    border-radius: 10px;
-    padding: 12px;
-    box-sizing: border-box;
-}
-
-.member-list-header {
-    font-size: 12px;
-    color: #64748b;
-    border-bottom: 1px solid #f1f5f9;
-    padding-bottom: 6px;
-    margin-bottom: 8px;
-}
-
-/* Khu vực cuộn danh sách khách hàng nếu quá dài */
-.member-container-scroll {
-    max-height: 280px;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    padding-right: 2px;
-}
-
-/* Thanh cuộn nhỏ tinh tế chuẩn Châu Âu */
-.member-container-scroll::-webkit-scrollbar {
-    width: 4px;
-}
-.member-container-scroll::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
-    border-radius: 4px;
-}
-
-/* Item thông tin từng khách hàng trong danh sách */
-.member-item {
+/* Bố cục vùng chứa Timeline và nút bấm */
+.renewal-item-body {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    padding: 8px 10px;
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 6px;
-    font-size: 12.5px;
-    cursor: pointer;
-    transition: background 0.2s;
+    align-items: flex-end;
 }
 
-.member-item:hover {
-    background: #f1f5f9;
-    border-color: #cbd5e1;
-}
-
-.member-item-info {
+/* Khung chữ thời gian */
+.renewal-time-line {
     display: flex;
     flex-direction: column;
-    gap: 2px;
-    flex: 1;
-    min-width: 0;
+    gap: 5px;
+    font-size: 13px;
+    color: #666666;
 }
 
-.member-item-name {
-    display: block;
-    font-weight: 600;
-    color: #1e293b;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+.renewal-time-line b {
+    color: #1a1a1a;
 }
 
-.member-item-gid {
+/* Chữ hiển thị mã hóa đơn mảnh */
+.renewal-invoice-text {
     font-size: 11px;
-    color: #64748b;
-    font-family: monospace;
+    color: #999999;
+    margin-top: 2px;
 }
 
-.member-item-badge {
-    font-size: 11px;
-    font-weight: 600;
-    color: #3b82f6;
-    background: #eff6ff;
-    padding: 2px 6px;
-    border-radius: 4px;
+/* NÚT XÓA PHONG CÁCH CHÂU ÂU (LIGHT MODE MODAL) */
+.renewal-delete-item-btn {
+    background-color: transparent;
+    border: 1px solid #e0e4ec;
+    color: #555555;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 6px 12px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: fit-content;
+    font-family: inherit;
+    transition: all 0.2s ease-in-out;
 }
 
-.member-empty-state {
+/* Hiệu ứng di chuột đổi sang màu đỏ san hô cảnh báo */
+.renewal-delete-item-btn:hover {
+    background-color: #ff4d4f;
+    color: #ffffff;
+    border-color: #ff4d4f;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(255, 77, 79, 0.15);
+}
+
+.renewal-delete-item-btn:active {
+    transform: translateY(0) scale(0.96);
+}
+
+/* Các trạng thái chờ và trống */
+.renewal-loading, .renewal-empty {
     text-align: center;
-    color: #94a3b8;
-    font-size: 12.5px;
-    padding: 20px 0;
+    padding: 40px 10px;
+    color: #999999;
+    font-size: 13px;
 }

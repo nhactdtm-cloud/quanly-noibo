@@ -303,7 +303,7 @@
         margin: 0 auto 4px auto !important;
     }
 
-    /* Định cấu hình chung cho các ô nhập liệu chuẩn */
+    /* Đảm bảo toàn bộ ô nhập liệu và ô select thẳng hàng tăm tắp với nhãn chữ */
     .gr input, 
     .gr select,
     .gr input[readonly] {
@@ -322,6 +322,12 @@
         border: 1px solid var(--b) !important;
         border-radius: 6px !important;
     }
+
+    /* Ép text hiển thị bên trong các ô lịch (type="date") căn đều vào giữa trên iOS/Safari */
+    .gr input[type="date"]::-webkit-date-and-time-value {
+        text-align: center !important;
+    }
+
 
     /* 🌟 THẦN CHÚ ĐẬP TAN ĐỊNH DẠNG MẶC ĐỊNH CỦA INPUT DATE TRÊN MOBILE 🌟 */
     #r-start {
