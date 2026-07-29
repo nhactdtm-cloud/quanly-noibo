@@ -146,13 +146,13 @@ function xoaHoaDon(maHD) {
         });
 }
 
-// 1. Tạo một biến lưu mốc thời gian hiển thị thông báo gần nhất bên ngoài hàm
+// Biến lưu mốc thời gian hiển thị thông báo gần nhất bên ngoài hàm để tránh lặp
 let thoiGianThongBaoXoaGanNhat = 0;
 
 function xuLyDongBoSauKhiXoa(maHD) {
     const bayGio = Date.now();
     
-    // 2. CHẶN LẶP: Nếu thông báo trước đó vừa hiển thị cách đây chưa đầy 2000ms (2 giây), bỏ qua không hiện lại
+    // CHẶN LẶP: Nếu thông báo trước đó vừa hiển thị cách đây chưa đầy 2 giây, bỏ qua không hiện lại
     if (bayGio - thoiGianThongBaoXoaGanNhat > 2000) {
         if (typeof NotiModule !== 'undefined' && typeof NotiModule.show === 'function') {
             NotiModule.show(`Đã xóa thành công hóa đơn ${maHD}!`, "success");
@@ -170,5 +170,12 @@ function xuLyDongBoSauKhiXoa(maHD) {
         ThuChiModule.taiHoatDongHomNay();
     }
 
-    dongModalChiTiet(); // Đóng Modal chi tiết
+    // ĐÓNG MODAL THEO CƠ CHẾ CỦA UIBUTTON NHÚNG TRÊN INDEX.HTML
+    // Bạn hãy thay 'detailModal' bằng đúng ID của thẻ div Modal chi tiết trong file index.html của bạn nhé
+    const modalChiTiet = document.getElementById('detailModal'); 
+    if (modalChiTiet) {
+        modalChiTiet.classList.remove('active');
+        modalChiTiet.classList.remove('show');
+    }
 }
+
