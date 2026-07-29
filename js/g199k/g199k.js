@@ -6,7 +6,7 @@ const R199kModule = {
     searchId: 0,
 
     init: function() {
-        // Đặt ngày bắt đầu mặc định là ngày hôm nay dạng YYYY-MM-DD
+
         const today = new Date().toISOString().split('T')[0];
         document.getElementById('r-start').value = today;
         
@@ -32,7 +32,6 @@ const R199kModule = {
             this.tínhNgàyKếtThúc();
         });
 
-        // 3. Khi chọn lại ngày bắt đầu -> Tính toán lại và đồng bộ cột phải
         document.getElementById('r-start').addEventListener('change', () => {
             this.tínhNgàyKếtThúc();
         });
@@ -334,7 +333,6 @@ tínhNgàyKếtThúc: function() {
             return;
         }
 
-        // Tạo bản sao đối tượng Date để không ghi đè ngày bắt đầu
         let date = new Date(ngàyBắtĐầuValue);
         
         if (gói === '1 THÁNG') {
@@ -378,7 +376,6 @@ capNhatKhungChamSocKhachHang: function() {
         // Cập nhật Dòng 1: Mã GID ( Tên Khách Hàng )
         document.getElementById('display-customer-info').innerText = `${gid} ( ${name} )`;
 
-        // Định dạng ngày bắt đầu từ YYYY-MM-DD sang DD/MM/YYYY để hiển thị đẹp mắt
         let startFormatted = '--/--/----';
         if (startVal) {
             const [y, m, d] = startVal.split('-');

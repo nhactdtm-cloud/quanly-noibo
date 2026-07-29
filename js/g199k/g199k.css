@@ -263,7 +263,7 @@
 }
 
 /*==========================================================================
- MOBILE (Responsive) - BẢN SỬA ĐÍCH DANH THEO ID JS
+ MOBILE (Responsive) - BẢN FIX TRIỆT ĐỂ 100% CHO INPUT DATE
  ========================================================================== */
 @media (max-width: 768px) {
     .r199k-workspace {
@@ -303,7 +303,7 @@
         margin: 0 auto 4px auto !important;
     }
 
-    /* Định cấu hình chung cho các ô nhập liệu */
+    /* Định cấu hình chung cho các ô nhập liệu chuẩn */
     .gr input, 
     .gr select,
     .gr input[readonly] {
@@ -323,25 +323,38 @@
         border-radius: 6px !important;
     }
 
-    /* 🌟 BẬT ĐÈ BẸP LỖI RIÊNG CHO Ô NGÀY BẮT ĐẦU THEO ID TRONG JS 🌟 */
+    /* 🌟 THẦN CHÚ ĐẬP TAN ĐỊNH DẠNG MẶC ĐỊNH CỦA INPUT DATE TRÊN MOBILE 🌟 */
     #r-start {
-        display: block !important;
-        width: 100% !important;
-        max-width: 100% !important;
-        box-sizing: border-box !important;
-        height: 34px !important;
-        line-height: 24px !important; 
-        padding: 4px 10px !important;
-        background: #fafafa !important;
-        border: 1px solid var(--b) !important;
-        border-radius: 6px !important;
+        display: flex !important;            /* Chuyển sang flex để căn giữa văn bản ẩn bên trong */
+        align-items: center !important;      
+        justify-content: center !important;  
         text-align: center !important;
+        -webkit-appearance: none !important; /* Xóa bỏ giao diện mặc định của iOS */
+        appearance: none !important;
+        min-height: 34px !important;         /* Giữ nguyên chiều cao đồng bộ */
     }
 
-    /* Đẩy icon lịch mặc định của trình duyệt điện thoại (nếu có) sang góc phải */
+    /* Ép văn bản hiển thị ngày (chữ ngày 29 thg 7...) lọt vào chính giữa trọng tâm */
+    #r-start::-webkit-date-and-time-value {
+        text-align: center !important;
+        width: 100% !important;
+        margin: 0 auto !important;
+        display: block !important;
+    }
+
+    /* Ẩn bớt các khoảng đệm thừa tự sinh của trình duyệt gây lệch khay */
+    #r-start::-webkit-inner-spin-button,
+    #r-start::-webkit-clear-button {
+        display: none !important;
+        -webkit-appearance: none !important;
+    }
+
+    /* Đẩy icon hình cái lịch nhỏ về sát lề phải, không cho chèn ép làm lệch chữ */
     #r-start::-webkit-calendar-picker-indicator {
         position: absolute !important;
         right: 12px !important;
+        margin: 0 !important;
+        padding: 0 !important;
     }
 
     #p-g .card .btn-sm {
