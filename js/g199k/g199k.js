@@ -323,7 +323,7 @@ taiDanhSachThanhVienTheoUser: function() {
 
 
     
-    tínhNgàyKếtThúc: function() {
+tínhNgàyKếtThúc: function() {
         const ngàyBắtĐầuValue = document.getElementById('r-start').value;
         const gói = document.getElementById('r-goi').value;
         const inputEnd = document.getElementById('r-end');
@@ -339,11 +339,23 @@ taiDanhSachThanhVienTheoUser: function() {
         
         if (gói === '1 THÁNG') {
             date.setMonth(date.getMonth() + 1);
-            inputEnd.value = date.toISOString().split('T')[0]; // Định dạng chuẩn YYYY-MM-DD
-            inputTien.value = "199000"; // Đổi số tiền thành 199.000đ theo yêu cầu mẫu văn bản
+            
+            // ĐỔI SỬA Ở ĐÂY: Định dạng thành DD/MM/YYYY
+            let day = String(date.getDate()).padStart(2, '0');
+            let month = String(date.getMonth() + 1).padStart(2, '0');
+            let year = date.getFullYear();
+            inputEnd.value = `${day}/${month}/${year}`; 
+            
+            inputTien.value = "199000"; 
         } else if (gói === '3 THÁNG') {
             date.setMonth(date.getMonth() + 3);
-            inputEnd.value = date.toISOString().split('T')[0]; // Định dạng chuẩn YYYY-MM-DD
+            
+            // ĐỔI SỬA Ở ĐÂY: Định dạng thành DD/MM/YYYY
+            let day = String(date.getDate()).padStart(2, '0');
+            let month = String(date.getMonth() + 1).padStart(2, '0');
+            let year = date.getFullYear();
+            inputEnd.value = `${day}/${month}/${year}`;
+            
             inputTien.value = "500000";
         } else {
             inputEnd.value = "HỦY NGAY";
@@ -353,6 +365,7 @@ taiDanhSachThanhVienTheoUser: function() {
         // KÍCH HOẠT ĐỒNG BỘ: Cập nhật real-time sang cột bên phải ngay khi tính xong ngày
         this.capNhatKhungChamSocKhachHang();
     },
+
 
     capNhatKhungChamSocKhachHang: function() {
         const gid = document.getElementById('r-gid').value || 'TỰ ĐỘNG SINH';
