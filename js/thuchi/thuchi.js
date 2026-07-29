@@ -71,29 +71,78 @@ const ThuChiModule = {
     
     taoHoaDon() { return "HD" + Date.now().toString(36).toUpperCase() + Math.random().toString(36).substring(2, 6).toUpperCase(); },
     
-    subData() {
-        const kh = document.getElementById('kh').value || "-", gc = document.getElementById('gc').value || "-", lgd = document.getElementById('lgd').value, st = document.getElementById('st').value;
-        if (!lgd) return NotiModule.show("Vui lòng chọn Loại Giao Dịch cụ thể!", "error");
-        if (!st || Number(st) <= 0) return NotiModule.show("Vui lòng nhập số tiền hợp lệ!", "error");
-        
-        const numSt = Number(st), hoaDon = this.taoHoaDon(), admin = (typeof UserModule !== 'undefined' && UserModule.uName) ? UserModule.uName : "ADMIN";
-        
-        this.totalOrders++; this.md === 'THU' ? this.totalRevenue += numSt : this.totalExpense += numSt; this.uSt();
-        try { if (typeof G199kModule !== 'undefined' && typeof G199kModule.rRow === 'function') G199kModule.rRow(hoaDon, kh, gc, lgd, numSt, this.md, admin); } catch (e) {}
-        
-        NotiModule.show(`Đã lưu đơn ${hoaDon}! Đang đồng bộ...`, "success");
-        document.getElementById('kh').value = document.getElementById('gc').value = document.getElementById('st').value = ""; this.iId();
+subData() {
+    // 1. Lấy dữ liệu từ các ô nhập liệu một cách an toàn
+    const kh = document.getElementById('kh')?.value?.trim() || "-";
+    const gc = document.getElementById('gc')?.value?.trim() || "-";
+    const lgd = document.getElementById('lgd')?.value;
+    const st = document.getElementById('st')?.value;
 
-        let queue = JSON.parse(localStorage.getItem('thuchi_queue')) || [];
-        const newRecord = { hoaDon, khachHang: kh, ghiChu: gc, loaiGd: lgd, soTien: numSt, mode: this.md === 'THU' ? 'THU TIỀN' : 'CHI TIỀN', adminName: admin };
-        queue.push(newRecord);
-        localStorage.setItem('thuchi_queue', JSON.stringify(queue));
-        
-        // Đẩy đơn mới nhập tạm thời vào cache để bấm xem chi tiết được luôn
+    // 2. KIỂM TRA CHẶN: Nếu chưa chọn Loại Giao Dịch (bằng rỗng hoặc bằng chữ mặc định)
+    if (!lgd || lgd === "" || lgd === "Chọn loại giao dịch") {
+        return NotiModule.show("Vui lòng chọn Loại Giao Dịch cụ thể!", "error");
+    }
+
+    // 3. KIỂM TRA CHẶN: Nếu số tiền trống, không phải là số hoặc nhỏ hơn/bằng 0
+    if (!st || isNaN(st) || Number(st) <= 0) {
+        return NotiModule.show("Vui lòng nhập số tiền hợp lệ lớn hơn 0!", "error");
+    }
+    
+    // --- CHỈ KHI DỮ LIỆU HỢP LỆ MỚI CHẠY TIẾP XUỐNG DƯỚI NÀY ---
+    const numSt = Number(st);
+    const hoaDon = this.taoHoaDon();
+    const admin = (typeof UserModule !== 'undefined' && UserModule.uName) ? UserModule.uName : "ADMIN";
+    
+    // Cập nhật tổng số lượng và doanh thu hệ thống
+    this.totalOrders++; 
+    this.md === 'THU' ? this.totalRevenue += numSt : this.totalExpense += numSt; 
+    this.uSt();
+
+    // 4. GỬI SANG GOOGLE SHEETS (Đã bọc kiểm tra biến lgd một lần nữa cho chắc chắn)
+    try { 
+        if (typeof G199kModule !== 'undefined' && typeof G199kModule.rRow === 'function') {
+            if (lgd && lgd !== "" && lgd !== "Chọn loại giao dịch") {
+                G199kModule.rRow(hoaDon, kh, gc, lgd, numSt, this.md, admin); 
+            } else {
+                return; // Ngăn chặn tuyệt đối nếu có lỗi logic bất ngờ
+            }
+        } 
+    } catch (e) {
+        console.error("Lỗi đồng bộ Google Sheets:", e);
+    }
+    
+    // Thông báo thành công cho người dùng
+    NotiModule.show(`Đã lưu đơn ${hoaDon}! Đang đồng bộ...`, "success");
+    
+    // 5. LÀM TRỐNG FORM (Chừa lại thanh chọn để hàm initLgdRong xử lý sau)
+    if (document.getElementById('kh')) document.getElementById('kh').value = "";
+    if (document.getElementById('gc')) document.getElementById('gc').value = "";
+    if (document.getElementById('st')) document.getElementById('st').value = ""; 
+    this.iId();
+
+    // 6. LƯU VÀO HÀNG ĐỢI OFFLINE & CACHE HIỂN THỊ
+    let queue = JSON.parse(localStorage.getItem('thuchi_queue')) || [];
+    const newRecord = { 
+        hoaDon, 
+        khachHang: kh, 
+        ghiChu: gc, 
+        loaiGd: lgd, 
+        soTien: numSt, 
+        mode: this.md === 'THU' ? 'THU TIỀN' : 'CHI TIỀN', 
+        adminName: admin 
+    };
+    queue.push(newRecord);
+    localStorage.setItem('thuchi_queue', JSON.stringify(queue));
+    
+    if (typeof ThuChiModule !== 'undefined' && ThuChiModule.duLieuGiaoDichHomNay) {
         ThuChiModule.duLieuGiaoDichHomNay.push(newRecord);
+    }
 
-        this.initLgdRong(); this.processQueue(); 
-    },
+    // 7. RESET THANH CHỌN VỀ RỖNG & XỬ LÝ ĐỒNG BỘ TIẾP THEO
+    this.initLgdRong(); 
+    this.processQueue(); 
+},
+
 
     processQueue() {
         if (this.isSyncing) return;

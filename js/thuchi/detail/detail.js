@@ -40,10 +40,6 @@ function moChiTietHoaDon(maHD) {
     }
 }
 
-function dongModalChiTiet() {
-    const modal = document.getElementById('detailModal');
-    if (modal) modal.classList.remove('active');
-}
 
 function xoaHoaDon(maHD) {
     if (!confirm(`Bạn có chắc chắn muốn xóa hóa đơn ${maHD} này không? Hành động này không thể hoàn tác!`)) return;
@@ -99,9 +95,7 @@ function khoiTaoModalHTML() {
     modalDiv.id = 'detailModal';
     modalDiv.className = 'detail-modal';
     
-    // Gọi hàm từ UIButton để lấy chuỗi HTML nút x dùng chung
-    // Gán id là "detailModalCloseBtn" để dễ viết sự kiện click
-    const closeButtonHtml = UIButton.closeModal(null, "detailModalCloseBtn");
+    const closeButtonHtml = UIButton.closeModal("detailModalCloseBtn");
 
     modalDiv.innerHTML = `
         <div class="detail-content">
@@ -112,21 +106,11 @@ function khoiTaoModalHTML() {
         </div>
     `;
 
-    // Lắng nghe sự kiện click trên toàn bộ modal
-    modalDiv.addEventListener('click', (e) => {
-        // Nếu click ra vùng ngoài modal (nền tối)
-        if (e.target.id === 'detailModal') {
-            dongModalChiTiet();
-        }
-        // Nếu click đúng vào nút x dùng chung (id detailModalCloseBtn)
-        if (e.target.id === 'detailModalCloseBtn') {
-            dongModalChiTiet();
-        }
-    });
-
     document.body.appendChild(modalDiv);
-}
 
+    // Dòng này bây giờ tự động kích hoạt cả tính năng bấm nút x lẫn bấm ra ngoài màn hình
+    UIButton.setupCloseEvent("detailModalCloseBtn", "detailModal");
+}
 
 
 function xoaHoaDon(maHD) {

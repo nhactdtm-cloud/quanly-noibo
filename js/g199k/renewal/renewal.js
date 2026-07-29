@@ -13,7 +13,7 @@ const RenewalModule = {
         const titleContainer = document.getElementById('renewal-history-title');
         
         titleContainer.innerText = `🔄 Đang tải lịch sử: ${gid}...`;
-        historyContainer.innerHTML = '<div class="renewal-loading">🔄 Đang truy vấn dữ liệu từ Google Sheets...</div>';
+        historyContainer.innerHTML = '<div class="renewal-loading">🔄 Vui lòng chờ trong giây lát...</div>';
 
         const url = `${this.WEB_APP_URL}?action=GET_HISTORY&gid=${encodeURIComponent(gid)}`;
 
@@ -152,9 +152,7 @@ const RenewalModule = {
         popup.id = 'renewal-history-popup';
         popup.className = 'renewal-popup-overlay show';
 
-        // Gọi hàm từ UIButton để tạo mã HTML cho nút x dùng chung
-        // Giữ nguyên id "btn-close-renewal" để code xử lý sự kiện click bên dưới hoạt động bình thường
-        const closeButtonHtml = UIButton.closeModal(null, "btn-close-renewal");
+        const closeButtonHtml = UIButton.closeModal("btn-close-renewal");
 
         popup.innerHTML = `
             <div class="renewal-popup-content">
@@ -168,13 +166,11 @@ const RenewalModule = {
 
         document.body.appendChild(popup);
 
-        // Giữ nguyên các hàm bắt sự kiện cũ (vẫn hoạt động tốt vì id không đổi)
-        document.getElementById('btn-close-renewal').addEventListener('click', () => this.dongPopup());
-        popup.addEventListener('click', (e) => {
-            if (e.target === popup) this.dongPopup();
-        });
+        // Gọi UIButton để lo việc click nút x và click vùng nền tối
+        UIButton.setupCloseEvent("btn-close-renewal", "renewal-history-popup");
     },
 
+    // BẮT BUỘC KHÔI PHỤC HÀM NÀY: Để các logic kết nối máy chủ gọi ẩn popup không bị lỗi sập mã nguồn
     dongPopup: function() {
         const popup = document.getElementById('renewal-history-popup');
         if (popup) popup.classList.remove('show');
