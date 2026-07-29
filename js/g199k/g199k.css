@@ -263,7 +263,7 @@
 }
 
 /*==========================================================================
- MOBILE (Responsive) - BẢN SỬA ĐÍCH DANH THEO ID JS
+ MOBILE (Responsive) - BẢN BAO VÂY TOÀN BỘ KHAY NGÀY BẮT ĐẦU
  ========================================================================== */
 @media (max-width: 768px) {
     .r199k-workspace {
@@ -303,7 +303,7 @@
         margin: 0 auto 4px auto !important;
     }
 
-    /* Định cấu hình chung cho các ô nhập liệu */
+    /* Định cấu hình chung cho các ô nhập liệu tiêu chuẩn */
     .gr input, 
     .gr select,
     .gr input[readonly] {
@@ -323,25 +323,26 @@
         border-radius: 6px !important;
     }
 
-    /* 🌟 BẬT ĐÈ BẸP LỖI RIÊNG CHO Ô NGÀY BẮT ĐẦU THEO ID TRONG JS 🌟 */
-    #r-start {
+    /* 🌟 THẦN CHÚ SỬA LỖI: ÉP BẤT KỲ THẺ LẠ NÀO CỦA THƯ VIỆN CHỌN NGÀY VÀO TÂM 🌟 */
+    .gr:has(#r-start) *, 
+    .gr:has([id*="start"]) *, 
+    [class*="flatpickr-input"],
+    [class*="picker"] {
         display: block !important;
         width: 100% !important;
         max-width: 100% !important;
-        box-sizing: border-box !important;
+        box-sizing: border-box !important; /* Ép thu viền */
+        
+        /* Đồng bộ khay viền xám giống các ô khác */
         height: 34px !important;
-        line-height: 24px !important; 
+        line-height: 24px !important;
         padding: 4px 10px !important;
         background: #fafafa !important;
         border: 1px solid var(--b) !important;
         border-radius: 6px !important;
+        
+        /* Ép dòng chữ ra chính giữa */
         text-align: center !important;
-    }
-
-    /* Đẩy icon lịch mặc định của trình duyệt điện thoại (nếu có) sang góc phải */
-    #r-start::-webkit-calendar-picker-indicator {
-        position: absolute !important;
-        right: 12px !important;
     }
 
     #p-g .card .btn-sm {
