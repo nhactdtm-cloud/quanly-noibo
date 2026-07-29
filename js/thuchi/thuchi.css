@@ -183,28 +183,28 @@
 
 
 /* ==========================================================================
-   TỐI ƯU CHO BẢN MOBILE: CỐ ĐỊNH BOTTOM - BẬT LĂN NỘI BỘ KHÔNG BỊ TRÀN
+   TỐI ƯU CHO BẢN MOBILE: CUỘN TRANG TỰ NHIÊN - ĐẢM BẢO HIỆN ĐỦ CÁC KHỐI
    ========================================================================== */
 @media (max-width: 768px) {
-    /* 1. Khóa cứng chiều cao vùng workspace bằng chiều cao màn hình trừ đi thanh điều hướng đáy */
+    /* 1. Mở khóa chiều cao toàn trang để user cuộn xuống xem được hết các khối */
     .thuchi-workspace { 
         display: flex;
-        flex-direction: column; /* Xếp dọc từ trên xuống */
+        flex-direction: column; 
         width: 100%;
-        height: calc(100vh - 60px); /* 60px là ước lượng chiều cao thanh menu đáy, hãy chỉnh lại nếu cần */
-        overflow: hidden; /* Triệt tiêu hoàn toàn con lăn tổng của toàn trang */
-        gap: 12px;
+        height: auto !important; /* Hủy bỏ calc(100vh) của PC để tránh bị cắt mất phần dưới */
+        overflow-y: visible !important; /* Cho phép cuộn trang tổng */
+        gap: 16px;
         padding: 12px;
+        padding-bottom: 80px; /* Tạo khoảng trống ở đáy để không bị menu đè lên khối cuối */
         box-sizing: border-box;
     }
 
-    /* 2. Khối Form nhập liệu: Tự co theo nội dung, giữ nguyên cấu trúc */
+    /* 2. Khối Form nhập liệu */
     #p-t .card { 
         grid-template-columns: 1fr; 
         height: auto; 
         padding: 16px; 
         row-gap: 12px; 
-        flex-shrink: 0; /* KHÔNG cho phép Form bị bóp méo chiều cao */
     }
     
     #p-t .card .seg, #p-t .card .btn-sm { 
@@ -217,35 +217,30 @@
         margin-top: 4px; 
     }
 
-    /* 3. Vùng chứa các khối bên phải (Thống kê + Đối soát) */
+    /* 3. Vùng chứa các khối bên phải */
     .thuchi-workspace-right { 
-        flex: 1; /* Chiếm trọn vẹn phần diện tích còn lại ở giữa màn hình */
         display: flex;
         flex-direction: column;
-        gap: 12px; 
-        height: 100%;
-        min-height: 0; /* BẮT BUỘC để kích hoạt overflow cho phần tử con */
-        overflow: hidden;
+        gap: 16px; 
+        height: auto !important; /* Hủy bỏ khóa chiều cao của PC */
+        overflow: visible !important; 
     }
 
     /* Khối Thống kê tài chính */
     .stat-sidebar { 
         order: 1; 
-        flex-shrink: 0; /* Giữ nguyên không gian, không cho co bóp */
-        padding: 14px;
-        gap: 8px;
+        height: auto;
+        padding: 16px;
     }
 
-    /* 4. KHỐI ĐỐI SOÁT LỊCH SỬ (Vùng có danh sách HDMS... trong ảnh) */
+    /* 4. KHỐI ĐỐI SOÁT LỊCH SỬ HÓA ĐƠN: Giờ sẽ hiện ra ngay dưới khối thống kê */
     .quick-history { 
         order: 2; 
-        flex: 1; /* Tự động phình to tối đa điền vào khoảng trống */
-        height: 100%;
-        min-height: 0; /* QUAN TRỌNG: Ép trình duyệt không được tự đẩy dài danh sách ra */
-        overflow-y: auto !important; /* BẮT BUỘC BẬT CON LĂN TẠI ĐÂY */
-        -webkit-overflow-scrolling: touch; /* Vuốt mượt trên iPhone */
+        height: auto !important; /* Hủy bỏ flex: 1 và chiều cao cố định của PC */
+        max-height: 400px; /* KHÓA CHIỀU CAO TỐI ĐA: Nếu quá nhiều hóa đơn thì sẽ tự bật con lăn tại đây */
+        overflow-y: auto !important; /* Bật con lăn nội bộ nếu danh sách vượt quá 400px */
+        -webkit-overflow-scrolling: touch; 
         padding: 16px;
         padding-top: 0px; 
-        margin-bottom: 0px; 
     }
 }
