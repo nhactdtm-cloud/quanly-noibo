@@ -239,6 +239,7 @@ taiDanhSachThanhVienTheoUser: function() {
         };
     };
 
+    
     // Hàm gọi API đồng bộ mạng thực tế và cập nhật đè vào cache cứng
     const taiDuLieuMoiTuMang = (isBackground = false) => {
         if (this.isSubmittingMembers) return;
@@ -319,6 +320,12 @@ taiDanhSachThanhVienTheoUser: function() {
     }
 },
 
+refreshRenewList: function () {
+    localStorage.removeItem('r199k_members_cache');
+    localStorage.removeItem('r199k_members_cache_time');
+
+    this.taiDanhSachThanhVienTheoUser();
+},
 
 
     

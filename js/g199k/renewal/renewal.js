@@ -101,6 +101,10 @@ const RenewalModule = {
                 var targetAdmin = adminName ? adminName.toString().trim() : "ADMIN";
                 this.xoaDongTienThuChiByGet(hoaDon, targetAdmin);
 
+                 if (typeof R199kModule !== "undefined") {
+                R199kModule.refreshRenewList();
+                }
+
                 if (typeof NotiModule !== 'undefined') {
                     NotiModule.show("Đã dọn dẹp thành viên và dòng tiền thành công!", "success");
                 }
