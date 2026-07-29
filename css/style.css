@@ -9,6 +9,7 @@
     --b: #e4e4e7;
     --r: 16px;
 }
+
 * {
     box-sizing: border-box;
     margin: 0;
@@ -16,6 +17,7 @@
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     -webkit-tap-highlight-color: transparent;
 }
+
 body {
     display: flex;
     height: 100vh;
@@ -23,14 +25,17 @@ body {
     color: var(--t);
     overflow: hidden;
 }
+
 .app-ct {
     display: none;
     width: 100%;
     height: 100%;
 }
+
 .app-ct.auth {
     display: flex;
 }
+
 .sb {
     width: 240px;
     background: var(--sf);
@@ -40,17 +45,20 @@ body {
     padding: 24px;
     z-index: 100;
 }
+
 .logo {
     font-size: 18px;
     font-weight: 700;
     color: var(--p);
     margin-bottom: 32px;
 }
+
 .menu {
     display: flex;
     flex-direction: column;
     gap: 6px;
 }
+
 .m-btn {
     background: none;
     border: none;
@@ -64,10 +72,12 @@ body {
     display: flex;
     gap: 12px;
 }
+
 .m-btn.active {
     background: #f4f4f5;
     color: var(--p);
 }
+
 .main {
     flex: 1;
     padding: 32px;
@@ -85,12 +95,14 @@ body {
     color: var(--ts);
     margin-bottom: 15px;
 }
+
 .page {
     display: none;
     width: 100%;
     max-width: 1200px;
     margin: 0 auto;
 }
+
 .page.active {
     display: block;
 }
@@ -100,6 +112,7 @@ h2 {
     font-weight: 700;
     margin-bottom: 20px;
 }
+
 .btn-sm {
     width: 100%;
     padding: 14px;
@@ -112,10 +125,12 @@ h2 {
     cursor: pointer;
     margin-top: 10px;
 }
+
 .gr {
     margin-bottom: 16px;
     text-align: left;
 }
+
 .gr label {
     display: block;
     font-size: 11px;
@@ -124,6 +139,7 @@ h2 {
     margin-bottom: 6px;
     text-transform: uppercase;
 }
+
 .gr input, .gr select {
     width: 100%;
     padding: 12px;
@@ -134,6 +150,7 @@ h2 {
     background: #fafafa;
     font-weight: 500;
 }
+
 .gr input:focus, .gr select:focus {
     border-color: var(--p);
     background: var(--sf);
@@ -144,66 +161,86 @@ h2 {
 }
 
 /* ==========================================================================
-   FIX LỖI HIỂN THỊ MOBILE (CHIA ĐỀU 3 NÚT Ở THANH ĐÁY)
+   FIX LỖI HIỂN THỊ MOBILE (NỀN XÁM FULL - ĐẢO MÀU NÚT ACTIVE/INACTIVE)
    ========================================================================== */
 @media(max-width:768px){
     body { 
         flex-direction: column; 
+        height: 100vh;
+        overflow: hidden;
     }
     
-    /* Ép thanh đáy dàn hàng ngang dạng Flexbox chứa đều các nút */
+    /* Khối màu xám phủ rộng từ trên xuống đáy màn hình */
+    .main { 
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh; 
+        padding: 16px; 
+        padding-bottom: 85px; 
+        overflow-y: auto; 
+        box-sizing: border-box;
+        z-index: 1;
+    }
+
+    /* Thanh chứa nút chuyển sang suốt */
     .sb {
         width: 100%; 
-        height: 65px; 
+        height: auto; 
         flex-direction: row !important; 
         padding: 0; 
         border-right: none; 
-        border-top: 1px solid var(--b);
+        border-top: none; 
         position: fixed; 
         bottom: 0; 
         left: 0; 
-        background: var(--sf);
-        align-items: center;
+        background: transparent; 
+        align-items: stretch;
         justify-content: space-between;
+        z-index: 999; 
     }
     
     .logo { 
         display: none; 
     }
     
-    /* Chia khối menu chứa 2 nút chức năng chính chiếm 66% chiều ngang */
     .menu { 
         flex-direction: row; 
         width: 66.66%; 
         gap: 0;
     }
     
-    /* Cấu hình chung cho toàn bộ nút bấm ở thanh đáy (Xếp icon trên, chữ dưới) */
+    /* ĐÃ SỬA: Nút chưa bấm (mặc định) có nền MÀU TRẮNG */
     .m-btn { 
         flex-direction: column !important; 
         align-items: center !important; 
         justify-content: center !important;
         font-size: 10px !important; 
-        padding: 6px 0 !important; 
-        width: 50% !important; /* 2 nút trong menu mỗi nút chiếm 50% của khối menu */
+        padding: 12px 0 !important; 
+        width: 50% !important; 
         border-radius: 0px; 
         gap: 4px !important;
         text-align: center !important;
+        background: var(--sf); /* Nền màu trắng */
+        border-top: 1px solid var(--b);
     }
     
-    /* Nút Đăng xuất chiếm 33.33% không gian còn lại ở rìa phải thanh đáy Mobile */
+    /* ĐÃ SỬA: Nút đang bấm (active) sẽ đổ MÀU XÁM hệ thống */
+    .m-btn.active {
+        background: var(--bg) !important; /* Đổi sang màu xám của nền */
+        color: var(--p) !important;
+    }
+    
+    /* Nút Đăng xuất mặc định màu trắng */
     .logout-btn {
         margin-top: 0 !important;
         width: 33.33% !important;
         border-radius: 0px;
-        border-left: 1px solid var(--b); /* Tạo vạch ngăn cách nhẹ với 2 nút cũ */
-    }
-    
-    .main { 
-        padding: 16px; 
-        height: calc(100vh - 65px); 
-        padding-bottom: 40px; 
-        overflow-y: auto; /* Cho phép cuộn trang dọc tự nhiên trên điện thoại */
+        background: var(--sf) !important; 
+        border-top: 1px solid var(--b);
+        border-left: 1px solid var(--b); 
+        padding: 12px 0 !important;
     }
     
     .usr-bar { 
