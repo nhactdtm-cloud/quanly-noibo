@@ -638,27 +638,33 @@
     .gr input[readonly] {
         width: 100% !important;
         max-width: 100% !important;
-        display: inline-flex !important;    /* Chuyển sang flex để căn giữa nội dung bên trong */
-        align-items: center !important;     /* Căn giữa chữ theo chiều dọc */
-        justify-content: center !important; /* Căn giữa chữ theo chiều ngang */
-        text-align: center !important;     
+        display: block !important;         /* Trả về block chuẩn để không bị vỡ khay, mất viền */
+        text-align: center !important;     /* Căn giữa chữ theo chiều ngang */
         font-size: 13px !important;        
         -webkit-text-fill-color: var(--t) !important; 
         opacity: 1 !important;             
-        box-sizing: border-box !important; /* Quan trọng: Ép viền thụt vào trong để không bị lệch phải */
+        box-sizing: border-box !important; /* Ép viền thụt vào trong để nằm gọn trong form */
+        
+        /* Căn giữa theo chiều dọc dựa trên chiều cao 34px của ô nhập ở phần 1 */
+        height: 34px !important;
+        line-height: 26px !important;      /* Điều chỉnh dòng chữ lọt vào chính giữa tâm ô */
+        padding: 4px 10px !important;
     }
 
-    /* Bổ sung để xử lý riêng cho ô chọn ngày nếu dùng thẻ input type="date" thuần */
-    .gr input[type="date"] {
-        position: relative;
-        justify-content: center !important;
+    /* 🌟 XỬ LÝ RIÊNG CHO CÁC Ô CHỌN NGÀY ĐỂ BUỘC CHỮ PHẢI RA GIỮA 🌟 */
+    .gr input[type="date"],
+    .gr input[placeholder*="ngày"],
+    #ngay_bat_dau_id_cua_ban { /* Thay ID thật của ô ngày bắt đầu vào đây nếu có */
         text-align: center !important;
+        display: block !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
     }
 
-    /* Đẩy icon lịch mặc định của hệ điều hành về góc phải, không cho đè lệch chữ */
+    /* Nếu ô này là thẻ input type="date" thuần, đẩy icon lịch sang góc phải */
     .gr input[type="date"]::-webkit-calendar-picker-indicator {
-        position: absolute;
-        right: 12px;
+        position: absolute !important;
+        right: 12px !important;
     }
 
     /* Nút bấm Đăng xuất và Nhập dữ liệu bảng */
@@ -675,6 +681,7 @@
         box-sizing: border-box !important;
     }
 }
+
 
 
 
