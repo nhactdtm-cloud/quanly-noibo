@@ -16,9 +16,11 @@ const UserModule = {
         document.getElementById('lg-sc').style.display = 'none';
         document.getElementById('ap').classList.add('auth');
         
+        // Khi đăng nhập thành công, kích hoạt tải lại dữ liệu chuẩn của tài khoản này
         if (typeof ThuChiModule !== 'undefined') {
             ThuChiModule.iId();
             ThuChiModule.sm('THU');
+            ThuChiModule.taiHoatDongHomNay(); // Tải đúng dữ liệu theo tài khoản mới
         }
     },
 
@@ -58,16 +60,40 @@ const UserModule = {
         }
     },
 
-    // 2. Logic Đăng xuất
+    // 2. Logic Đăng xuất (ĐÃ ĐƯỢC FIX LÀM SẠCH HOÀN TOÀN)
     handleLogout: function() {
-        // XÓA TRẠNG THÁI TRONG LOCALSTORAGE
-        localStorage.removeItem('loggedUser');
+        // 2.1. XÓA SẠCH DỮ LIỆU SỐ TIỀN VÀ MẢNG CACHE TRONG THUCHIMODULE
+        if (typeof ThuChiModule !== 'undefined') {
+            ThuChiModule.totalOrders = 0;
+            ThuChiModule.totalRevenue = 0;
+            ThuChiModule.totalExpense = 0;
+            ThuChiModule.duLieuGiaoDichHomNay = [];
+            
+            // Ép giao diện hiển thị tổng thu/chi quay về 0đ ngay lập tức
+            ThuChiModule.uSt(); 
+            
+            // Xóa sạch bảng đối soát nhanh bên phải (Khối đối soát tự hiện "Chưa có dữ liệu.")
+            ThuChiModule.capNhatKhoiDoiSoat([]); 
+        }
 
+        // 2.2. LÀM TRỐNG BẢNG GIAO DỊCH CHÍNH TRÊN MÀN HÌNH (NẾU CÓ)
+        if (document.getElementById('bảng-giao-dịch')) {
+            document.getElementById('bảng-giao-dịch').innerHTML = '';
+        }
+
+        // 2.3. XÓA SẠCH KEY ĐĂNG NHẬP TRONG LOCALSTORAGE
+        localStorage.removeItem('loggedUser');
+        
+        // Reset tên biến quản lý về mặc định
+        this.uName = 'ADMIN';
+
+        // 2.4. KHÔI PHỤC GIAO DIỆN MÀN HÌNH ĐĂNG NHẬP GỐC
         document.getElementById('pw').value = '';
+        document.getElementById('un').value = ''; // Xóa luôn ô nhập tài khoản cho sạch
         document.getElementById('ap').classList.remove('auth');
         document.getElementById('lg-sc').style.display = 'flex';
         
         if (typeof st === 'function') st('t');
-        NotiModule.show("Đã đăng xuất tài khoản an toàn!", "info");
+        NotiModule.show("Đã đăng xuất tài khoản và làm sạch dữ liệu!", "info");
     }
 };

@@ -20,64 +20,71 @@ const ThuChiModule = {
     },
 
     taiHoatDongHomNay() {
-        // 1. CƯỠNG BỨC RESET GIAO DIỆN VỀ 0Đ NGAY LẬP TỨC
-        this.totalOrders = 0; this.totalRevenue = 0; this.totalExpense = 0;
+        // KIỂM TRA CHẶN: Nếu đang trong quá trình fetch dữ liệu thì không cho chạy trùng lặp
+        if (this.isLoadingData) return;
+        this.isLoadingData = true;
+
+        // 1. CƯỠNG BỨC RESET TOÀN BỘ SỐ LIỆU VỀ 0 TRƯỚC KHI TÍNH TOÁN
+        this.totalOrders = 0; 
+        this.totalRevenue = 0; 
+        this.totalExpense = 0;
+        this.duLieuGiaoDichHomNay = []; // Xóa sạch mảng cũ tránh dồn tích dữ liệu
         this.uSt();
         this.capNhatKhoiDoiSoat([]);
 
-        // 2. CƠ CHẾ BẪY BẮT TÊN USER ĐỘNG CHUẨN XÁC
-        let countAttempts = 0;
-        const checkUserInterval = setInterval(() => {
-            countAttempts++;
-            
-            // Tìm chữ viết sau cụm từ "Tài khoản:" trên toàn bộ nội dung trang web
-            let admin = "ADMIN";
-            const bodyText = document.body.innerText || "";
-            const match = bodyText.match(/Tài\s*khoản:\s*([A-Za-z0-9_.-]+)/i);
-            
-            if (match && match[1]) {
-                admin = match[1].trim().toUpperCase();
-            } else if (typeof UserModule !== 'undefined' && UserModule.uName) {
-                admin = UserModule.uName.trim().toUpperCase();
-            }
+        // Lấy tên tài khoản an toàn từ bộ nhớ
+        let admin = localStorage.getItem('loggedUser') || (typeof UserModule !== 'undefined' && UserModule.uName) || "ADMIN";
+        admin = admin.trim().toUpperCase();
 
-            // ĐIỀU KIỆN CHẠY: Nếu đã tìm thấy tên tài khoản khác ADMIN (ví dụ TUNG) HOẶC đã đợi quá lâu (sau 1.5 giây)
-            if (admin !== "ADMIN" || countAttempts > 15) {
-                clearInterval(checkUserInterval); // Hủy vòng lặp kiểm tra ngay lập tức
+        console.log("=> TIẾN HÀNH TẢI DỮ LIỆU ĐỘC QUYỀN CHO USER:", admin);
+
+        // Làm sạch khu vực hiển thị bảng giao dịch cũ trên giao diện trước khi fetch
+        if (typeof G199kModule !== 'undefined' && document.getElementById('bảng-giao-dịch')) { 
+            document.getElementById('bảng-giao-dịch').innerHTML = ''; 
+        }
+
+        // 2. GỌI API ĐỒNG BỘ ĐẾN GOOGLE SHEETS
+        fetch(`${this.WEB_APP_URL}?adminName=${encodeURIComponent(admin)}&admin=${encodeURIComponent(admin)}`)
+        .then(r => r.ok ? r.json() : Promise.reject())
+        .then(res => {
+            if (!res || res.status !== "success" || !Array.isArray(res.data) || res.data.length === 0) {
+                return; // Nếu không có dữ liệu, giữ nguyên trạng thái 0đ sạch sẽ
+            }
+            
+            // Lưu dữ liệu sạch vào bộ nhớ đệm
+            this.duLieuGiaoDichHomNay = res.data;
+
+            // 3. DUYỆT MẢNG ĐỂ TÍNH TOÁN (ĐẢM BẢO CHỈ TÍNH TOÁN TRÊN DỮ LIỆU SẠCH VỪA TRẢ VỀ)
+            res.data.forEach(item => {
+                this.totalOrders++;
+                const mode = item.mode === 'THU TIỀN' || item.mode === 'THU' ? 'THU' : 'CHI';
                 
-                console.log("=> CHÍNH THỨC BẮT ĐƯỢC TÊN USER GỬI LÊN GOOGLE SHEETS:", admin);
+                if (mode === 'THU') {
+                    this.totalRevenue += Number(item.soTien || 0);
+                } else {
+                    this.totalExpense += Number(item.soTien || 0);
+                }
+                
+                try { 
+                    if (typeof G199kModule !== 'undefined' && typeof G199kModule.rRow === 'function') {
+                        G199kModule.rRow(item.hoaDon, item.khachHang, item.ghiChu, item.loaiGd, item.soTien, mode, admin); 
+                    } 
+                } catch (e) {
+                    console.error("Lỗi vẽ dòng giao diện:", e);
+                }
+            });
 
-                // 3. TIẾN HÀNH GỌI GOOGLE SHEETS KHI ĐÃ CÓ TÊN USER CHUẨN
-                fetch(`${this.WEB_APP_URL}?adminName=${encodeURIComponent(admin)}&admin=${encodeURIComponent(admin)}`)
-                .then(r => r.ok ? r.json() : Promise.reject())
-                .then(res => {
-                    if (!res || res.status !== "success" || !Array.isArray(res.data) || res.data.length === 0) {
-                        this.duLieuGiaoDichHomNay = [];
-                        this.capNhatKhoiDoiSoat([]);
-                        return; 
-                    }
-                    
-                    this.duLieuGiaoDichHomNay = res.data;
-                    this.capNhatKhoiDoiSoat(res.data);
-                    
-                    if (typeof G199kModule !== 'undefined' && document.getElementById('bảng-giao-dịch')) { 
-                        document.getElementById('bảng-giao-dịch').innerHTML = ''; 
-                    }
-
-                    res.data.forEach(item => {
-                        this.totalOrders++;
-                        const mode = item.mode === 'THU TIỀN' || item.mode === 'THU' ? 'THU' : 'CHI';
-                        mode === 'THU' ? this.totalRevenue += Number(item.soTien || 0) : this.totalExpense += Number(item.soTien || 0);
-                        try { if (typeof G199kModule !== 'undefined' && typeof G199kModule.rRow === 'function') G199kModule.rRow(item.hoaDon, item.khachHang, item.ghiChu, item.loaiGd, item.soTien, mode, admin); } catch (e) {}
-                    });
-                    this.uSt();
-                }).catch(err => {
-                    console.error("Lỗi kết nối API Google Sheets:", err);
-                    this.duLieuGiaoDichHomNay = [];
-                    this.capNhatKhoiDoiSoat([]);
-                });
-            }
-        }, 100); // Cứ mỗi 100ms quét lại hệ thống 1 lần để bẫy tên tài khoản
+            // 4. ĐẨY SỐ LIỆU CHUẨN XÁC CUỐI CÙNG LÊN MÀN HÌNH
+            this.capNhatKhoiDoiSoat(res.data);
+            this.uSt();
+        })
+        .catch(err => {
+            console.error("Lỗi kết nối API:", err);
+        })
+        .finally(() => {
+            // Mở khóa cờ chặn để có thể tải lại dữ liệu ở các lần tiếp theo (khi thêm đơn mới)
+            this.isLoadingData = false;
+        });
     },
 
 

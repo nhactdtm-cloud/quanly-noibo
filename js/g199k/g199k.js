@@ -195,66 +195,97 @@ const R199kModule = {
 
 
 taiDanhSachThanhVienTheoUser: function() {
-    
     const container = document.getElementById('r199k-member-container');
-    container.innerHTML = '<div class="member-empty-state">🔄 Đang tải dữ liệu...</div>';
+    if (!container) return;
 
-    // [ĐÃ SỬA] Loại bỏ tham số lọc &adminName để Backend Apps Script quét và trả về toàn bộ dữ liệu bảng
-    const url = `${this.WEB_APP_URL}?action=GET_MEMBERS`;
+    // Cấu hình thời gian hết hạn cache (Ví dụ: 300000ms = 5 phút)
+    const CACHE_TIMEOUT = 5 * 60 * 1000; 
+    const cacheKey = 'r199k_members_cache';
+    const cacheTimeKey = 'r199k_members_cache_time';
 
-    fetch(url)
-    .then(response => response.json())
-    .then(res => {
-        if (res.status === "success" && res.data && res.data.length > 0) {
-            container.innerHTML = ''; // Xóa dòng trạng thái chờ
-            
-            res.data.forEach(item => {
-                const itemDiv = document.createElement('div');
-                itemDiv.className = 'member-item';
-                itemDiv.innerHTML = `
-                    <div class="member-item-info">
-                        <!-- Thêm class r-click-name và style pointer để người dùng biết có thể click -->
-                        <span class="member-item-name r-click-name" style="cursor: pointer;">${item.name}</span>
-                        <span class="member-item-gid">${item.gid}</span>
-                    </div>
-                    <span class="member-item-badge">${item.goi}</span>
-                `;
-                
-                // 1. SỰ KIỆN MỚI: Khi click vào TÊN khách hàng
-                const nameBtn = itemDiv.querySelector('.r-click-name');
-                if (nameBtn) {
-                    nameBtn.addEventListener('click', (e) => {
-                        e.stopPropagation(); // ⛔ DỪNG CHUYỂN HƯỚNG/HÀNH VI CLICK CỦA THẺ CHA
-                        
-                        // Gọi hàm hiển thị lịch sử từ file renewal.js (Ví dụ module tên là RenewalModule)
-                        if (typeof RenewalModule !== 'undefined' && typeof RenewalModule.hienThiLichSuGiaHan === 'function') {
-                            RenewalModule.hienThiLichSuGiaHan(item.gid);
-                        } else {
-                            console.error("Chưa tìm thấy RenewalModule hoặc hàm hienThiLichSuGiaHan trong renewal.js");
-                            // Fallback tạm thời nếu chưa liên kết file thành công
-                            NotiModule.show(`Đang xem lịch sử của ${item.name} (${item.gid})`, "success");
-                        }
-                    });
+    // Hàm phụ trợ xử lý vẽ giao diện siêu tốc từ mảng dữ liệu (Gom DOM Fragment + Event Delegation)
+    const renderGiaoDienSieuToc = (data) => {
+        const fragment = document.createDocumentFragment();
+        data.forEach(item => {
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'member-item';
+            itemDiv.setAttribute('data-gid', item.gid);
+            itemDiv.innerHTML = `
+                <div class="member-item-info" data-gid="${item.gid}">
+                    <span class="member-item-name r-click-name" style="cursor: pointer;" data-action="view-history" data-gid="${item.gid}">${item.name}</span>
+                    <span class="member-item-gid" data-gid="${item.gid}">${item.gid}</span>
+                </div>
+                <span class="member-item-badge" data-gid="${item.gid}">${item.goi}</span>
+            `;
+            fragment.appendChild(itemDiv);
+        });
+        container.innerHTML = ''; 
+        container.appendChild(fragment);
+
+        // Ủy quyền sự kiện duy nhất tại thẻ cha
+        container.onclick = (e) => {
+            const target = e.target;
+            const gid = target.getAttribute('data-gid');
+            if (!gid) return;
+
+            if (target.getAttribute('data-action') === 'view-history') {
+                e.stopPropagation();
+                if (typeof RenewalModule !== 'undefined' && typeof RenewalModule.hienThiLichSuGiaHan === 'function') {
+                    RenewalModule.hienThiLichSuGiaHan(gid);
+                } else {
+                    NotiModule.show(`Lịch sử: ${target.innerText} (${gid})`, "success");
                 }
-                
-                // 2. Sự kiện của thẻ cha: Click vào vùng khác (như GID, Badge) thì vẫn điền form gia hạn như cũ
-                itemDiv.addEventListener('click', () => {
-                    document.getElementById('r-gid').value = item.gid;
-                    this.tựĐộngTìmKiếmKháchHàng('GID');
-                });
-                
-                container.appendChild(itemDiv);
-            });
-        } else {
+            } else {
+                const inputGid = document.getElementById('r-gid');
+                if (inputGid) { inputGid.value = gid; this.tựĐộngTìmKiếmKháchHàng('GID'); }
+            }
+        };
+    };
+
+    // ==========================================================================
+    // BƯỚC QUYẾT ĐỊNH TỐC ĐỘ: KIỂM TRA BỘ NHỚ ĐỆM TRÌNH DUYỆT (LOCALSTORAGE)
+    // ==========================================================================
+    const cachedData = localStorage.getItem(cacheKey);
+    const cachedTime = localStorage.getItem(cacheTimeKey);
+    const now = Date.now();
+
+    // Nếu có dữ liệu trong máy và chưa quá 5 phút -> LẬP TỨC XUẤT RA MÀN HÌNH (0ms)
+    if (cachedData && cachedTime && (now - cachedTime < CACHE_TIMEOUT)) {
+        console.log("⚡ ĐÃ LOAD XONG DANH SÁCH THÀNH VIÊN TỪ CACHE CỨNG (0ms)!");
+        return renderGiaoDienSieuToc(JSON.parse(cachedData));
+    }
+
+    // Nếu không có cache hoặc cache đã quá hạn, tiến hành gọi API (Chặn lệnh gọi trùng)
+    if (this.isSubmittingMembers) return;
+    this.isSubmittingMembers = true;
+
+    // Chỉ hiện chữ "Đang tải" khi trong máy hoàn toàn chưa có cục dữ liệu nào
+    if (!cachedData) container.innerHTML = '<div class="member-empty-state">🔄 Đang tải dữ liệu mạng...</div>';
+
+    fetch(`${this.WEB_APP_URL}?action=GET_MEMBERS`)
+    .then(response => response.ok ? response.json() : Promise.reject())
+    .then(res => {
+        if (res.status === "success" && Array.isArray(res.data) && res.data.length > 0) {
+            // ĐÓNG DẤU CACHE: Ghi dữ liệu mạng vừa tải về vào ổ cứng để lần sau bốc dùng luôn
+            localStorage.setItem(cacheKey, JSON.stringify(res.data));
+            localStorage.setItem(cacheTimeKey, now.toString());
+
+            // Vẽ lên màn hình
+            renderGiaoDienSieuToc(res.data);
+        } else if (!cachedData) {
             container.innerHTML = '<div class="member-empty-state">Chưa có thành viên nào trong hệ thống.</div>';
         }
     })
     .catch(err => {
-        console.error("Lỗi tải danh sách thành viên:", err);
-        container.innerHTML = '<div class="member-empty-state">❌ Không thể tải danh sách.</div>';
+        console.error("Lỗi mạng, tự động bốc dữ liệu cũ ra dùng tạm:", err);
+        // Nếu mất mạng hoặc Google Apps Script lỗi, bốc tạm đống cache cũ ra cứu cánh
+        if (cachedData) renderGiaoDienSieuToc(JSON.parse(cachedData));
+        else container.innerHTML = '<div class="member-empty-state">❌ Không thể tải danh sách.</div>';
+    })
+    .finally(() => {
+        this.isSubmittingMembers = false;
     });
 },
-
 
 
     
