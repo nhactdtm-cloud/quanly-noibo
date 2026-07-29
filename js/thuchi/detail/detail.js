@@ -32,7 +32,7 @@ function moChiTietHoaDon(maHD) {
             <div class="detail-row"><span class="detail-label">Quản Lý (Loại):</span><span class="detail-value" style="color:${isThu ? 'green' : 'red'}">${item.mode}</span></div>
             <div class="detail-row"><span class="detail-label">Loại GD:</span><span class="detail-value">${item.loaiGd || '-'}</span></div>
             <div class="detail-row"><span class="detail-label">Số Tiền:</span><span class="detail-value" style="color:${isThu ? 'green' : 'red'}">${dinhDangTien}</span></div>
-            <div class="detail-row"><span class="detail-label">Trạng Thái:</span><span class="detail-value" style="color:green;">✨ HOÀN THÀNH</span></div>
+            <div class="detail-row"><span class="detail-label">Trạng Thái:</span><span class="detail-value" style="color:green;"> HOÀN THÀNH</span></div>
             <div class="detail-row"><span class="detail-label">Nhân Viên:</span><span class="detail-value">${item.adminName || 'ADMIN'}</span></div>
         `;
     } else {
@@ -146,10 +146,18 @@ function xoaHoaDon(maHD) {
         });
 }
 
-// Hàm bổ trợ dọn dẹp dữ liệu cục bộ và vẽ lại giao diện ngay lập tức
+// 1. Tạo một biến lưu mốc thời gian hiển thị thông báo gần nhất bên ngoài hàm
+let thoiGianThongBaoXoaGanNhat = 0;
+
 function xuLyDongBoSauKhiXoa(maHD) {
-    if (typeof NotiModule !== 'undefined' && typeof NotiModule.show === 'function') {
-        NotiModule.show(`Đã xóa thành công hóa đơn ${maHD}!`, "success");
+    const bayGio = Date.now();
+    
+    // 2. CHẶN LẶP: Nếu thông báo trước đó vừa hiển thị cách đây chưa đầy 2000ms (2 giây), bỏ qua không hiện lại
+    if (bayGio - thoiGianThongBaoXoaGanNhat > 2000) {
+        if (typeof NotiModule !== 'undefined' && typeof NotiModule.show === 'function') {
+            NotiModule.show(`Đã xóa thành công hóa đơn ${maHD}!`, "success");
+        }
+        thoiGianThongBaoXoaGanNhat = bayGio; // Cập nhật lại mốc thời gian vừa thông báo
     }
 
     // Xóa đơn hàng khỏi bộ nhớ đệm cache cục bộ trên Web

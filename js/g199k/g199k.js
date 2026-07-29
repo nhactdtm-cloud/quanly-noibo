@@ -365,59 +365,69 @@ tínhNgàyKếtThúc: function() {
 },
 
 
-capNhatKhungChamSocKhachHang: function() {
+    capNhatKhungChamSocKhachHang: function() {
         const gid = document.getElementById('r-gid').value || 'TỰ ĐỘNG SINH';
         const name = document.getElementById('r-name').value.trim() || 'Chưa nhập tên';
         const goi = document.getElementById('r-goi').value;
         const startVal = document.getElementById('r-start').value; // Định dạng HTML5: YYYY-MM-DD
-        const endVal = document.getElementById('r-end').value;     // Đã đổi thành định dạng: DD/MM/YYYY
+        const endVal = document.getElementById('r-end').value;     
         const tienVal = document.getElementById('r-tien').value || 0;
 
         // Cập nhật Dòng 1: Mã GID ( Tên Khách Hàng )
         document.getElementById('display-customer-info').innerText = `${gid} ( ${name} )`;
 
+        // 1. Định dạng Ngày bắt đầu (Luôn đảm bảo ra DD/MM/YYYY)
         let startFormatted = '--/--/----';
         if (startVal) {
             const [y, m, d] = startVal.split('-');
-            startFormatted = `${d}/${m}/${y}`;
+            startFormatted = `${d.padStart(2, '0')}/${m.padStart(2, '0')}/${y}`;
         }
 
-        // 🌟 FIX TẠI ĐÂY: Vì endVal hiện tại đã là DD/MM/YYYY, không cần convert lại nữa
+        // 2. SỬA ĐỊNH DẠNG LỊCH SAI & TÍNH NGÀY CÒN LẠI
         let endFormatted = '--/--/----';
         let endDateObj = null;
 
         if (endVal && endVal !== "HỦY NGAY") {
-            endFormatted = endVal; // Lấy trực tiếp chuỗi DD/MM/YYYY để hiển thị luôn
+            // Dùng Regex trích xuất tất cả các cụm số bất kể chuỗi là "ngày 29 thg 8, 2026" hay "29/08/2026"
+            const parts = endVal.match(/\d+/g);
             
-            // Tách chuỗi DD/MM/YYYY để tạo đối tượng Date phục vụ tính toán số ngày còn lại
-            const parts = endVal.split('/');
-            const d = parseInt(parts[0], 10);
-            const m = parseInt(parts[1], 10) - 1; // Tháng trong JS chạy từ 0 - 11
-            const y = parseInt(parts[2], 10);
-            endDateObj = new Date(y, m, d);
+            if (parts && parts.length >= 3) {
+                const d = parseInt(parts[0], 10);
+                const m = parseInt(parts[1], 10); // Tháng thực tế (1 - 12)
+                const y = parseInt(parts[2], 10);
+                
+                // Ép lịch hiển thị quay trở lại dạng số truyền thống DD/MM/YYYY 
+                const dayStr = String(d).padStart(2, '0');
+                const monthStr = String(m).padStart(2, '0');
+                endFormatted = `${dayStr}/${monthStr}/${y}`;
+                
+                // Khởi tạo đối tượng Date phục vụ tính toán (tháng trong JS trừ đi 1)
+                endDateObj = new Date(y, m - 1, d);
+            } else {
+                endFormatted = endVal;
+            }
         } else if (endVal === "HỦY NGAY") {
             endFormatted = "HỦY NGAY";
         }
 
-        // 🌟 FIX TẠI ĐÂY: Tính số ngày còn lại thực tế từ HÔM NAY đến NGÀY KẾT THÚC
+        // 3. Tính số ngày còn lại thực tế từ HÔM NAY đến NGÀY KẾT THÚC
         let diffDays = 0;
-        if (endDateObj) {
+        if (endDateObj && !isNaN(endDateObj.getTime())) {
             const today = new Date();
             today.setHours(0, 0, 0, 0); // Đưa mốc hôm nay về 00:00:00 để tính chính xác theo ngày
             
-            // Tính khoảng cách thời gian giữa ngày kết thúc và hôm nay
             const diffTime = endDateObj - today;
-            // Đổi ra số ngày (nếu âm tức là đã quá hạn)
             diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
             if (diffDays < 0) diffDays = 0; 
         }
 
-        // Cập nhật Dòng 2: Khung thông tin gia hạn thanh toán nhóm
+        // Cập nhật dữ liệu lên Khung thông tin gia hạn thanh toán nhóm
         document.getElementById('lbl-goi').innerText = goi;
         document.getElementById('lbl-time').innerText = `${startFormatted} → ${endFormatted}`;
         document.getElementById('lbl-days').innerText = (goi === 'Hủy ĐK' || endVal === "HỦY NGAY") ? '0 ngày' : `${diffDays} ngày`;
         document.getElementById('lbl-tien').innerText = Number(tienVal).toLocaleString('vi-VN') + 'đ';
     },
+
 
 
     // HÀM MỚI: Đăng ký sự kiện Click là tự động sao chép văn bản
