@@ -52,19 +52,8 @@
     color: #1a1a1a;
 }
 
-.renewal-close-btn {
-    background: none;
-    border: none;
-    color: #999999;
-    font-size: 22px;
-    cursor: pointer;
-    line-height: 1;
-    padding: 0;
-    transition: color 0.2s ease;
-}
-
-.renewal-close-btn:hover {
-    color: #ff4d4f;
+.renewal-popup-header {
+    position: relative;
 }
 
 /* Vùng chứa danh sách */

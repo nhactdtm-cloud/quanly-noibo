@@ -15,7 +15,7 @@ const ThuChiModule = {
 
     initLgdRong() {
         const sel = document.getElementById('lgd'); if (!sel) return;
-        sel.innerHTML = ''; sel.add(new Option('-- Chọn loại giao dịch --', ''));
+        sel.innerHTML = ''; sel.add(new Option('Chọn loại giao dịch', ''));
         this.oT.forEach(o => sel.add(new Option(o, o))); sel.value = '';
     },
 
@@ -48,7 +48,7 @@ const ThuChiModule = {
         box.innerHTML = [...arr].reverse().map(i => {
             const isThu = i.mode === 'THU TIỀN';
             return `<div style="display:flex;justify-content:space-between;font-size:13px;padding:3px 0;border-bottom:1px dashed #eee;">
-                <a href="javascript:void(0);" onclick="moChiTietHoaDon('${i.hoaDon}')" style="font-weight:bold;color:#1e40af;text-decoration:none;cursor:pointer;">📌 ${i.hoaDon}</a>
+                <a href="javascript:void(0);" onclick="moChiTietHoaDon('${i.hoaDon}')" style="font-weight:bold;color:#1e40af;text-decoration:none;cursor:pointer;"> ${i.hoaDon}</a>
                 <span style="color:${isThu?'green':'red'};font-weight:bold;">${isThu?'+':'-'}${i.soTien.toLocaleString('vi-VN')}đ</span>
             </div>`;
         }).join('') || '<div style="color:#888;font-size:12px;">Chưa có dữ liệu.</div>';
@@ -64,7 +64,7 @@ const ThuChiModule = {
     
     sm(m) {
         this.md = m; const bT = document.getElementById('s-thu'), bC = document.getElementById('s-chi'), sel = document.getElementById('lgd');
-        bT.className = bC.className = 'seg-btn'; sel.innerHTML = ''; sel.add(new Option('-- Chọn loại giao dịch --', ''));
+        bT.className = bC.className = 'seg-btn'; sel.innerHTML = ''; sel.add(new Option('Chọn loại giao dịch', ''));
         m === 'THU' ? (bT.classList.add('active', 'thu'), this.oT.forEach(o => sel.add(new Option(o, o)))) : (bC.classList.add('active', 'chi'), this.oC.forEach(o => sel.add(new Option(o, o))));
         sel.value = '';
     },

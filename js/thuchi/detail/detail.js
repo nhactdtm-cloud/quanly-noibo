@@ -99,20 +99,34 @@ function khoiTaoModalHTML() {
     modalDiv.id = 'detailModal';
     modalDiv.className = 'detail-modal';
     
+    // Gọi hàm từ UIButton để lấy chuỗi HTML nút x dùng chung
+    // Gán id là "detailModalCloseBtn" để dễ viết sự kiện click
+    const closeButtonHtml = UIButton.closeModal(null, "detailModalCloseBtn");
+
     modalDiv.innerHTML = `
         <div class="detail-content">
-            <span class="detail-modal-close-x" onclick="dongModalChiTiet()">&times;</span>
+            ${closeButtonHtml}
             <h3>🔍 Chi Tiết Giao Dịch</h3>
             <div id="detailRowsContainer"></div>
             <button id="detailDeleteBtn" class="detail-delete-btn">XÓA HÓA ĐƠN</button>
         </div>
     `;
 
+    // Lắng nghe sự kiện click trên toàn bộ modal
     modalDiv.addEventListener('click', (e) => {
-        if (e.target.id === 'detailModal') dongModalChiTiet();
+        // Nếu click ra vùng ngoài modal (nền tối)
+        if (e.target.id === 'detailModal') {
+            dongModalChiTiet();
+        }
+        // Nếu click đúng vào nút x dùng chung (id detailModalCloseBtn)
+        if (e.target.id === 'detailModalCloseBtn') {
+            dongModalChiTiet();
+        }
     });
+
     document.body.appendChild(modalDiv);
 }
+
 
 
 function xoaHoaDon(maHD) {

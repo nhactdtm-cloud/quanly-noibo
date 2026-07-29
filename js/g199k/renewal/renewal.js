@@ -151,11 +151,16 @@ const RenewalModule = {
         const popup = document.createElement('div');
         popup.id = 'renewal-history-popup';
         popup.className = 'renewal-popup-overlay show';
+
+        // Gọi hàm từ UIButton để tạo mã HTML cho nút x dùng chung
+        // Giữ nguyên id "btn-close-renewal" để code xử lý sự kiện click bên dưới hoạt động bình thường
+        const closeButtonHtml = UIButton.closeModal(null, "btn-close-renewal");
+
         popup.innerHTML = `
             <div class="renewal-popup-content">
                 <div class="renewal-popup-header">
                     <h3 id="renewal-history-title">📜 Lịch Sử Gia Hạn</h3>
-                    <button id="btn-close-renewal" class="renewal-close-btn">&times;</button>
+                    ${closeButtonHtml}
                 </div>
                 <div id="renewal-history-list" class="renewal-popup-body"></div>
             </div>
@@ -163,6 +168,7 @@ const RenewalModule = {
 
         document.body.appendChild(popup);
 
+        // Giữ nguyên các hàm bắt sự kiện cũ (vẫn hoạt động tốt vì id không đổi)
         document.getElementById('btn-close-renewal').addEventListener('click', () => this.dongPopup());
         popup.addEventListener('click', (e) => {
             if (e.target === popup) this.dongPopup();
@@ -180,4 +186,5 @@ const RenewalModule = {
         const [y, m, d] = dateStr.split('-');
         return y && m && d ? `${d}/${m}/${y}` : dateStr;
     }
+
 };

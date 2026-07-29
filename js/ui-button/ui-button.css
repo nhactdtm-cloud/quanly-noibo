@@ -1,0 +1,26 @@
+.ui-close-btn {
+
+    position: absolute;
+
+    top: 10px;
+    right: 15px;
+
+    font-size: 30px;
+    font-weight: bold;
+
+    color: #666;
+
+    cursor: pointer;
+
+    line-height: 1;
+
+    user-select: none;
+
+    transition: 0.2s;
+}
+
+
+.ui-close-btn:hover {
+    color: red;
+    transform: scale(1.15);
+}

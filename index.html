@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
     <title>G_199K Premium System</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="js/ui-button/ui-button.css">
     <link rel="stylesheet" href="js/user/user.css">
     <link rel="stylesheet" href="js/thuchi/detail/detail.css">
     <link rel="stylesheet" href="js/thuchi/thuchi.css">
@@ -19,7 +20,7 @@
     <!-- MÀN HÌNH ĐĂNG NHẬP -->
     <div id="lg-sc">
         <div class="lg-bx">
-            <h2>G_199K / CORE</h2>
+            <h2>G_199K / THU CHI</h2>
             <div class="login-sub">Hệ thống quản lý nội bộ</div>
             <div class="gr"><label>Tài khoản</label><input type="text" id="un" value="admin"></div>
             <div class="gr"><label>Mật khẩu</label><input type="password" id="pw" placeholder="••••••"></div>
@@ -70,13 +71,13 @@
                         
                         <!-- KHỐI HOẠT ĐỘNG (HÀNG TRÊN) -->
                         <div class="stat-sidebar">
-                            <div class="stat-box-title">📊 HOẠT ĐỘNG HÔM NAY</div>
+                            <div class="stat-box-title">📊 HOẠT ĐỘNG THU CHI</div>
                             <div class="stat-card">
-                                <span class="stat-label">Tổng hóa đơn đã duyệt</span>
+                                <span class="stat-label">Hóa đơn đã duyệt</span>
                                 <span class="stat-val" id="stat-total-orders">0</span>
                             </div>
                             <div class="stat-card">
-                                <span class="stat-label">Doanh thu trong ngày</span>
+                                <span class="stat-label">Tổng doanh thu</span>
                                 <span class="stat-val thu" id="stat-total-revenue">0đ</span>
                             </div>
                             <div class="stat-card">
@@ -182,7 +183,7 @@
         <div class="stat-box-title">👥 DANH SÁCH KHÁCH HÀNG</div>
         <div class="member-list-card">
             <div class="member-list-header">
-                <span>Nhân viên: <strong id="lbl-current-admin">ADMIN</strong></span>
+                <span>Cập nhật mới</span>
             </div>
             <!-- Khung chứa danh sách các item khách hàng đổ về từ JS -->
             <div id="r199k-member-container" class="member-container-scroll">
@@ -203,6 +204,7 @@
 
     <script src="js/notification/notification.js"></script>
     <script src="js/user/user.js"></script>
+    <script src="js/ui-button/ui-button.js"></script>
     <script src="js/thuchi/detail/detail.js"></script>
     <script src="js/thuchi/thuchi.js"></script>
     <script src="js/g199k/renewal/renewal.js"></script>

@@ -195,9 +195,6 @@ const R199kModule = {
 
 
 taiDanhSachThanhVienTheoUser: function() {
-    // Thay đổi hiển thị tiêu đề để nhân viên biết đây là danh sách tổng của toàn bộ hệ thống
-    const lblAdmin = document.getElementById('lbl-current-admin');
-    if (lblAdmin) lblAdmin.innerText = "TẤT CẢ THÀNH VIÊN";
     
     const container = document.getElementById('r199k-member-container');
     container.innerHTML = '<div class="member-empty-state">🔄 Đang tải dữ liệu...</div>';
