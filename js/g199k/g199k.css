@@ -263,7 +263,7 @@
 }
 
 /*==========================================================================
- MOBILE (Responsive) - BẢN FIX TRIỆT ĐỂ 100% CHO INPUT DATE
+ MOBILE (Responsive) - CHỈ CĂN TÂM CHỮ VÀ GIỮ NGUYÊN HÀNH VI CHỌN LỊCH GỐC
  ========================================================================== */
 @media (max-width: 768px) {
     .r199k-workspace {
@@ -303,18 +303,18 @@
         margin: 0 auto 4px auto !important;
     }
 
-    /* Đảm bảo toàn bộ ô nhập liệu và ô select thẳng hàng tăm tắp với nhãn chữ */
+    /* ĐỊNH CẤU HÌNH CHUNG: Ép khay vuông vắn đồng đều, chống phình hoặc lệch viền */
     .gr input, 
     .gr select,
     .gr input[readonly] {
         width: 100% !important;
         max-width: 100% !important;
         display: block !important;         
-        text-align: center !important;     
+        text-align: center !important;     /* Ép chữ text nhảy vào tâm ngang */
         font-size: 13px !important;        
         -webkit-text-fill-color: var(--t) !important; 
         opacity: 1 !important;             
-        box-sizing: border-box !important; 
+        box-sizing: border-box !important; /* Buộc viền tính thụt vào trong khung */
         height: 34px !important;
         line-height: 24px !important; 
         padding: 4px 10px !important;
@@ -323,46 +323,19 @@
         border-radius: 6px !important;
     }
 
-    /* Ép text hiển thị bên trong các ô lịch (type="date") căn đều vào giữa trên iOS/Safari */
-    .gr input[type="date"]::-webkit-date-and-time-value {
-        text-align: center !important;
-    }
-
-
-    /* 🌟 THẦN CHÚ ĐẬP TAN ĐỊNH DẠNG MẶC ĐỊNH CỦA INPUT DATE TRÊN MOBILE 🌟 */
-    #r-start {
-        display: flex !important;            /* Chuyển sang flex để căn giữa văn bản ẩn bên trong */
-        align-items: center !important;      
-        justify-content: center !important;  
-        text-align: center !important;
-        -webkit-appearance: none !important; /* Xóa bỏ giao diện mặc định của iOS */
-        appearance: none !important;
-        min-height: 34px !important;         /* Giữ nguyên chiều cao đồng bộ */
-    }
-
-    /* Ép văn bản hiển thị ngày (chữ ngày 29 thg 7...) lọt vào chính giữa trọng tâm */
+    /* 🌟 CĂN CHỮ VÀO TÂM CHO Ô CHỌN LỊCH (Ngày Bắt Đầu) TRÊN IOS/SAFARI 🌟 */
     #r-start::-webkit-date-and-time-value {
         text-align: center !important;
         width: 100% !important;
-        margin: 0 auto !important;
-        display: block !important;
     }
 
-    /* Ẩn bớt các khoảng đệm thừa tự sinh của trình duyệt gây lệch khay */
-    #r-start::-webkit-inner-spin-button,
-    #r-start::-webkit-clear-button {
-        display: none !important;
-        -webkit-appearance: none !important;
-    }
-
-    /* Đẩy icon hình cái lịch nhỏ về sát lề phải, không cho chèn ép làm lệch chữ */
+    /* Đẩy icon lịch của ô Ngày Bắt Đầu về lề phải để không che khuất chữ */
     #r-start::-webkit-calendar-picker-indicator {
         position: absolute !important;
         right: 12px !important;
-        margin: 0 !important;
-        padding: 0 !important;
     }
 
+    /* Nút bấm Đăng xuất và Nhập dữ liệu bảng */
     #p-g .card .btn-sm {
         height: 40px !important;              
         width: 100% !important;
