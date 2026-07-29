@@ -194,51 +194,70 @@ const R199kModule = {
     },
 
 
-    taiDanhSachThanhVienTheoUser: function() {
-        // Thay đổi hiển thị tiêu đề để nhân viên biết đây là danh sách tổng của toàn bộ hệ thống
-        const lblAdmin = document.getElementById('lbl-current-admin');
-        if (lblAdmin) lblAdmin.innerText = "TẤT CẢ THÀNH VIÊN";
-        
-        const container = document.getElementById('r199k-member-container');
-        container.innerHTML = '<div class="member-empty-state">🔄 Đang tải dữ liệu...</div>';
+taiDanhSachThanhVienTheoUser: function() {
+    // Thay đổi hiển thị tiêu đề để nhân viên biết đây là danh sách tổng của toàn bộ hệ thống
+    const lblAdmin = document.getElementById('lbl-current-admin');
+    if (lblAdmin) lblAdmin.innerText = "TẤT CẢ THÀNH VIÊN";
+    
+    const container = document.getElementById('r199k-member-container');
+    container.innerHTML = '<div class="member-empty-state">🔄 Đang tải dữ liệu...</div>';
 
-        // [ĐÃ SỬA] Loại bỏ tham số lọc &adminName để Backend Apps Script quét và trả về toàn bộ dữ liệu bảng
-        const url = `${this.WEB_APP_URL}?action=GET_MEMBERS`;
+    // [ĐÃ SỬA] Loại bỏ tham số lọc &adminName để Backend Apps Script quét và trả về toàn bộ dữ liệu bảng
+    const url = `${this.WEB_APP_URL}?action=GET_MEMBERS`;
 
-        fetch(url)
-        .then(response => response.json())
-        .then(res => {
-            if (res.status === "success" && res.data && res.data.length > 0) {
-                container.innerHTML = ''; // Xóa dòng trạng thái chờ
+    fetch(url)
+    .then(response => response.json())
+    .then(res => {
+        if (res.status === "success" && res.data && res.data.length > 0) {
+            container.innerHTML = ''; // Xóa dòng trạng thái chờ
+            
+            res.data.forEach(item => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'member-item';
+                itemDiv.innerHTML = `
+                    <div class="member-item-info">
+                        <!-- Thêm class r-click-name và style pointer để người dùng biết có thể click -->
+                        <span class="member-item-name r-click-name" style="cursor: pointer; text-decoration: underline;">${item.name}</span>
+                        <span class="member-item-gid">${item.gid}</span>
+                    </div>
+                    <span class="member-item-badge">${item.goi}</span>
+                `;
                 
-                res.data.forEach(item => {
-                    const itemDiv = document.createElement('div');
-                    itemDiv.className = 'member-item';
-                    itemDiv.innerHTML = `
-                        <div class="member-item-info">
-                            <span class="member-item-name">${item.name}</span>
-                            <span class="member-item-gid">${item.gid}</span>
-                        </div>
-                        <span class="member-item-badge">${item.goi}</span>
-                    `;
-                    
-                    // Sự kiện tương tác tiện ích: Click vào khách hàng trong danh sách sẽ tự điền nhanh vào form để gia hạn luôn
-                    itemDiv.addEventListener('click', () => {
-                        document.getElementById('r-gid').value = item.gid;
-                        this.tựĐộngTìmKiếmKháchHàng('GID');
+                // 1. SỰ KIỆN MỚI: Khi click vào TÊN khách hàng
+                const nameBtn = itemDiv.querySelector('.r-click-name');
+                if (nameBtn) {
+                    nameBtn.addEventListener('click', (e) => {
+                        e.stopPropagation(); // ⛔ DỪNG CHUYỂN HƯỚNG/HÀNH VI CLICK CỦA THẺ CHA
+                        
+                        // Gọi hàm hiển thị lịch sử từ file renewal.js (Ví dụ module tên là RenewalModule)
+                        if (typeof RenewalModule !== 'undefined' && typeof RenewalModule.hienThiLichSuGiaHan === 'function') {
+                            RenewalModule.hienThiLichSuGiaHan(item.gid);
+                        } else {
+                            console.error("Chưa tìm thấy RenewalModule hoặc hàm hienThiLichSuGiaHan trong renewal.js");
+                            // Fallback tạm thời nếu chưa liên kết file thành công
+                            NotiModule.show(`Đang xem lịch sử của ${item.name} (${item.gid})`, "success");
+                        }
                     });
-                    
-                    container.appendChild(itemDiv);
+                }
+                
+                // 2. Sự kiện của thẻ cha: Click vào vùng khác (như GID, Badge) thì vẫn điền form gia hạn như cũ
+                itemDiv.addEventListener('click', () => {
+                    document.getElementById('r-gid').value = item.gid;
+                    this.tựĐộngTìmKiếmKháchHàng('GID');
                 });
-            } else {
-                container.innerHTML = '<div class="member-empty-state">Chưa có thành viên nào trong hệ thống.</div>';
-            }
-        })
-        .catch(err => {
-            console.error("Lỗi tải danh sách thành viên:", err);
-            container.innerHTML = '<div class="member-empty-state">❌ Không thể tải danh sách.</div>';
-        });
-    },
+                
+                container.appendChild(itemDiv);
+            });
+        } else {
+            container.innerHTML = '<div class="member-empty-state">Chưa có thành viên nào trong hệ thống.</div>';
+        }
+    })
+    .catch(err => {
+        console.error("Lỗi tải danh sách thành viên:", err);
+        container.innerHTML = '<div class="member-empty-state">❌ Không thể tải danh sách.</div>';
+    });
+},
+
 
 
     
