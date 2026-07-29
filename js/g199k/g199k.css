@@ -263,7 +263,7 @@
 }
 
 /*==============================
- MOBILE (Responsive)
+ MOBILE (Responsive) - ĐÃ FIX LỖI LỆCH NGÀY
 ===============================*/
 @media (max-width: 768px) {
     .r199k-workspace {
@@ -293,6 +293,16 @@
     .r199k-sidebar {
         height: auto;
         margin-bottom: 30px;
+    }
+
+    /* 🌟 ĐOẠN FIX LỖI CĂN GIỮA VÀ SWELL FONT CHO Ô NGÀY KẾT THÚC TRÊN MOBILE 🌟 */
+    .gr input, 
+    .gr select,
+    .gr input[readonly] {
+        text-align: center !important;     /* Ép chữ căn vào chính giữa ô như bản PC */
+        font-size: 13px !important;        /* Giữ nguyên size chữ 13px chuẩn, chống tự phóng to */
+        -webkit-text-fill-color: var(--t) !important; /* Fix lỗi chữ bị mờ màu xám trên iOS */
+        opacity: 1 !important;             /* Bỏ độ mờ mặc định của các dòng máy cảm ứng */
     }
 }
 
