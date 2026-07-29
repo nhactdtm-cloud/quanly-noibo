@@ -68,12 +68,17 @@ const UserModule = {
             ThuChiModule.totalRevenue = 0;
             ThuChiModule.totalExpense = 0;
             ThuChiModule.duLieuGiaoDichHomNay = [];
-            
-            // Ép giao diện hiển thị tổng thu/chi quay về 0đ ngay lập tức
             ThuChiModule.uSt(); 
-            
-            // Xóa sạch bảng đối soát nhanh bên phải (Khối đối soát tự hiện "Chưa có dữ liệu.")
             ThuChiModule.capNhatKhoiDoiSoat([]); 
+        }
+
+        // ==========================================================================
+        // ĐÃ THÊM: XÓA SẠCH BỘ NHỚ ĐỆM THÀNH VIÊN VÀ RAM CACHE LỊCH SỬ GIA HẠN
+        // ==========================================================================
+        localStorage.removeItem('r199k_members_cache');
+        localStorage.removeItem('r199k_members_cache_time');
+        if (typeof RenewalModule !== 'undefined') {
+            RenewalModule.lichSuCache = {}; // Xóa sạch RAM cache lịch sử gia hạn của tài khoản cũ
         }
 
         // 2.2. LÀM TRỐNG BẢNG GIAO DỊCH CHÍNH TRÊN MÀN HÌNH (NẾU CÓ)
@@ -83,17 +88,16 @@ const UserModule = {
 
         // 2.3. XÓA SẠCH KEY ĐĂNG NHẬP TRONG LOCALSTORAGE
         localStorage.removeItem('loggedUser');
-        
-        // Reset tên biến quản lý về mặc định
         this.uName = 'ADMIN';
 
         // 2.4. KHÔI PHỤC GIAO DIỆN MÀN HÌNH ĐĂNG NHẬP GỐC
         document.getElementById('pw').value = '';
-        document.getElementById('un').value = ''; // Xóa luôn ô nhập tài khoản cho sạch
+        document.getElementById('un').value = ''; 
         document.getElementById('ap').classList.remove('auth');
         document.getElementById('lg-sc').style.display = 'flex';
         
         if (typeof st === 'function') st('t');
         NotiModule.show("Đã đăng xuất tài khoản và làm sạch dữ liệu!", "info");
     }
+
 };

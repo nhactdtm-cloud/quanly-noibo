@@ -198,12 +198,11 @@ taiDanhSachThanhVienTheoUser: function() {
     const container = document.getElementById('r199k-member-container');
     if (!container) return;
 
-    // Cấu hình thời gian hết hạn cache (Ví dụ: 300000ms = 5 phút)
-    const CACHE_TIMEOUT = 5 * 60 * 1000; 
     const cacheKey = 'r199k_members_cache';
     const cacheTimeKey = 'r199k_members_cache_time';
+    const CACHE_TIMEOUT = 5 * 60 * 1000; // 5 phút
 
-    // Hàm phụ trợ xử lý vẽ giao diện siêu tốc từ mảng dữ liệu (Gom DOM Fragment + Event Delegation)
+    // Hàm render giao diện tối ưu (Gom DOM Fragment + Event Delegation)
     const renderGiaoDienSieuToc = (data) => {
         const fragment = document.createDocumentFragment();
         data.forEach(item => {
@@ -222,7 +221,6 @@ taiDanhSachThanhVienTheoUser: function() {
         container.innerHTML = ''; 
         container.appendChild(fragment);
 
-        // Ủy quyền sự kiện duy nhất tại thẻ cha
         container.onclick = (e) => {
             const target = e.target;
             const gid = target.getAttribute('data-gid');
@@ -242,50 +240,86 @@ taiDanhSachThanhVienTheoUser: function() {
         };
     };
 
+    // Hàm gọi API đồng bộ mạng thực tế và cập nhật đè vào cache cứng
+    const taiDuLieuMoiTuMang = (isBackground = false) => {
+        if (this.isSubmittingMembers) return;
+        this.isSubmittingMembers = true;
+
+        if (!isBackground) container.innerHTML = '<div class="member-empty-state">🔄 Đang tải dữ liệu mạng...</div>';
+
+        fetch(`${this.WEB_APP_URL}?action=GET_MEMBERS`)
+        .then(response => response.ok ? response.json() : Promise.reject())
+        .then(res => {
+            if (res.status === "success" && Array.isArray(res.data) && res.data.length > 0) {
+                // Đóng dấu cục cache mới tinh vào máy
+                localStorage.setItem(cacheKey, JSON.stringify(res.data));
+                localStorage.setItem(cacheTimeKey, Date.now().toString());
+                
+                // Vẽ lại giao diện theo dữ liệu mới
+                renderGiaoDienSieuToc(res.data);
+                
+                if (isBackground && typeof NotiModule !== 'undefined') {
+                    NotiModule.show("Hệ thống đã tự động cập nhật dữ liệu mới tinh!", "success");
+                }
+            } else if (!isBackground) {
+                container.innerHTML = '<div class="member-empty-state">Chưa có thành viên nào.</div>';
+            }
+        })
+        .catch(err => {
+            console.error("Lỗi tải mạng:", err);
+            if (!isBackground) container.innerHTML = '<div class="member-empty-state">❌ Không thể tải danh sách.</div>';
+        })
+        .finally(() => {
+            this.isSubmittingMembers = false;
+        });
+    };
+
     // ==========================================================================
-    // BƯỚC QUYẾT ĐỊNH TỐC ĐỘ: KIỂM TRA BỘ NHỚ ĐỆM TRÌNH DUYỆT (LOCALSTORAGE)
+    // LOGIC XỬ LÝ CACHE THÔNG MINH CHO THIẾT BỊ MOBILE
     // ==========================================================================
     const cachedData = localStorage.getItem(cacheKey);
     const cachedTime = localStorage.getItem(cacheTimeKey);
     const now = Date.now();
 
-    // Nếu có dữ liệu trong máy và chưa quá 5 phút -> LẬP TỨC XUẤT RA MÀN HÌNH (0ms)
-    if (cachedData && cachedTime && (now - cachedTime < CACHE_TIMEOUT)) {
-        console.log("⚡ ĐÃ LOAD XONG DANH SÁCH THÀNH VIÊN TỪ CACHE CỨNG (0ms)!");
-        return renderGiaoDienSieuToc(JSON.parse(cachedData));
-    }
+    if (cachedData && cachedTime) {
+        const parsedCache = JSON.parse(cachedData);
+        
+        // BƯỚC 1: Lập tức lôi dữ liệu cũ ra vẽ lên màn hình luôn (Tải tức thì 0ms cho mobile đỡ lag)
+        renderGiaoDienSieuToc(parsedCache);
 
-    // Nếu không có cache hoặc cache đã quá hạn, tiến hành gọi API (Chặn lệnh gọi trùng)
-    if (this.isSubmittingMembers) return;
-    this.isSubmittingMembers = true;
-
-    // Chỉ hiện chữ "Đang tải" khi trong máy hoàn toàn chưa có cục dữ liệu nào
-    if (!cachedData) container.innerHTML = '<div class="member-empty-state">🔄 Đang tải dữ liệu mạng...</div>';
-
-    fetch(`${this.WEB_APP_URL}?action=GET_MEMBERS`)
-    .then(response => response.ok ? response.json() : Promise.reject())
-    .then(res => {
-        if (res.status === "success" && Array.isArray(res.data) && res.data.length > 0) {
-            // ĐÓNG DẤU CACHE: Ghi dữ liệu mạng vừa tải về vào ổ cứng để lần sau bốc dùng luôn
-            localStorage.setItem(cacheKey, JSON.stringify(res.data));
-            localStorage.setItem(cacheTimeKey, now.toString());
-
-            // Vẽ lên màn hình
-            renderGiaoDienSieuToc(res.data);
-        } else if (!cachedData) {
-            container.innerHTML = '<div class="member-empty-state">Chưa có thành viên nào trong hệ thống.</div>';
+        // BƯỚC 2: Kiểm tra xem thời gian cache đã quá 5 phút chưa
+        if (now - cachedTime > CACHE_TIMEOUT) {
+            // Nếu quá 5 phút, tiến hành quét mới công khai
+            taiDuLieuMoiTuMang(false);
+        } else {
+            // BƯỚC 3: NÚT THẮT QUYẾT ĐỊNH: Nếu chưa quá 5 phút, âm thầm gọi API chạy ngầm để kiểm tra đơn mới
+            fetch(`${this.WEB_APP_URL}?action=GET_MEMBERS_COUNT`) // Hãy tạo tác vụ phụ này ở Backend nếu cần, hoặc gọi thẳng link gốc dạng nhẹ
+            .then(r => r.json())
+            .then(res => {
+                // Kiểm tra xem số lượng phần tử trên Sheets trả về có khác với độ dài cục cache hiện tại không
+                if (res.status === "success" && res.count !== parsedCache.length) {
+                    console.log("🔔 Phát hiện có thành viên mới hoặc cập nhật mới trên Sheets! Tiến hành đồng bộ ngầm...");
+                    taiDuLieuMoiTxTuMang(true); // Gọi cập nhật ngầm đè giao diện
+                }
+            }).catch(() => {
+                // Nếu Backend không có hàm GET_MEMBERS_COUNT, ta fetch ngầm luôn link gốc để check dữ liệu
+                fetch(`${this.WEB_APP_URL}?action=GET_MEMBERS`)
+                .then(r => r.json())
+                .then(res => {
+                    if (res.status === "success" && res.data && res.data.length !== parsedCache.length) {
+                        localStorage.setItem(cacheKey, JSON.stringify(res.data));
+                        localStorage.setItem(cacheTimeKey, Date.now().toString());
+                        renderGiaoDienSieuToc(res.data);
+                    }
+                });
+            });
         }
-    })
-    .catch(err => {
-        console.error("Lỗi mạng, tự động bốc dữ liệu cũ ra dùng tạm:", err);
-        // Nếu mất mạng hoặc Google Apps Script lỗi, bốc tạm đống cache cũ ra cứu cánh
-        if (cachedData) renderGiaoDienSieuToc(JSON.parse(cachedData));
-        else container.innerHTML = '<div class="member-empty-state">❌ Không thể tải danh sách.</div>';
-    })
-    .finally(() => {
-        this.isSubmittingMembers = false;
-    });
+    } else {
+        // Nếu trong máy hoàn toàn chưa có cache, bắt buộc tải công khai lần đầu
+        taiDuLieuMoiTuMang(false);
+    }
 },
+
 
 
     
@@ -467,7 +501,7 @@ taiDanhSachThanhVienTheoUser: function() {
             adminName: UserModule.uName || "ADMIN"
         };
 
-        fetch(this.WEB_APP_URL, {
+fetch(this.WEB_APP_URL, {
             method: "POST",
             headers: { "Content-Type": "text/plain" },
             body: JSON.stringify(payload)
@@ -477,6 +511,12 @@ taiDanhSachThanhVienTheoUser: function() {
             if (res.status === "success") {
                 this.guiThuChi(hoaDon, name, goi, tien);
                 NotiModule.show(`Đã đồng bộ thành viên vào bảng R-199K thành công!`, "success");
+
+                // ==========================================================================
+                // ĐÃ THÊM: Đập tan bộ nhớ đệm cũ để bắt ép Mobile tải lại danh sách mới tinh
+                // ==========================================================================
+                localStorage.removeItem('r199k_members_cache');
+                localStorage.removeItem('r199k_members_cache_time');
 
                 // Reset form dữ liệu nhập
                 document.getElementById("r-name").value = "";
@@ -496,6 +536,7 @@ taiDanhSachThanhVienTheoUser: function() {
         });
     }
 };
+
 
 document.addEventListener("DOMContentLoaded", () => {
     R199kModule.init();

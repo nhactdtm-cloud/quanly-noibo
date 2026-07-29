@@ -13,7 +13,7 @@ const RenewalModule = {
         const titleContainer = document.getElementById('renewal-history-title');
         
         titleContainer.innerText = `🔄 Đang tải lịch sử: ${gid}...`;
-        historyContainer.innerHTML = '<div class="renewal-loading">🔄 Vui lòng chờ trong giây lát...</div>';
+        historyContainer.innerHTML = '<div class="renewal-loading">🔄 Đang tải lịch sử gia hạn khách hàng...</div>';
 
         const url = `${this.WEB_APP_URL}?action=GET_HISTORY&gid=${encodeURIComponent(gid)}`;
 
