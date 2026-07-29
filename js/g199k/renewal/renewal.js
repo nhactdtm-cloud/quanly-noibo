@@ -43,7 +43,7 @@ const RenewalModule = {
                             <div class="renewal-time-line">
                                 <span>📅 Bắt đầu: <b>${startFormatted}</b></span>
                                 <span>⌛ Kết thúc: <b>${endFormatted}</b></span>
-                                <div class="renewal-invoice-text">🧾 Mã HD: ${item.hoaDon || 'Không có'}</div>
+                                <div class="renewal-invoice-text">Mã HD: ${item.hoaDon || 'Không có'}</div>
                             </div>
                             <button class="renewal-delete-item-btn" title="Xóa giao dịch lỗi">
                                 🗑️ Xóa
