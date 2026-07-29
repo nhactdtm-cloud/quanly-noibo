@@ -262,71 +262,95 @@
     color: #10b981;
 }
 
-/*==============================
- MOBILE (Responsive) - ĐÃ SỬA TRIỆT ĐỂ LỖI LỆCH KHUNG
-===============================*/
+/*==========================================================================
+ MOBILE (Responsive) - BẢN TỔNG HỢP TINH GỌN CHỐNG TRÀN VÀ CĂN TÂM CHỮ CHUẨN 100%
+ ========================================================================== */
 @media (max-width: 768px) {
-    /* Khống chế toàn bộ workspace không cho phép tràn khung ngang */
+    /* Khống chế toàn bộ không gian làm việc chính không tràn khung ngang */
     .r199k-workspace {
-        grid-template-columns: 1fr;
-        height: auto;
+        display: flex !important;
+        flex-direction: column !important;
+        width: 100% !important;
+        max-width: 100% !important;
         gap: 16px;
-        width: 100% !important;
-        overflow-x: hidden; /* Chặn tràn khung ngang toàn cục */
+        padding: 0 4px; 
+        box-sizing: border-box !important;
+        overflow-x: hidden; /* Chặn lăn chuột ngang toàn cục */
     }
 
+    /* Đập tan Grid 2 cột của PC, chuyển hẳn sang xếp dọc Flexbox thẳng đều */
     #p-g .card {
-        grid-template-columns: 1fr !important; /* Ép TOÀN BỘ form thành 1 cột dọc duy nhất */
-        padding: 12px;
-        row-gap: 10px;                         /* Tăng nhẹ khoảng cách dọc cho dễ bấm */
-        height: auto;
+        display: flex !important;
+        flex-direction: column !important;
         width: 100% !important;
-        box-sizing: border-box;
+        padding: 16px 14px !important;
+        row-gap: 12px !important; 
+        height: auto !important;
+        box-sizing: border-box !important;
     }
 
-    /* Ép tất cả các nhóm input (.gr) chiếm trọn 100% chiều rộng, không bị chia đôi */
+    /* Ép tất cả các khay chứa và tab điều hướng rộng sát 100% khung */
     #p-g .card .gr,
     #p-g .card .seg,
     #p-g .card .gr:has(#r-gid),
-    #p-g .card .gr:has(#btn-add-r199k) {
-        grid-column: span 1 !important;
+    #p-g .card .gr:has(#btn-add-r199k),
+    .gr {
+        grid-column: unset !important; 
         width: 100% !important;
         max-width: 100% !important;
-        box-sizing: border-box;
+        margin: 0 !important;
+        box-sizing: border-box !important;
     }
 
-    /* Đảm bảo thanh tab điều hướng căn giữa đẹp mắt */
+    /* Căn giữa thanh tab Đăng ký mới / Gia hạn */
     #p-g .card .seg {
-        margin: 0 auto 6px auto;
+        margin: 0 auto 4px auto !important;
     }
 
-    #p-g .card .btn-sm {
-        height: 38px;              
-        width: 100% !important;
-    }
-
-    .r199k-sidebar {
-        height: auto;
-        margin-bottom: 30px;
-        width: 100% !important;
-        box-sizing: border-box;
-    }
-
-    /* ĐOẠN FIX LỖI CĂN GIỮA VÀ CHỐNG PHÓNG TO TRÊN MOBILE */
+    /* ĐỐI TƯỢNG CHÍNH: Ép khay vuông vắn, chống lệch phải và căn chữ vào chính giữa */
     .gr input, 
     .gr select,
     .gr input[readonly] {
-        text-align: center !important;     
+        width: 100% !important;
+        max-width: 100% !important;
+        display: block !important;         /* Giữ block chuẩn để không bị vỡ khay, mất viền */
+        text-align: center !important;     /* Căn giữa chữ theo chiều ngang */
         font-size: 13px !important;        
         -webkit-text-fill-color: var(--t) !important; 
         opacity: 1 !important;             
-        width: 100% !important;            /* Đảm bảo input không nở to hơn thẻ cha */
-        box-sizing: border-box !important; /* Ép viền tính vào trong chiều rộng */
+        box-sizing: border-box !important; /* Ép viền thụt vào trong để không bao giờ bị tràn */
+        
+        /* Cố định chiều cao và dùng line-height để đẩy chữ vào chính giữa tâm ô */
+        height: 34px !important;
+        line-height: 24px !important; 
+        padding: 4px 10px !important;
+        background: #fafafa !important;
+        border: 1px solid var(--b) !important;
+        border-radius: 6px !important;
+    }
+
+    /* Bổ sung đẩy icon lịch mặc định (nếu có) sang góc phải để không đè lên chữ */
+    .gr input[type="date"]::-webkit-calendar-picker-indicator {
+        position: absolute !important;
+        right: 12px !important;
+    }
+
+    /* Nút bấm Đăng xuất và Nhập dữ liệu bảng */
+    #p-g .card .btn-sm {
+        height: 40px !important;              
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+
+    /* Sidebar danh sách khách hàng bên dưới */
+    .r199k-sidebar {
+        width: 100% !important;
+        height: auto !important;
+        margin-bottom: 30px;
+        box-sizing: border-box !important;
     }
 }
-/* ==========================================================================
-   G199K.CSS - GIAO DIỆN PC 2 CỘT TỐI ƯU (ĐÃ ĐƯỢC THU GỌN CHIỀU CAO)
-   ========================================================================== */
+
 
 .r199k-workspace {
     display: grid;
@@ -587,102 +611,6 @@
     font-weight: 700;
     color: #10b981;
 }
-
-/*==============================
- MOBILE (Responsive) - FIX TRIỆT ĐỂ LỖI LỆCH KHAY NHẬP LIỆU
-===============================*/
-@media (max-width: 768px) {
-    /* Ép không gian làm việc chính không được phép tràn khung */
-    .r199k-workspace {
-        display: flex !important;
-        flex-direction: column !important;
-        width: 100% !important;
-        max-width: 100% !important;
-        gap: 16px;
-        padding: 0 8px; /* Tạo khoảng cách an toàn với viền màn hình điện thoại */
-        box-sizing: border-box !important;
-    }
-
-    /* Đập tan cấu hình Grid 2 cột trên PC, chuyển hẳn sang Flexbox dọc cho Mobile */
-    #p-g .card {
-        display: flex !important;
-        flex-direction: column !important;
-        width: 100% !important;
-        padding: 16px 14px !important;
-        row-gap: 12px !important; /* Khoảng cách đều đặn giữa các khay nhập liệu */
-        height: auto !important;
-        box-sizing: border-box !important;
-    }
-
-    /* Ép chặt TẤT CẢ các khay chứa (.gr) và thanh tab điều hướng (.seg) rộng đúng 100% */
-    #p-g .card .gr,
-    #p-g .card .seg,
-    #p-g .card .gr:has(#r-gid),
-    #p-g .card .gr:has(#btn-add-r199k),
-    .gr {
-        grid-column: unset !important; /* Hủy bỏ cấu hình Grid cột trên PC */
-        width: 100% !important;
-        max-width: 100% !important;
-        margin: 0 0 4px 0 !important;
-        box-sizing: border-box !important;
-    }
-
-    /* Căn giữa thanh tab Đăng ký mới / Gia hạn */
-    #p-g .card .seg {
-        margin: 0 auto 8px auto !important;
-    }
-
-    /* Đảm bảo toàn bộ ô nhập liệu và ô select thẳng hàng tăm tắp với nhãn chữ */
-    .gr input, 
-    .gr select,
-    .gr input[readonly] {
-        width: 100% !important;
-        max-width: 100% !important;
-        display: block !important;         /* Trả về block chuẩn để không bị vỡ khay, mất viền */
-        text-align: center !important;     /* Căn giữa chữ theo chiều ngang */
-        font-size: 13px !important;        
-        -webkit-text-fill-color: var(--t) !important; 
-        opacity: 1 !important;             
-        box-sizing: border-box !important; /* Ép viền thụt vào trong để nằm gọn trong form */
-        
-        /* Căn giữa theo chiều dọc dựa trên chiều cao 34px của ô nhập ở phần 1 */
-        height: 34px !important;
-        line-height: 26px !important;      /* Điều chỉnh dòng chữ lọt vào chính giữa tâm ô */
-        padding: 4px 10px !important;
-    }
-
-    /* 🌟 XỬ LÝ RIÊNG CHO CÁC Ô CHỌN NGÀY ĐỂ BUỘC CHỮ PHẢI RA GIỮA 🌟 */
-    .gr input[type="date"],
-    .gr input[placeholder*="ngày"],
-    #ngay_bat_dau_id_cua_ban { /* Thay ID thật của ô ngày bắt đầu vào đây nếu có */
-        text-align: center !important;
-        display: block !important;
-        width: 100% !important;
-        box-sizing: border-box !important;
-    }
-
-    /* Nếu ô này là thẻ input type="date" thuần, đẩy icon lịch sang góc phải */
-    .gr input[type="date"]::-webkit-calendar-picker-indicator {
-        position: absolute !important;
-        right: 12px !important;
-    }
-
-    /* Nút bấm Đăng xuất và Nhập dữ liệu bảng */
-    #p-g .card .btn-sm {
-        height: 40px !important;              
-        width: 100% !important;
-        box-sizing: border-box !important;
-    }
-
-    .r199k-sidebar {
-        width: 100% !important;
-        height: auto !important;
-        margin-bottom: 30px;
-        box-sizing: border-box !important;
-    }
-}
-
-
 
 
 /* Tiện ích ẩn hiện */
