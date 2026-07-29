@@ -183,27 +183,28 @@
 
 
 /* ==========================================================================
-   TỐI ƯU CHO BẢN MOBILE: BẬT CON LĂN NỘI BỘ CHO KHỐI ĐỐI SOÁT
+   TỐI ƯU CHO BẢN MOBILE: CỐ ĐỊNH BOTTOM - BẬT LĂN NỘI BỘ KHÔNG BỊ TRÀN
    ========================================================================== */
 @media (max-width: 768px) {
-    /* 1. Khóa chiều cao cố định khít màn hình Mobile để triệt tiêu thanh cuộn toàn trang */
+    /* 1. Khóa cứng chiều cao vùng workspace bằng chiều cao màn hình trừ đi thanh điều hướng đáy */
     .thuchi-workspace { 
-        grid-template-columns: 1fr; 
-        height: calc(100vh - 100px); /* Tùy chỉnh trừ đi chiều cao Header/Nav của Mobile */
-        overflow: hidden; /* Chặn tuyệt đối không cho toàn trang cuộn */
         display: flex;
-        flex-direction: column; /* Xếp chồng các khối theo chiều dọc */
+        flex-direction: column; /* Xếp dọc từ trên xuống */
+        width: 100%;
+        height: calc(100vh - 60px); /* 60px là ước lượng chiều cao thanh menu đáy, hãy chỉnh lại nếu cần */
+        overflow: hidden; /* Triệt tiêu hoàn toàn con lăn tổng của toàn trang */
         gap: 12px;
         padding: 12px;
+        box-sizing: border-box;
     }
 
-    /* 2. Khối Form nhập liệu: Tự co giãn theo nội dung, không chiếm hết màn hình */
+    /* 2. Khối Form nhập liệu: Tự co theo nội dung, giữ nguyên cấu trúc */
     #p-t .card { 
         grid-template-columns: 1fr; 
         height: auto; 
         padding: 16px; 
         row-gap: 12px; 
-        flex-shrink: 0; /* Ép form không bị bóp nghẹt chiều cao */
+        flex-shrink: 0; /* KHÔNG cho phép Form bị bóp méo chiều cao */
     }
     
     #p-t .card .seg, #p-t .card .btn-sm { 
@@ -216,33 +217,35 @@
         margin-top: 4px; 
     }
 
-    /* 3. Vùng chứa các khối bên phải (Giờ chuyển xuống dưới Form trên Mobile) */
+    /* 3. Vùng chứa các khối bên phải (Thống kê + Đối soát) */
     .thuchi-workspace-right { 
-        flex: 1; /* Chiếm trọn toàn bộ không gian còn lại của màn hình */
-        min-height: 0; /* BẮT BUỘC: Flexbox hack để kích hoạt overflow nội bộ */
+        flex: 1; /* Chiếm trọn vẹn phần diện tích còn lại ở giữa màn hình */
         display: flex;
         flex-direction: column;
         gap: 12px; 
-        height: auto; /* Để flex-grow tự tính toán */
+        height: 100%;
+        min-height: 0; /* BẮT BUỘC để kích hoạt overflow cho phần tử con */
+        overflow: hidden;
     }
 
-    /* Đổi thứ tự: Đẩy Thống kê lên trên, Khối đối soát lịch sử xuống cuối */
+    /* Khối Thống kê tài chính */
     .stat-sidebar { 
         order: 1; 
-        flex-shrink: 0; /* Giữ nguyên kích thước khối thông số */
+        flex-shrink: 0; /* Giữ nguyên không gian, không cho co bóp */
         padding: 14px;
         gap: 8px;
     }
 
-    /* 4. KHỐI ĐỐI SOÁT LỊCH SỬ: Bật con lăn độc lập trên Mobile */
+    /* 4. KHỐI ĐỐI SOÁT LỊCH SỬ (Vùng có danh sách HDMS... trong ảnh) */
     .quick-history { 
         order: 2; 
-        flex: 1; /* Tự động phình to hết cỡ phần không gian trống cuối cùng */
-        min-height: 0; /* BẮT BUỘC: Kích hoạt thuộc tính cuộn dọc */
-        overflow-y: auto; /* BẬT CON LĂN CHUỘT / VUỐT TAY TRÊN MOBILE */
-        -webkit-overflow-scrolling: touch; /* Giúp vuốt cuộn mượt mà trên iPhone/iOS */
+        flex: 1; /* Tự động phình to tối đa điền vào khoảng trống */
+        height: 100%;
+        min-height: 0; /* QUAN TRỌNG: Ép trình duyệt không được tự đẩy dài danh sách ra */
+        overflow-y: auto !important; /* BẮT BUỘC BẬT CON LĂN TẠI ĐÂY */
+        -webkit-overflow-scrolling: touch; /* Vuốt mượt trên iPhone */
         padding: 16px;
-        padding-top: 0px; /* Giữ nguyên logic triệt tiêu khoảng hở của PC */
-        margin-bottom: 0px; /* Bỏ margin bottom gây hở trang */
+        padding-top: 0px; 
+        margin-bottom: 0px; 
     }
 }
