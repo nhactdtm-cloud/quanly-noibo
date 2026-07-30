@@ -88,7 +88,15 @@
                         
                         <!-- KHỐI HOẠT ĐỘNG (HÀNG TRÊN) -->
                         <div class="stat-sidebar">
-                            <div class="stat-box-title">📊 HOẠT ĐỘNG THU CHI</div>
+
+    <div class="stat-box-header">
+        <div class="stat-box-title">📊 HOẠT ĐỘNG</div>
+        <select id="filter-date-range" onchange="ThuChiModule.thayDoiBoLocThoiGian()" class="stat-filter-select">
+            <option value="today" selected>Hôm nay</option>
+            <option value="30days">30 ngày qua</option>
+        </select>
+    </div>                            
+        
                             <div class="stat-card">
                                 <span class="stat-label">Hóa đơn đã duyệt</span>
                                 <span class="stat-val" id="stat-total-orders">0</span>
