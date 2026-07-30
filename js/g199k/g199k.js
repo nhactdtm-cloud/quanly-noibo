@@ -162,6 +162,8 @@ const R199kModule = {
             if (currentSearchId !== this.searchId) return;
             if (res.status === "success") {
 
+                this.currentGhiChu = res.data.ghiChu || ""; 
+
                 this.isAutofilling = true;
 
                 if (type === 'GID') {
@@ -335,11 +337,20 @@ tínhNgàyKếtThúc: function() {
     const inputEnd = document.getElementById('r-end');
     const inputTien = document.getElementById('r-tien');
 
-    if (!ngàyBắtĐầuValue) {
+    // 1. Kiểm tra nếu không có giá trị
+    if (!ngàyBắtĐầuValue || ngàyBắtĐầuValue.trim() === "") {
         inputEnd.value = "";
         return;
     }
 
+    let date = new Date(ngàyBắtĐầuValue);
+
+    // 2. THÊM MỚI: Kiểm tra nếu ngày tháng nhập vào bị sai định dạng (Invalid Date)
+    if (isNaN(date.getTime())) {
+        inputEnd.value = "Ngày bắt đầu lỗi"; // Hoặc để trống "" tùy bạn
+        return;
+    }
+    
     // Hàm phụ trợ định dạng ngày thành: "ngày DD thg MM, YYYY" giống Ngày bắt đầu
     const địnhDạngKiểuLịch = (dateObj) => {
         let day = dateObj.getDate();
@@ -347,19 +358,13 @@ tínhNgàyKếtThúc: function() {
         let year = dateObj.getFullYear();
         return `ngày ${day} thg ${month}, ${year}`;
     };
-
-    let date = new Date(ngàyBắtĐầuValue);
     
     if (gói === '1 THÁNG') {
         date.setMonth(date.getMonth() + 1);
-        
-        // ĐÃ ĐỔI: Sử dụng định dạng lịch tiếng Việt
         inputEnd.value = địnhDạngKiểuLịch(date); 
         inputTien.value = "199000"; 
     } else if (gói === '3 THÁNG') {
         date.setMonth(date.getMonth() + 3);
-        
-        // ĐÃ ĐỔI: Sử dụng định dạng lịch tiếng Việt
         inputEnd.value = địnhDạngKiểuLịch(date);
         inputTien.value = "500000";
     } else {
@@ -370,6 +375,7 @@ tínhNgàyKếtThúc: function() {
     // KÍCH HOẠT ĐỒNG BỘ: Cập nhật real-time sang cột bên phải ngay khi tính xong ngày
     this.capNhatKhungChamSocKhachHang();
 },
+
 
 
     capNhatKhungChamSocKhachHang: function() {
@@ -489,24 +495,32 @@ tínhNgàyKếtThúc: function() {
         return `HD${y}${m}${d}${h}${i}${s}${rand}`;
     },
 
-    guiThuChi: function(hoaDon, name, goi, tien) {
-        fetch(this.THUCHI_WEB_APP_URL, {
-            method: "POST",
-            headers: {
-                "Content-Type": "text/plain"
-            },
-            body: JSON.stringify({
-                hoaDon: hoaDon,
-                khachHang: name,
-                ghiChu: goi,
-                loaiGd: "R-199",
-                soTien: Number(tien),
-                mode: "THU TIỀN",
-                adminName: UserModule.uName || "ADMIN"
-            })
+guiThuChi: function(hoaDon, name, goi, tien) {
+    // KIỂM TRA ĐIỀU KIỆN CHẶN: Nếu goi (ghi chú) là "Hủy ĐK" thì thoát luôn, không gửi sang Google Sheets
+    if (goi === "Hủy ĐK") {
+        console.log("Bỏ qua không gửi sang THU CHI vì gói/ghi chú là Hủy ĐK.");
+        return; 
+    }
+
+    fetch(this.THUCHI_WEB_APP_URL, {
+        method: "POST",
+        headers: {
+            "Content-Type": "text/plain"
+        },
+        body: JSON.stringify({
+            hoaDon: hoaDon,
+            khachHang: name,
+            ghiChu: goi,
+            loaiGd: "R-199",
+            soTien: Number(tien),
+            mode: "THU TIỀN",
+            adminName: UserModule.uName || "ADMIN"
         })
-        .catch(err => console.log("Lỗi ghi Thu Chi:", err));
-    },
+    })
+    .catch(err => console.log("Lỗi ghi Thu Chi:", err));
+},
+
+
 
     submitR199k: function() {
         const gid = document.getElementById('r-gid').value.trim().toUpperCase();

@@ -19,7 +19,6 @@ window.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btn-login-submit').addEventListener('click', () => UserModule.handleLogin());
     document.getElementById('btn-logout').addEventListener('click', () => UserModule.handleLogout());
     
-    // Các sự kiện Tab và Form cũ
     document.getElementById('btn-g').addEventListener('click', () => st('g'));
     document.getElementById('btn-t').addEventListener('click', () => st('t'));
     document.getElementById('s-thu').addEventListener('click', () => ThuChiModule.sm('THU'));
