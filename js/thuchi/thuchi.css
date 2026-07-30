@@ -1,5 +1,6 @@
 /* ==========================================================================
    BẢN PC: KHÓA CHIỀU CAO - THẲNG HÀNG NÚT BẤM - BẬT LĂN NỘI BỘ ĐỐI SOÁT
+   (ĐÃ FIX GỌN KHỐI THU CHI ĐỂ MỞ RỘNG DIỆN TÍCH ĐỐI SOÁT VỪA NHẬP)
    ========================================================================== */
 
 /* Khung chứa 2 cột chính: Khóa cứng chiều cao khít vùng main */
@@ -40,20 +41,52 @@
     box-sizing: border-box;
 }
 
-/* KHỐI 1: HOẠT ĐỘNG HÔM NAY (Bỏ hẳn con lăn chuột, vừa khít nội dung) */
+/* KHỐI 1: HOẠT ĐỘNG HÔM NAY (Đã fix gọn: Thu padding, ép các chỉ số dàn hàng ngang) */
 .stat-sidebar {
     background: var(--sf);
-    padding: 20px;
+    padding: 12px 16px; /* Giảm padding để tiết kiệm tối đa chiều cao */
     border-radius: var(--r);
     border: 1px solid var(--b);
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 8px; /* Thu hẹp khoảng cách giữa tiêu đề và nội dung */
     box-sizing: border-box;
     flex-shrink: 0; /* Ép không bị co bóp diện tích */
     overflow: hidden; /* Triệt tiêu hoàn toàn con lăn chuột ở khối này */
 }
 
+/* Khung chứa các thẻ stat-card bên trong (Cần bọc div ở HTML như hướng dẫn trước) */
+.stat-sidebar > div:not(.stat-box-title) {
+    display: flex;
+    flex-direction: row; /* Chuyển từ dọc sang ngang */
+    justify-content: space-between;
+    gap: 12px;
+    width: 100%;
+}
+
+/* Tối ưu lại cấu trúc ô thông số khi nằm ngang */
+.stat-card { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 2px; 
+    flex: 1; /* Chia đều 3 cột bằng nhau */
+}
+
+.stat-label { 
+    font-size: var(--f-size-xs); /* Hạ xuống cỡ chữ nhỏ 11px để không bị rớt dòng khi nằm ngang */
+    color: var(--ts); 
+    white-space: nowrap; /* Giữ chữ trên một hàng */
+} 
+
+.stat-val { 
+    font-size: var(--f-size-md); /* Giảm từ xl (20px) xuống md (15px) để số tiền dài không đè nhau */
+    font-weight: var(--f-weight-bold); 
+}
+.stat-val.thu { color: var(--s); }
+.stat-val.chi { color: var(--d); }
+
+
+/* KHỐI 2: ĐỐI SOÁT VỪA NHẬP (Tự động giãn rộng tối đa phần không gian còn lại) */
 .quick-history {
     background: var(--sf);
     padding: 20px;
@@ -63,12 +96,11 @@
     flex-direction: column;
     gap: 12px;
     box-sizing: border-box;
-    flex: 1;
+    flex: 1; /* Chiếm trọn vùng trống còn lại của cột phải */
     min-height: 0;
-    overflow-y: auto;
+    overflow-y: auto; /* Bật thanh cuộn nội bộ khi danh sách quá dài */
     padding-top: 0px; /* BẮT BUỘC: Đổi từ 20px thành 0px để triệt tiêu hoàn toàn khoảng hở trên đầu */
 }
-
 
 /* Thanh cuộn nội bộ mỏng đẹp chuẩn UI cao cấp */
 .quick-history::-webkit-scrollbar {
@@ -162,16 +194,6 @@
     padding-top: 20px; /* BẮT BUỘC: Bù lại 20px padding vào đây để tiêu đề ôm khít lên sát mép bo góc mà không làm hở chữ */
 }
 
-
-.stat-card { display: flex; flex-direction: column; gap: 4px; }
-.stat-label { font-size: var(--f-size-label); color: var(--ts); } /* Đã đổi (12px) */
-.stat-val { 
-    font-size: var(--f-size-xl);       /* Đã đổi (20px) */
-    font-weight: var(--f-weight-bold); /* Đã đổi (700) */
-}
-.stat-val.thu { color: var(--s); }
-.stat-val.chi { color: var(--d); }
-
 .history-mini-item {
     display: flex;
     justify-content: space-between;
@@ -183,6 +205,7 @@
 }
 .history-mini-item .thu { color: var(--s); font-weight: var(--f-weight-bold); } /* Đã đổi (700) */
 .history-mini-item .chi { color: var(--d); font-weight: var(--f-weight-bold); } /* Đã đổi (700) */
+
 .helper-text { 
     font-size: var(--f-size-xs); /* Đã đổi (11px) */
     color: var(--ts); 
