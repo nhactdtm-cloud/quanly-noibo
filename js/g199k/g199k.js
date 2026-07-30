@@ -301,7 +301,7 @@ taiDanhSachThanhVienTheoUser: function() {
                 // Kiểm tra xem số lượng phần tử trên Sheets trả về có khác với độ dài cục cache hiện tại không
                 if (res.status === "success" && res.count !== parsedCache.length) {
                     console.log("🔔 Phát hiện có thành viên mới hoặc cập nhật mới trên Sheets! Tiến hành đồng bộ ngầm...");
-                    taiDuLieuMoiTxTuMang(true); // Gọi cập nhật ngầm đè giao diện
+                    taiDuLieuMoiTuMang(true); // Gọi cập nhật ngầm đè giao diện
                 }
             }).catch(() => {
                 // Nếu Backend không có hàm GET_MEMBERS_COUNT, ta fetch ngầm luôn link gốc để check dữ liệu
@@ -496,19 +496,18 @@ tínhNgàyKếtThúc: function() {
     },
 
 guiThuChi: function(hoaDon, name, goi, tien) {
-    // KIỂM TRA ĐIỀU KIỆN CHẶN: Nếu goi (ghi chú) là "Hủy ĐK" thì thoát luôn, không gửi sang Google Sheets
+
     if (goi === "Hủy ĐK") {
-        console.log("Bỏ qua không gửi sang THU CHI vì gói/ghi chú là Hủy ĐK.");
-        return; 
+        return Promise.resolve();
     }
 
-    fetch(this.THUCHI_WEB_APP_URL, {
+    return fetch(this.THUCHI_WEB_APP_URL, {
         method: "POST",
         headers: {
             "Content-Type": "text/plain"
         },
         body: JSON.stringify({
-            hoaDon: hoaDon,
+            hoaDon,
             khachHang: name,
             ghiChu: goi,
             loaiGd: "R-199",
@@ -516,10 +515,10 @@ guiThuChi: function(hoaDon, name, goi, tien) {
             mode: "THU TIỀN",
             adminName: UserModule.uName || "ADMIN"
         })
-    })
-    .catch(err => console.log("Lỗi ghi Thu Chi:", err));
+    }).catch(err => {
+        console.log("Lỗi ghi Thu Chi:", err);
+    });
 },
-
 
 
     submitR199k: function() {
@@ -562,27 +561,35 @@ fetch(this.WEB_APP_URL, {
         })
         .then(response => response.json())
         .then(res => {
-            if (res.status === "success") {
-                this.guiThuChi(hoaDon, name, goi, tien);
-                NotiModule.show(`Đã đồng bộ thành viên vào bảng R-199K thành công!`, "success");
+if (res.status === "success") {
 
-                // ==========================================================================
-                // ĐÃ THÊM: Đập tan bộ nhớ đệm cũ để bắt ép Mobile tải lại danh sách mới tinh
-                // ==========================================================================
-                localStorage.removeItem('r199k_members_cache');
-                localStorage.removeItem('r199k_members_cache_time');
+    this.guiThuChi(hoaDon, name, goi, tien)
+    .finally(() => {
 
-                // Reset form dữ liệu nhập
-                document.getElementById("r-name").value = "";
-                document.getElementById("r-gmail").value = "";
+        // Reload dữ liệu Thu Chi giống lúc mở lần đầu
+        if (typeof ThuChiModule !== "undefined") {
+            ThuChiModule.taiHoatDongHomNay();
+        }
 
-                const today = new Date().toISOString().split("T")[0];
-                document.getElementById("r-start").value = today;
+        NotiModule.show("Đã đồng bộ thành viên vào bảng R-199K thành công!", "success");
 
-                this.setMode("NEW");
-                this.tựĐộngSinhGid();
-                this.tínhNgàyKếtThúc();
-            }
+        // Xóa cache danh sách gia hạn
+        localStorage.removeItem("r199k_members_cache");
+        localStorage.removeItem("r199k_members_cache_time");
+
+        // Reset form
+        document.getElementById("r-name").value = "";
+        document.getElementById("r-gmail").value = "";
+
+        document.getElementById("r-start").value =
+            new Date().toISOString().split("T")[0];
+
+        this.setMode("NEW");
+        this.tựĐộngSinhGid();
+        this.tínhNgàyKếtThúc();
+    });
+
+}
         })
         .finally(() => {
             btn.innerText = "NHẬP DỮ LIỆU BẢNG";

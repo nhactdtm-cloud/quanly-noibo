@@ -74,8 +74,9 @@
 .quick-history::-webkit-scrollbar {
     width: 4px;
 }
+
 .quick-history::-webkit-scrollbar-thumb {
-    background: #e4e4e7;
+    background: var(--b);
     border-radius: 10px;
 }
 
@@ -84,7 +85,7 @@
     grid-column: span 2;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    background: #f4f4f5;
+    background: var(--bg);
     padding: 4px;
     border-radius: 10px;
     margin-bottom: 4px;
@@ -126,13 +127,13 @@
     border-radius: 10px;
     font-size: 15px;
     outline: none;
-    background: #fafafa;
+    background: var(--input-bg);
     font-weight: 500;
     color: var(--t);
     height: 44px; /* Khóa chiều cao ô input */
     box-sizing: border-box;
 }
-.gr input[readonly] { background: #f4f4f5; color: var(--ts); cursor: not-allowed; }
+.gr input[readonly] { background: var(--bg); color: var(--ts); cursor: not-allowed; }
 
 /* FIX LỖI LỆCH NÚT: Đồng bộ chiều cao tuyệt đối với ô Số Tiền cạnh bên */
 #p-t .card .btn-sm {

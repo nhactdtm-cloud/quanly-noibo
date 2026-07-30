@@ -1,15 +1,3 @@
-:root {
-    --p: #000000;
-    --s: #16a34a;
-    --d: #dc2626;
-    --bg: #f4f4f5;
-    --sf: #ffffff;
-    --t: #09090b;
-    --ts: #71717a;
-    --b: #e4e4e7;
-    --r: 16px;
-}
-
 * {
     box-sizing: border-box;
     margin: 0;
@@ -74,7 +62,7 @@ body {
 }
 
 .m-btn.active {
-    background: #f4f4f5;
+    background: var(--bg);
     color: var(--p);
 }
 
@@ -120,7 +108,7 @@ h2 {
     border-radius: 10px;
     font-size: 14px;
     font-weight: 700;
-    color: #fff;
+    color: var(--white);
     background: var(--p);
     cursor: pointer;
     margin-top: 10px;
@@ -140,111 +128,110 @@ h2 {
     text-transform: uppercase;
 }
 
-.gr input, .gr select {
+.gr input,
+.gr select {
     width: 100%;
     padding: 12px;
     border: 1px solid var(--b);
     border-radius: 10px;
     font-size: 15px;
     outline: none;
-    background: #fafafa;
+    background: var(--input-bg);
     font-weight: 500;
 }
 
-.gr input:focus, .gr select:focus {
+.gr input:focus,
+.gr select:focus {
     border-color: var(--p);
     background: var(--sf);
 }
 
 .logout-btn:hover {
-    background: #fef2f2 !important;
+    background: var(--danger-light) !important;
 }
 
 /* ==========================================================================
-   FIX LỖI HIỂN THỊ MOBILE (NỀN XÁM FULL - ĐẢO MÀU NÚT ACTIVE/INACTIVE)
+   FIX LỖI HIỂN THỊ MOBILE
    ========================================================================== */
-@media(max-width:768px){
-    body { 
-        flex-direction: column; 
+
+@media (max-width:768px){
+
+    body {
+        flex-direction: column;
         height: 100vh;
         overflow: hidden;
     }
-    
-    /* Khối màu xám phủ rộng từ trên xuống đáy màn hình */
-    .main { 
+
+    .main {
         position: absolute;
         top: 0;
         left: 0;
         width: 100%;
-        height: 100vh; 
-        padding: 16px; 
-        padding-bottom: 85px; 
-        overflow-y: auto; 
+        height: 100vh;
+        padding: 16px;
+        padding-bottom: 85px;
+        overflow-y: auto;
         box-sizing: border-box;
         z-index: 1;
     }
 
-    /* Thanh chứa nút chuyển sang suốt */
     .sb {
-        width: 100%; 
-        height: auto; 
-        flex-direction: row !important; 
-        padding: 0; 
-        border-right: none; 
-        border-top: none; 
-        position: fixed; 
-        bottom: 0; 
-        left: 0; 
-        background: transparent; 
+        width: 100%;
+        height: auto;
+        flex-direction: row !important;
+        padding: 0;
+        border-right: none;
+        border-top: none;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        background: transparent;
         align-items: stretch;
         justify-content: space-between;
-        z-index: 999; 
+        z-index: 999;
     }
-    
-    .logo { 
-        display: none; 
+
+    .logo {
+        display: none;
     }
-    
-    .menu { 
-        flex-direction: row; 
-        width: 66.66%; 
+
+    .menu {
+        flex-direction: row;
+        width: 66.66%;
         gap: 0;
     }
-    
-    /* ĐÃ SỬA: Nút chưa bấm (mặc định) có nền MÀU TRẮNG */
-    .m-btn { 
-        flex-direction: column !important; 
-        align-items: center !important; 
+
+    .m-btn {
+        flex-direction: column !important;
+        align-items: center !important;
         justify-content: center !important;
-        font-size: 10px !important; 
-        padding: 12px 0 !important; 
-        width: 50% !important; 
-        border-radius: 0px; 
+        font-size: 10px !important;
+        padding: 12px 0 !important;
+        width: 50% !important;
+        border-radius: 0;
         gap: 4px !important;
         text-align: center !important;
-        background: var(--sf); /* Nền màu trắng */
+        background: var(--sf);
         border-top: 1px solid var(--b);
     }
-    
-    /* ĐÃ SỬA: Nút đang bấm (active) sẽ đổ MÀU XÁM hệ thống */
+
     .m-btn.active {
-        background: var(--bg) !important; /* Đổi sang màu xám của nền */
+        background: var(--bg) !important;
         color: var(--p) !important;
     }
-    
-    /* Nút Đăng xuất mặc định màu trắng */
+
     .logout-btn {
         margin-top: 0 !important;
         width: 33.33% !important;
-        border-radius: 0px;
-        background: var(--sf) !important; 
+        border-radius: 0;
+        background: var(--sf) !important;
         border-top: 1px solid var(--b);
-        border-left: 1px solid var(--b); 
+        border-left: 1px solid var(--b);
         padding: 12px 0 !important;
     }
-    
-    .usr-bar { 
-        margin-bottom: 10px; 
-        font-size: 12px; 
+
+    .usr-bar {
+        margin-bottom: 10px;
+        font-size: 12px;
     }
 }

@@ -11,6 +11,7 @@
     justify-content: center;
     padding: 20px;
 }
+
 .lg-bx {
     background: var(--sf);
     width: 100%;
@@ -18,9 +19,10 @@
     padding: 30px;
     border-radius: var(--r);
     border: 1px solid var(--b);
-    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    box-shadow: var(--shadow-sm);
     text-align: center;
 }
+
 .login-sub {
     font-size: 13px;
     color: var(--ts);

@@ -23,7 +23,7 @@
 
 /* Hộp thoại nội dung chính trung tâm */
 .detail-content {
-    background: #ffffff;
+    background: var(--sf);
     width: 100%;
     max-width: 480px;
     padding: 24px;
@@ -44,8 +44,8 @@
     margin-top: 0;
     margin-bottom: 20px;
     font-size: 18px;
-    color: #1f2937;
-    border-bottom: 1px solid #f3f4f6;
+    color: var(--t);
+    border-bottom: 1px solid var(--b);
     padding-bottom: 12px;
 }
 
@@ -55,7 +55,7 @@
     justify-content: space-between;
     padding: 10px 0;
     font-size: 14px;
-    border-bottom: 1px dashed #f3f4f6;
+    border-bottom: 1px dashed var(--b);
 }
 
 .detail-row:last-of-type {
@@ -64,12 +64,12 @@
 }
 
 .detail-label {
-    color: #6b7280;
+    color: var(--ts);
     font-weight: 500;
 }
 
 .detail-value {
-    color: #111827;
+    color: var(--t);
     font-weight: 600;
 }
 
@@ -77,10 +77,10 @@
 .detail-delete-btn {
     width: 100%;
     height: 44px;
-    background: #ef4444;
+    background: var(--d);
     border: none;
     border-radius: 10px;
-    color: #ffffff;
+    color: var(--white);
     font-weight: 700;
     font-size: 14px;
     cursor: pointer;

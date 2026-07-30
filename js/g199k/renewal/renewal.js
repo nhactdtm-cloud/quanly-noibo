@@ -101,6 +101,10 @@ const RenewalModule = {
                 var targetAdmin = adminName ? adminName.toString().trim() : "ADMIN";
                 this.xoaDongTienThuChiByGet(hoaDon, targetAdmin);
 
+                if (typeof ThuChiModule !== "undefined") {
+                ThuChiModule.taiHoatDongHomNay();
+                }
+
                  if (typeof R199kModule !== "undefined") {
                 R199kModule.refreshRenewList();
                 }
