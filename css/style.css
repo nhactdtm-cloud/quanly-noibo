@@ -149,3 +149,8 @@ h2 {
 .logout-btn:hover {
     background: var(--danger-light) !important;
 }
+
+#gc::-webkit-calendar-picker-indicator {
+  display: none !important;
+  -webkit-appearance: none;
+}

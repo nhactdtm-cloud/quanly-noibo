@@ -62,7 +62,19 @@
                         </div>
                         <div class="gr"><label>ID Lệnh</label><input type="text" id="id" readonly></div>
                         <div class="gr"><label>Khách Hàng</label><input type="text" id="kh" placeholder="Vd : Huyền Aerobic"></div>
-                        <div class="gr"><label>Ghi Chú</label><input type="text" id="gc" placeholder="Nhập nội dung..."></div>
+<div class="gr">
+    <label>Ghi Chú</label>
+    <!-- Thêm list="goi-y-gc" vào input -->
+    <input type="text" id="gc" list="goi-y-gc" placeholder="Nhập nội dung...">
+    
+    <!-- Danh sách gợi ý thả xuống (Bạn có thể tự đổi chữ trong phần value="" theo ý muốn) -->
+    <datalist id="goi-y-gc">
+        <option value="Facebook">
+        <option value="Nguồn Zalo">
+        <option value="Khách hàng call">
+    </datalist>
+</div>
+
                         <div class="gr"><label>Loại Giao Dịch</label><select id="lgd"></select></div>
                         <div class="gr"><label>Số Tiền (VND)</label><input type="number" inputmode="numeric" id="st" placeholder="0"></div>
                         <div class="gr">

@@ -259,6 +259,20 @@
     .toast-item.fade-out {
         animation: mobileSlideOut .35s cubic-bezier(.16,1,.3,1) forwards !important;
     }
+
+    /* --- [5] TỐI ƯU Ô GỢI Ý GHI CHÚ CHỈ TRÊN MOBILE --- */
+    #gc::-webkit-calendar-picker-indicator {
+        display: none !important;
+        -webkit-appearance: none !important;
+        appearance: none !important;
+        opacity: 0 !important;
+        width: 0 !important;
+        height: 0 !important;
+    }
+    #gc {
+        -webkit-appearance: none !important;
+        appearance: none !important;
+    }
 }
 
 /* ==========================================================================

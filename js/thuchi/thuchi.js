@@ -1,7 +1,7 @@
 const ThuChiModule = {
     WEB_APP_URL: "https://script.google.com/macros/s/AKfycbwNA4KT2HEPkCCeQu8ZHLhapDREaNyOUHh9UcleiA6HrxVzLOfNRLpkEDj7zLRJ79kYsQ/exec",
     md: 'THU', totalOrders: 0, totalRevenue: 0, totalExpense: 0,
-    oT: ['NHẠC LẺ', 'R-199', 'DOANH THU KHÁC'], oC: ['ADS', 'MUA PIN', 'CHI PHÍ VẬN HÀNH'], isSyncing: false, 
+    oT: ['NHẠC LẺ', 'PHÍ ĐÀO TẠO', 'DOANH THU KHÁC'], oC: ['ADS', 'CHI PHÍ VẬN HÀNH'], isSyncing: false, 
     
     // BIẾN MỚI: Bộ nhớ đệm lưu trữ danh sách đơn hàng thực tế
     duLieuGiaoDichHomNay: [],
