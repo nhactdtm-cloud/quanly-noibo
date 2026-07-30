@@ -53,7 +53,7 @@
         flex-direction: column !important;
         align-items: center !important;
         justify-content: center !important;
-        font-size: 10px !important;
+        font-size: var(--f-size-xs-fine) !important; /* Đã đổi (10px -> quy về biến nhỏ 10.5px cho mịn) */
         padding: 12px 0 !important;
         width: 50% !important;
         border-radius: 0;
@@ -80,7 +80,7 @@
 
     .usr-bar {
         margin-bottom: 10px;
-        font-size: 12px;
+        font-size: var(--f-size-label); /* Đã đổi (12px) */
     }
 
 
@@ -184,7 +184,7 @@
         max-width: 100% !important;
         display: block !important;         
         text-align: center !important;     
-        font-size: 13px !important;        
+        font-size: var(--f-size-sm);    /* Đã đổi (13px) */        
         -webkit-text-fill-color: var(--t) !important; 
         opacity: 1 !important;             
         box-sizing: border-box !important; 
@@ -237,5 +237,51 @@
         height: auto !important;
         margin-bottom: 30px;
         box-sizing: border-box !important;
+    }
+
+
+    /* --- [4] TOAST NOTIFICATION MOBILE --- */
+    #toast-container {
+        top: 16px;
+        right: 16px;
+        left: 16px;
+        width: auto;
+        max-width: none;
+    }
+
+    .toast-item {
+        font-size: var(--f-size-sm);    /* Đang dùng biến (13px) */
+        padding: 14px 16px;
+        border-radius: var(--r);
+        animation: mobileSlideIn .4s cubic-bezier(.16,1,.3,1) forwards;
+    }
+
+    .toast-item.fade-out {
+        animation: mobileSlideOut .35s cubic-bezier(.16,1,.3,1) forwards !important;
+    }
+}
+
+/* ==========================================================================
+   ANIMATION KEYFRAMES MOBILE (Đặt ngoài @media để trình duyệt biên dịch chuẩn)
+   ========================================================================== */
+@keyframes mobileSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-30px) scale(.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes mobileSlideOut {
+    from {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-30px) scale(.95);
     }
 }

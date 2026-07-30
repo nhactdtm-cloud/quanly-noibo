@@ -1,5 +1,5 @@
 /* ==========================================================================
-   TOAST NOTIFICATION - USE GLOBAL THEME
+   TOAST NOTIFICATION - USE GLOBAL THEME (PC & GENERAL)
    ========================================================================== */
 
 #toast-container {
@@ -23,13 +23,11 @@
     border-radius: var(--r);
     border: 1px solid var(--b);
 
-    box-shadow:
-        0 4px 6px -1px rgba(0,0,0,.03),
-        0 10px 15px -3px rgba(0,0,0,.08),
-        0 20px 25px -5px rgba(0,0,0,.05);
+    /* Đã đồng bộ sang biến bóng đổ toast chuyên dụng */
+    box-shadow: var(--shadow-toast);
 
-    font-size: 14px;
-    font-weight: 600;
+    font-size: var(--f-size-base);       /* Đã đổi (14px) */
+    font-weight: var(--f-weight-semibold); /* Đã đổi (600) */
     line-height: 1.5;
 
     display: flex;
@@ -70,7 +68,7 @@
 }
 
 .toast-item span {
-    font-size: 16px;
+    font-size: var(--f-size-md);        /* Đã đổi (16px -> quy về md cho cỡ chữ icon cân đối) */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -78,7 +76,7 @@
 }
 
 /* ==========================================================================
-   ANIMATION
+   ANIMATION PC
    ========================================================================== */
 
 .toast-item.fade-out {
@@ -104,54 +102,5 @@
     to {
         opacity: 0;
         transform: translateX(80px) scale(.95);
-    }
-}
-
-/* ==========================================================================
-   MOBILE
-   ========================================================================== */
-
-@media (max-width:768px){
-
-    #toast-container{
-        top:16px;
-        right:16px;
-        left:16px;
-        width:auto;
-        max-width:none;
-    }
-
-    .toast-item{
-        font-size:13px;
-        padding:14px 16px;
-        border-radius:var(--r);
-
-        animation:mobileSlideIn .4s cubic-bezier(.16,1,.3,1) forwards;
-    }
-
-    .toast-item.fade-out{
-        animation:mobileSlideOut .35s cubic-bezier(.16,1,.3,1) forwards !important;
-    }
-}
-
-@keyframes mobileSlideIn{
-    from{
-        opacity:0;
-        transform:translateY(-30px) scale(.95);
-    }
-    to{
-        opacity:1;
-        transform:translateY(0) scale(1);
-    }
-}
-
-@keyframes mobileSlideOut{
-    from{
-        opacity:1;
-        transform:translateY(0) scale(1);
-    }
-    to{
-        opacity:0;
-        transform:translateY(-30px) scale(.95);
     }
 }

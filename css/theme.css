@@ -65,4 +65,26 @@
        TRANSITION
        ========================================================================== */
     --transition: all .2s ease-in-out;
+
+    /* ==========================================================================
+       FONT SYSTEM (BẢN CHUẨN HÓA TOÀN HỆ THỐNG)
+       ========================================================================= */
+    --f-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    
+    /* Font Size (Cỡ chữ tăng dần từ nhỏ đến lớn) */
+    --f-size-xs-fine: 10.5px; /* cskh-badge-copy */
+    --f-size-xs: 11px;        /* label mục lớn, member-item-badge, member-item-gid, helper-text */
+    --f-size-label: 12px;     /* stat-box-title, cskh-title-text, member-list-header, renewal-delete-item-btn */
+    --f-size-sub: 12.5px;     /* display-customer-info, member-item, member-empty-state */
+    --f-size-sm: 13px;        /* usr-bar, history-mini-item, input/select/btn-sm R199K, login-sub, toast-mobile, renewal-item-package, renewal-time-line */
+    --f-size-base: 14px;      /* m-btn, btn-sm ThuChi, seg-btn, detail-row, detail-delete-btn, toast-pc, text mặc định */
+    --f-size-md: 15px;        /* input/select ThuChi, renewal-popup-header h3 */
+    --f-size-lg: 18px;        /* logo chính, detail-content h3 */
+    --f-size-xl: 20px;        /* h2 tiêu đề trang, stat-val số liệu lớn */
+
+    /* Font Weight (Độ đậm của chữ) */
+    --f-weight-medium: 500;   /* Dành cho text nội dung vừa, label phụ */
+    --f-weight-semibold: 600; /* Dành cho nhấn mạnh, sub-title, trạng thái */
+    --f-weight-bold: 700;     /* Dành cho tiêu đề lớn h2, h3, logo, nút bấm chính */
+
 }

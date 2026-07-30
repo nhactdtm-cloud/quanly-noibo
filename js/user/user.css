@@ -24,7 +24,8 @@
 }
 
 .login-sub {
-    font-size: 13px;
+    font-size: var(--f-size-sm);       /* Đã đổi (13px) */
     color: var(--ts);
     margin-bottom: 24px;
+    font-weight: var(--f-weight-medium); /* Bổ sung độ đậm vừa chuẩn UI sạch sẽ */
 }

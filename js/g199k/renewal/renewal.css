@@ -26,8 +26,8 @@
     color: var(--t);
     width: 90%;
     max-width: 440px;
-    border-radius: 16px;
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+    border-radius: var(--r);          /* Đã đồng bộ bo góc popup (16px) */
+    box-shadow: var(--shadow-lg);       /* Đã đồng bộ bóng đổ lớn của popup */
     border: 1px solid var(--b);
     overflow: hidden;
     display: flex;
@@ -47,8 +47,8 @@
 
 .renewal-popup-header h3 {
     margin: 0;
-    font-size: 16px;
-    font-weight: 600;
+    font-size: var(--f-size-md);        /* Đã đổi (16px -> quy về md cho cân đối tiêu đề h3) */
+    font-weight: var(--f-weight-semibold); /* Đã đổi (600) */
     color: var(--t);
 }
 
@@ -91,16 +91,16 @@
 .renewal-badge-count {
     background-color: var(--b);
     color: var(--ts);
-    font-size: 11px;
+    font-size: var(--f-size-xs);       /* Đã đổi (11px) */
     padding: 3px 10px;
     border-radius: 20px;
-    font-weight: 600;
+    font-weight: var(--f-weight-semibold); /* Đã đổi (600) */
 }
 
 /* Tên gói đăng ký */
 .renewal-item-package {
-    font-weight: 700;
-    font-size: 13px;
+    font-weight: var(--f-weight-bold);  /* Đã đổi (700) */
+    font-size: var(--f-size-sm);        /* Đã đổi (13px) */
     color: var(--t);
 }
 
@@ -120,7 +120,7 @@
     display: flex;
     flex-direction: column;
     gap: 5px;
-    font-size: 13px;
+    font-size: var(--f-size-sm);        /* Đã đổi (13px) */
     color: var(--ts);
 }
 
@@ -130,7 +130,7 @@
 
 /* Chữ hiển thị mã hóa đơn mảnh */
 .renewal-invoice-text {
-    font-size: 11px;
+    font-size: var(--f-size-xs);       /* Đã đổi (11px) */
     color: var(--ts);
     margin-top: 2px;
 }
@@ -141,16 +141,16 @@
     border: 1px solid var(--b);
     color: #555555;
     cursor: pointer;
-    font-size: 12px;
-    font-weight: 500;
+    font-size: var(--f-size-label);     /* Đã đổi (12px) */
+    font-weight: var(--f-weight-medium); /* Đã đổi (500) */
     padding: 6px 12px;
-    border-radius: 6px;
+    border-radius: var(--r-sm);         /* Đã đồng bộ bo góc nút nhỏ (6px) */
     display: flex;
     align-items: center;
     justify-content: center;
     height: fit-content;
     font-family: inherit;
-    transition: all 0.2s ease-in-out;
+    transition: var(--transition);       /* Đã đồng bộ biến hiệu ứng chuyển động mượt */
 }
 
 /* Hiệu ứng di chuột đổi sang màu đỏ san hô cảnh báo */
@@ -159,7 +159,7 @@
     color: #ffffff;
     border-color: var(--d);
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(255, 77, 79, 0.15);
+    box-shadow: 0 4px 12 rgba(255, 77, 79, 0.15);
 }
 
 .renewal-delete-item-btn:active {
@@ -171,5 +171,5 @@
     text-align: center;
     padding: 40px 10px;
     color: var(--ts);
-    font-size: 13px;
+    font-size: var(--f-size-sm);        /* Đã đổi (13px) */
 }
