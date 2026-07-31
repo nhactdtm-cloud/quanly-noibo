@@ -343,38 +343,47 @@
     padding: 20px 0;
 }
 
-/* Ô CHỌN BỘ LỌC (Đã bỏ mũi tên chỉ xuống và căn giữa chữ) */
+
+/* Ô CHỌN BỘ LỌC (Cỡ chữ nhỏ mảnh bằng "Hôm nay" nhưng khối nút rộng bằng "Hôm nay") */
 #filterStatus {
-    width: 100px !important;      
-    min-width: 100px !important;  
-    max-width: 100px !important;  
+    width: 110px !important;      /* TĂNG CHIỀU RỘNG bằng đúng ô "Hôm nay" */
+    min-width: 110px !important;  
+    max-width: 110px !important;  
     box-sizing: border-box !important;
-    padding: 2px 4px;        
-    border: 1px solid #d9d9d9;
-    border-radius: 4px;      
-    font-size: 11px;         
-    font-weight: 500;
-    color: #434343;
-    background-color: #ffffff;
+    padding: 2px 6px;             /* Khoảng cách đệm bên trong rộng rãi vừa phải */
+    border: 1px solid var(--b);   
+    border-radius: var(--r-sm);   
+    
+    /* Cấu hình phông chữ nhỏ mảnh */
+    font-family: var(--f-family);
+    font-size: var(--f-size-xs);  /* GIỮ CỠ CHỮ NHỎ MẢNH (11px) đúng bằng chữ "Hôm nay" */
+    font-weight: var(--f-weight-medium); 
+    color: var(--t);              
+    background-color: var(--sf);  
+    
     cursor: pointer;
     outline: none;
-    height: 22px;            
+    height: 24px;                 /* Chiều cao cân đối, thanh mảnh */
     line-height: 1;
+    transition: var(--transition); 
 
-    /* FIX CHÍNH: Xóa bỏ mũi tên chỉ xuống mặc định trên mọi trình duyệt */
-    -webkit-appearance: none;  /* Cho Chrome, Safari, Edge */
-    -moz-appearance: none;     /* Cho Firefox */
-    appearance: none;          /* Chuẩn CSS chung */
+    /* Xóa bỏ mũi tên chỉ xuống mặc định */
+    -webkit-appearance: none;  
+    -moz-appearance: none;     
+    appearance: none;          
     
-    text-align: center;        /* Căn chữ ra chính giữa ô */
-    text-align-last: center;   /* Đảm bảo chữ của lựa chọn đang hiển thị cũng ra giữa */
+    /* Căn chữ ra chính giữa ô */
+    text-align: center;        
+    text-align-last: center;   
 }
 
+/* Hiệu ứng tương tác */
 #filterStatus:hover {
-    border-color: #bfbfbf;
-    background-color: #fafafa;
+    border-color: var(--border-hover);  
+    background-color: var(--hover-bg);  
 }
 
 #filterStatus:focus {
-    border-color: #40a9ff;   
+    border-color: var(--info);          
+    box-shadow: var(--shadow-sm);       
 }

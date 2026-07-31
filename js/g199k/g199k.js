@@ -290,7 +290,7 @@ taiDanhSachThanhVienTheoUser: function() {
         if (this.isSubmittingMembers) return;
         this.isSubmittingMembers = true;
 
-        if (!isBackground) container.innerHTML = '<div class="member-empty-state">⟳ Đang tải dữ liệu khách hàng...</div>';
+        if (!isBackground) container.innerHTML = '<div class="member-empty-state">Đang tải dữ liệu khách hàng...</div>';
 
         fetch(`${this.WEB_APP_URL}?action=GET_MEMBERS`)
         .then(response => response.ok ? response.json() : Promise.reject())

@@ -12,8 +12,8 @@ const RenewalModule = {
         const historyContainer = document.getElementById('renewal-history-list');
         const titleContainer = document.getElementById('renewal-history-title');
         
-        titleContainer.innerText = `🔄 Đang tải lịch sử: ${gid}...`;
-        historyContainer.innerHTML = '<div class="renewal-loading">🔄 Đang tải lịch sử gia hạn khách hàng...</div>';
+        titleContainer.innerText = `Đang tải lịch sử: ${gid}...`;
+        historyContainer.innerHTML = '<div class="renewal-loading">Đang tải lịch sử gia hạn khách hàng...</div>';
 
         const url = `${this.WEB_APP_URL}?action=GET_HISTORY&gid=${encodeURIComponent(gid)}`;
 
@@ -22,7 +22,7 @@ const RenewalModule = {
         .then(res => {
             if (res.status === "success" && Array.isArray(res.data) && res.data.length > 0) {
                 const customerName = res.name || "Khách hàng";
-                titleContainer.innerText = `📜 Lịch Sử Gia Hạn: ${customerName} (${gid})`;
+                titleContainer.innerText = `KHÁCH HÀNG: ${customerName} (${gid})`;
                 historyContainer.innerHTML = ''; 
 
                 res.data.sort((a, b) => Number(b.lanGiaHan || 0) - Number(a.lanGiaHan || 0));
