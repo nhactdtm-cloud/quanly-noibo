@@ -89,7 +89,7 @@ const R199kModule = {
         } else {
             bRenew.classList.add('active', 'chi');
             inputGid.value = "";
-            inputGid.placeholder = "Nhập GID cần gia hạn (Ví dụ: G2603060)";
+            inputGid.placeholder = "🔍︎ Tìm kiếm bằng GID";
             inputGid.readOnly = false;
             
             // Ẩn Chăm sóc khách hàng - Hiện danh sách thành viên
@@ -247,7 +247,7 @@ taiDanhSachThanhVienTheoUser: function() {
         if (this.isSubmittingMembers) return;
         this.isSubmittingMembers = true;
 
-        if (!isBackground) container.innerHTML = '<div class="member-empty-state">🔄 Đang tải dữ liệu mạng...</div>';
+        if (!isBackground) container.innerHTML = '<div class="member-empty-state">Đang tải dữ liệu mạng...</div>';
 
         fetch(`${this.WEB_APP_URL}?action=GET_MEMBERS`)
         .then(response => response.ok ? response.json() : Promise.reject())
@@ -434,7 +434,6 @@ tínhNgàyKếtThúc: function() {
             if (diffDays < 0) diffDays = 0; 
         }
 
-        // Cập nhật dữ liệu lên Khung thông tin gia hạn thanh toán nhóm
         document.getElementById('lbl-goi').innerText = goi;
         document.getElementById('lbl-time').innerText = `${startFormatted} → ${endFormatted}`;
         document.getElementById('lbl-days').innerText = (goi === 'Hủy ĐK' || endVal === "HỦY NGAY") ? '0 ngày' : `${diffDays} ngày`;

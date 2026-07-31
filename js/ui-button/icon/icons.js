@@ -8,6 +8,7 @@ const ICON_LIBRARY = {
     "tang-truong": "tang-truong.svg",
 
     "qlkh": "qlkh.svg",
+    "repeat": "repeat.svg",    
     "community": "community.svg"
 };
 
