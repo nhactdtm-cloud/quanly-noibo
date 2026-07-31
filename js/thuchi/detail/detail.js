@@ -41,35 +41,6 @@ function moChiTietHoaDon(maHD) {
 }
 
 
-function xoaHoaDon(maHD) {
-    if (!confirm(`Bạn có chắc chắn muốn xóa hóa đơn ${maHD} này không? Hành động này không thể hoàn tác!`)) return;
-
-    // 1. Đổi giao diện nút bấm sang trạng thái chờ xử lý
-    const btnDelete = document.getElementById('detailDeleteBtn');
-    if (btnDelete) {
-        btnDelete.innerText = "ĐANG XÓA...";
-        btnDelete.disabled = true;
-        btnDelete.style.background = "#9ca3af";
-    }
-
-    const webAppUrl = ThuChiModule.WEB_APP_URL;
-    const admin = (typeof UserModule !== 'undefined' && UserModule.uName) ? UserModule.uName : "ADMIN";
-
-    // 2. Gửi lệnh xóa lên Google Sheets
-    fetch(`${webAppUrl}?action=delete&maId=${encodeURIComponent(maHD)}&adminName=${encodeURIComponent(admin)}`)
-        .then(response => {
-            if (response.ok) return response.json();
-            return Promise.reject("Mạng phản hồi chậm");
-        })
-        .then(res => {
-            xuLyDongBoSauKhiXoa(maHD);
-        })
-        .catch(err => {
-            console.warn("Google Apps Script phản hồi chậm nhưng lệnh xóa đã được thực thi:", err);
-            xuLyDongBoSauKhiXoa(maHD);
-        });
-}
-
 // Hàm bổ trợ dọn dẹp dữ liệu cục bộ và vẽ lại giao diện ngay lập tức
 function xuLyDongBoSauKhiXoa(maHD) {
     if (typeof NotiModule !== 'undefined' && typeof NotiModule.show === 'function') {
@@ -114,6 +85,21 @@ function khoiTaoModalHTML() {
 
 
 function xoaHoaDon(maHD) {
+    // ==========================================================================
+    // KHỐI CHẶN BẢO MẬT: CHỈ MASTER VÀ MANAGER ĐƯỢC PHÉP XÓA (STAFF BỊ CHẶN)
+    // ==========================================================================
+    const savedRole = localStorage.getItem('loggedRole');
+    const currentRole = (savedRole || '').trim().toUpperCase();
+
+    if (currentRole !== "MASTER" && currentRole !== "MANAGER") {
+        if (typeof NotiModule !== 'undefined') {
+            NotiModule.show("Từ chối: Tài khoản STAFF không đủ thẩm quyền để thực hiện thao tác XÓA hóa đơn này!", "error");
+        } else {
+            alert("Từ chối: Tài khoản STAFF không đủ thẩm quyền để thực hiện thao tác XÓA hóa đơn này!");
+        }
+        return; 
+    }
+
     if (!confirm(`Bạn có chắc chắn muốn xóa hóa đơn ${maHD} này không? Hành động này không thể hoàn tác!`)) return;
 
     // 1. Đổi giao diện nút bấm sang trạng thái chờ xử lý
@@ -125,26 +111,23 @@ function xoaHoaDon(maHD) {
     }
 
     const webAppUrl = ThuChiModule.WEB_APP_URL;
-    const admin = (typeof UserModule !== 'undefined' && UserModule.uName) ? UserModule.uName : "ADMIN";
 
-    // 2. Gửi lệnh xóa lên Google Sheets
-    fetch(`${webAppUrl}?action=delete&maId=${encodeURIComponent(maHD)}&adminName=${encodeURIComponent(admin)}`)
+    // 2. Thực hiện gọi API xóa dòng tiền tập trung trên 1 Sheet
+    fetch(`${webAppUrl}?action=delete&maId=${encodeURIComponent(maHD)}`)
         .then(response => {
-            // Nếu kết nối HTTP ổn định (status 200), ép chuyển đổi sang json luôn
             if (response.ok) return response.json();
-            return Promise.reject("Mạng phản hồi chậm");
+            throw new Error("Mạng phản hồi chậm");
         })
         .then(res => {
-            // Nhánh xử lý khi Google Apps Script phản hồi thành công hoàn toàn
+            // ĐÃ XÓA LỆNH NOTI TẠI ĐÂY: Nhường quyền hiển thị hoàn toàn cho hàm đồng bộ phía sau
             xuLyDongBoSauKhiXoa(maHD);
         })
         .catch(err => {
-            // KHẮC PHỤC LỖI KHỰNG: Do trên thực tế lệnh xóa của bạn luôn chạy thành công trên Sheets,
-            // nếu lỗi kết nối xảy ra do Google phản hồi chậm, ta vẫn cho đồng bộ giao diện luôn để nhân viên thao tác tiếp.
-            console.warn("Google Apps Script phản hồi chậm nhưng lệnh xóa đã được thực thi:", err);
+            console.warn("Đồng bộ giao diện sau khi lệnh gửi đi:", err);
             xuLyDongBoSauKhiXoa(maHD);
         });
 }
+
 
 // Biến lưu mốc thời gian hiển thị thông báo gần nhất bên ngoài hàm để tránh lặp
 let thoiGianThongBaoXoaGanNhat = 0;

@@ -1,24 +1,33 @@
+// js/user/user.js
 const UserModule = {
     uName: 'ADMIN',
+    uRole: 'STAFF', // Biến lưu trữ quyền hiện tại (Mặc định là STAFF)
 
-    // Hàm kiểm tra trạng thái khi vừa tải trang (Gọi hàm này khi ứng dụng vừa chạy)
+    // Hàm kiểm tra trạng thái khi vừa tải trang
     checkLoginStatus: function() {
         const savedUser = localStorage.getItem('loggedUser');
-        if (savedUser) {
+        const savedRole = localStorage.getItem('loggedRole'); // Lấy quyền đã lưu
+        
+        if (savedUser && savedRole) {
             this.uName = savedUser;
+            this.uRole = savedRole;
             this.applyLoginUI();
         }
     },
 
     // Hàm phụ trợ để áp dụng giao diện đã đăng nhập
     applyLoginUI: function() {
-        // ĐÃ SỬA: Đổi từ innerText thành innerHTML để trình duyệt hiểu thẻ <span>
-        document.getElementById('usr-disp').innerHTML = `<span data-icon="user"></span>  Tài khoản: ${this.uName}`;
+        // Cập nhật tên tài khoản và vai trò lên thanh header để dễ quản lý
+        document.getElementById('usr-disp').innerHTML = 
+            `<span data-icon="user"></span> Tài khoản: ${this.uName} <span class="role-badge role-${this.uRole.toLowerCase()}">[${this.uRole}]</span>`;
         
         document.getElementById('lg-sc').style.display = 'none';
         document.getElementById('ap').classList.add('auth');
         
-        // ĐÃ THÊM: Gọi hàm quét và hiển thị icon ngay sau khi đổi giao diện
+        // KÍCH HOẠT HÀM PHÂN QUYỀN GIAO DIỆN MỚI
+        this.applyRoleRestrictions();
+
+        // Gọi hàm quét và hiển thị icon ngay sau khi đổi giao diện
         if (typeof renderIcons === 'function') {
             renderIcons();
         }
@@ -27,10 +36,68 @@ const UserModule = {
         if (typeof ThuChiModule !== 'undefined') {
             ThuChiModule.iId();
             ThuChiModule.sm('THU');
-            ThuChiModule.taiHoatDongHomNay(); // Tải đúng dữ liệu theo tài khoản mới
+            ThuChiModule.taiHoatDongHomNay(); 
         }
     },
 
+    // ==========================================================================
+    // SỬA ĐỔI: HÀM PHÂN QUYỀN GIAO DIỆN CHO PHÉP STAFF XEM BÁO CÁO CÁ NHÂN
+    // ==========================================================================
+    applyRoleRestrictions: function() {
+        const optCancel = document.getElementById("opt-cancel"); // Option Hủy đăng ký ở phần 2
+        const statRevenue = document.getElementById("stat-total-revenue"); // Doanh thu phần 1
+        const statExpense = document.getElementById("stat-total-expense"); // Chi phí phần 1
+
+        // 1. Khôi phục nhãn giao diện chuẩn mặc định (Dành cho MASTER / MANAGER xem toàn hệ thống)
+        if (statRevenue) {
+            const card = statRevenue.closest('.stat-card');
+            if (card) {
+                card.style.display = "flex";
+                const label = card.querySelector('.stat-label');
+                if (label) label.innerText = "Tổng doanh thu";
+            }
+        }
+        if (statExpense) {
+            const card = statExpense.closest('.stat-card');
+            if (card) {
+                card.style.display = "flex";
+                const label = card.querySelector('.stat-label');
+                if (label) label.innerText = "Tổng chi phí phát sinh";
+            }
+        }
+        if (optCancel) {
+            optCancel.disabled = false;
+        }
+
+        // 2. Áp dụng luật phân quyền lọc nhãn dựa trên vai trò tài khoản
+        if (this.uRole === 'STAFF') {
+            // Không dùng style.display = "none" để ẩn nữa, giữ lại card nhưng đổi tên nhãn hiển thị
+            if (statRevenue) {
+                const card = statRevenue.closest('.stat-card');
+                if (card) {
+                    const label = card.querySelector('.stat-label');
+                    if (label) label.innerText = "Doanh thu của bạn";
+                }
+            }
+            if (statExpense) {
+                const card = statExpense.closest('.stat-card');
+                if (card) {
+                    const label = card.querySelector('.stat-label');
+                    if (label) label.innerText = "Chi phí của bạn";
+                }
+            }
+            
+            // Nhân viên vẫn bị cấm chọn tính năng hủy đăng ký khách hàng ở trang R-199K
+            if (optCancel) optCancel.disabled = true;
+        } 
+        else if (this.uRole === 'MANAGER') {
+            // Quản lý xem báo cáo toàn hệ thống nhưng vẫn bị cấm tính năng hủy đăng ký khách hàng
+            if (optCancel) optCancel.disabled = true;
+        }
+        else if (this.uRole === 'MASTER') {
+            // MASTER giữ đầy đủ mọi tính năng mặc định ban đầu
+        }
+    },
 
     // 1. Logic Đăng nhập
     handleLogin: async function() {
@@ -54,12 +121,14 @@ const UserModule = {
 
             if (matchedUser) {
                 this.uName = matchedUser.username.toUpperCase();
+                this.uRole = matchedUser.role.toUpperCase(); // Lấy chính xác ROLE từ json (MASTER/MANAGER/STAFF)
                 
                 // LƯU TRẠNG THÁI VÀO LOCALSTORAGE
                 localStorage.setItem('loggedUser', this.uName);
+                localStorage.setItem('loggedRole', this.uRole); // Lưu role để duy trì khi F5 trang
                 
                 this.applyLoginUI();
-                NotiModule.show(`Chào mừng ${this.uName} quay trở lại!`, "success");
+                NotiModule.show(`Chào mừng ${this.uName} (${this.uRole}) quay trở lại!`, "success");
             } else {
                 NotiModule.show("Mật khẩu hoặc tài khoản không chính xác!", "error");
             }
@@ -68,7 +137,7 @@ const UserModule = {
         }
     },
 
-    // 2. Logic Đăng xuất (ĐÃ ĐƯỢC FIX LÀM SẠCH HOÀN TOÀN)
+    // 2. Logic Đăng xuất
     handleLogout: function() {
         // 2.1. XÓA SẠCH DỮ LIỆU SỐ TIỀN VÀ MẢNG CACHE TRONG THUCHIMODULE
         if (typeof ThuChiModule !== 'undefined') {
@@ -80,13 +149,11 @@ const UserModule = {
             ThuChiModule.capNhatKhoiDoiSoat([]); 
         }
 
-        // ==========================================================================
-        // ĐÃ THÊM: XÓA SẠCH BỘ NHỚ ĐỆM THÀNH VIÊN VÀ RAM CACHE LỊCH SỬ GIA HẠN
-        // ==========================================================================
+        // XÓA SẠCH BỘ NHỚ ĐỆM THÀNH VIÊN VÀ RAM CACHE LỊCH SỬ GIA HẠN
         localStorage.removeItem('r199k_members_cache');
         localStorage.removeItem('r199k_members_cache_time');
         if (typeof RenewalModule !== 'undefined') {
-            RenewalModule.lichSuCache = {}; // Xóa sạch RAM cache lịch sử gia hạn của tài khoản cũ
+            RenewalModule.lichSuCache = {}; 
         }
 
         // 2.2. LÀM TRỐNG BẢNG GIAO DỊCH CHÍNH TRÊN MÀN HÌNH (NẾU CÓ)
@@ -96,7 +163,10 @@ const UserModule = {
 
         // 2.3. XÓA SẠCH KEY ĐĂNG NHẬP TRONG LOCALSTORAGE
         localStorage.removeItem('loggedUser');
+        localStorage.removeItem('loggedRole'); // Xóa role khi logout
+        
         this.uName = 'ADMIN';
+        this.uRole = 'STAFF'; // Đề phòng lỗi, đưa về quyền thấp nhất khi logout
 
         // 2.4. KHÔI PHỤC GIAO DIỆN MÀN HÌNH ĐĂNG NHẬP GỐC
         document.getElementById('pw').value = '';
@@ -107,5 +177,4 @@ const UserModule = {
         if (typeof st === 'function') st('t');
         NotiModule.show("Đã đăng xuất tài khoản và làm sạch dữ liệu!", "info");
     }
-
 };

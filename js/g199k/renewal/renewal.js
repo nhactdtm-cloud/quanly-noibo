@@ -71,10 +71,25 @@ const RenewalModule = {
         });
     },
 
-    /**
-     * Hàm xử lý xóa chính: Xóa thành viên ở G_199K trước, sau đó kích hoạt xóa Thu chi ngầm
-     */
     xoaGiaoDichLoiByHoaDon: function(hoaDon, lanGiaHan, elementDiv, adminName) {
+        // ==========================================================================
+        // KHỐI CHẶN BẢO MẬT: CHỈ MASTER VÀ MANAGER ĐƯỢC PHÉP XÓA (STAFF BỊ CHẶN)
+        // ==========================================================================
+        const savedRole = localStorage.getItem('loggedRole');
+        const currentRole = (savedRole || '').trim().toUpperCase();
+
+        if (currentRole !== "MASTER" && currentRole !== "MANAGER") {
+            if (typeof NotiModule !== 'undefined') {
+                NotiModule.show("Từ chối: Tài khoản STAFF không đủ thẩm quyền để thực hiện thao tác XÓA hóa đơn này!", "error");
+            } else {
+                alert("Từ chối: Tài khoản STAFF không đủ thẩm quyền để thực hiện thao tác XÓA hóa đơn này!");
+            }
+            return; // NGẮT HÀM LẬP TỨC: Chặn đứng hoàn toàn, không chạy lệnh fetch API xóa ở dưới
+        }
+
+        // ==========================================================================
+        // CÁC LUỒNG KIỂM TRA VÀ LOGIC XỬ LÝ XÓA GỐC CỦA BẠN (GIỮ NGUYÊN)
+        // ==========================================================================
         if (!hoaDon) {
             alert("Giao dịch này không có mã hóa đơn nên không thể xóa đích danh!");
             return;
@@ -102,11 +117,11 @@ const RenewalModule = {
                 this.xoaDongTienThuChiByGet(hoaDon, targetAdmin);
 
                 if (typeof ThuChiModule !== "undefined") {
-                ThuChiModule.taiHoatDongHomNay();
+                    ThuChiModule.taiHoatDongHomNay();
                 }
 
-                 if (typeof R199kModule !== "undefined") {
-                R199kModule.refreshRenewList();
+                if (typeof R199kModule !== "undefined") {
+                    R199kModule.refreshRenewList();
                 }
 
                 if (typeof NotiModule !== 'undefined') {
@@ -116,7 +131,7 @@ const RenewalModule = {
                 elementDiv.remove();
                 
                 const container = document.getElementById('renewal-history-list');
-                if (container.children.length === 0) {
+                if (container && container.children.length === 0) {
                     container.innerHTML = '<div class="renewal-empty">⚠️ Không còn lịch sử gia hạn nào.</div>';
                 }
             } else {
@@ -131,6 +146,7 @@ const RenewalModule = {
             alert("Không thể kết nối máy chủ để xử lý xóa!");
         });
     },
+
 
     /**
      * 🌟 HÀM ĐỒNG BỘ MỚI: Gọi lệnh GET khớp 100% với TÁC VỤ 1 (action=delete) trong hàm doGet của bảng Thu Chi

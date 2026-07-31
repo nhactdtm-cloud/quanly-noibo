@@ -2,15 +2,23 @@
   "users": [
     {
       "username": "admin",
-      "password": "123"
+      "password": "123",
+      "role": "MASTER"
     },
     {
       "username": "tung",
-      "password": "456"
+      "password": "456",
+      "role": "MANAGER"
+    },
+    {
+      "username": "car",
+      "password": "123",
+      "role": "MANAGER"
     },
     {
       "username": "mi",
-      "password": "456"
+      "password": "456",
+      "role": "STAFF"
     }
   ]
 }
