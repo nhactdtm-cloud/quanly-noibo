@@ -1,11 +1,15 @@
+/* ==========================================================================
+   PHẦN 1: KHUNG LÀM VIỆC CHÍNH VÀ FORM NHẬP LIỆU BÊN TRÁI
+   ========================================================================== */
+
 .d-none {
     display: none !important;
 }
 
-/* KHUNG LÀM VIỆC CHÍNH (2 CỘT TRÊN PC) */
+/* KHUNG LÀM VIỆC CHÍNH (Cố định cột phải 340px để chống co giãn toàn trang) */
 .r199k-workspace {
     display: grid;
-    grid-template-columns: 2fr 1fr;
+    grid-template-columns: 1fr 340px;
     gap: 20px;
     width: 100%;
     max-width: 1200px;
@@ -14,9 +18,7 @@
     box-sizing: border-box;
 }
 
-/* ==========================================================================
-   1. KHỐI FORM BÊN TRÁI (#p-g .card)
-   ========================================================================== */
+/* KHỐI FORM BÊN TRÁI (#p-g .card) */
 #p-g .card {
     background: var(--sf);
     border: 1px solid var(--b);
@@ -62,8 +64,8 @@
 }
 
 .gr label {
-    font-size: var(--f-size-xs);          /* Đã đổi (10px -> quy về xs) */
-    font-weight: var(--f-weight-semibold); /* Đã đổi (600) */
+    font-size: var(--f-size-xs);          
+    font-weight: var(--f-weight-semibold); 
     color: var(--ts);
     text-transform: uppercase;
     letter-spacing: .4px;
@@ -78,8 +80,8 @@
     border: 1px solid var(--b);
     border-radius: 6px;
     background: var(--input-bg);
-    font-size: var(--f-size-sm);          /* Đã đổi (13px) */
-    font-weight: var(--f-weight-medium);   /* Đã đổi (500) */
+    font-size: var(--f-size-sm);          
+    font-weight: var(--f-weight-medium);   
     color: var(--t);
     outline: none;
     box-sizing: border-box;
@@ -98,18 +100,16 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: var(--f-size-sm);          /* Đã đổi (13px) */
-    font-weight: var(--f-weight-bold);    /* Đã đổi (700) */
+    font-size: var(--f-size-sm);          
+    font-weight: var(--f-weight-bold);    
     margin: 0;
     box-sizing: border-box;
 }
 /* ==========================================================================
-   G199K-PART2.CSS - SIDEBAR PHẢI, DANH SÁCH THÀNH VIÊN VÀ FIX MOBILE RESPONSIVE
+   PHẦN 2: SIDEBAR PHẢI, DANH SÁCH THÀNH VIÊN VÀ BỘ LỌC
    ========================================================================== */
 
-/* ==========================================================================
-   2. KHỐI SIDEBAR BÊN PHẢI (.r199k-sidebar)
-   ========================================================================== */
+/* KHỐI SIDEBAR BÊN PHẢI (.r199k-sidebar) */
 .r199k-sidebar {
     background: var(--sf);
     border: 1px solid var(--b);
@@ -144,8 +144,8 @@
 }
 
 #display-customer-info {
-    font-size: var(--f-size-sub);         /* Đã đổi (12.5px -> Quy về cỡ sub vừa bổ sung) */
-    font-weight: var(--f-weight-semibold); /* Đã đổi (600) */
+    font-size: var(--f-size-sub);         
+    font-weight: var(--f-weight-semibold); 
 }
 
 /* THẺ CSKH DẠNG KHỐI DỮ LIỆU */
@@ -165,9 +165,9 @@
 .cskh-card:hover, 
 .cskh-card-block:hover {
     border-color: var(--b);
-    background-color: var(--hover-bg);   /* Đã đồng bộ sang biến hiệu ứng màu hover */
+    background-color: var(--hover-bg);   
     transform: translateY(-1px);
-    box-shadow: var(--shadow-md);         /* Đã đồng bộ sang biến shadow */
+    box-shadow: var(--shadow-md);         
 }
 
 /* CÁC THÀNH PHẦN TRONG THẺ KHỐI CSKH */
@@ -181,16 +181,16 @@
 }
 
 .cskh-title-text {
-    font-weight: var(--f-weight-bold);    /* Đã đổi (700) */
-    font-size: var(--f-size-label);       /* Đã đổi (12px) */
+    font-weight: var(--f-weight-bold);    
+    font-size: var(--f-size-label);       
     color: var(--t);
     letter-spacing: 0.3px;
 }
 
 .cskh-badge-copy {
-    font-size: var(--f-size-xs-fine);     /* Đã đổi (10.5px -> Quy về cỡ fine bổ sung) */
+    font-size: var(--f-size-xs-fine);     
     color: var(--ts);
-    font-weight: var(--f-weight-semibold); /* Đã đổi (600) */
+    font-weight: var(--f-weight-semibold); 
     background: #f8fafc;
     padding: 3px 6px;
     border-radius: 6px;
@@ -207,16 +207,16 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: var(--f-size-sm);          /* Đã đổi (13px) */
+    font-size: var(--f-size-sm);          
 }
 
 .cskh-label {
     color: var(--ts);
-    font-weight: var(--f-weight-medium);   /* Đã đổi (500) */
+    font-weight: var(--f-weight-medium);   
 }
 
 .cskh-value {
-    font-weight: var(--f-weight-semibold); /* Đã đổi (600) */
+    font-weight: var(--f-weight-semibold); 
     color: var(--t);
 }
 
@@ -226,7 +226,7 @@
 
 /* NHÃN TRẠNG THÁI ĐẶC BIỆT */
 .cskh-value.danger {
-    font-weight: var(--f-weight-bold);    /* Đã đổi (700) */
+    font-weight: var(--f-weight-bold);    
     color: var(--d);
     background: var(--danger-light);
     padding: 2px 6px;
@@ -234,13 +234,11 @@
 }
 
 .cskh-value.success {
-    font-weight: var(--f-weight-bold);    /* Đã đổi (700) */
+    font-weight: var(--f-weight-bold);    
     color: var(--s);
 }
 
-/* ==========================================================================
-   3. DANH SÁCH THÀNH VIÊN (.member-list-card)
-   ========================================================================== */
+/* DANH SÁCH THÀNH VIÊN (.member-list-card) */
 .member-list-card {
     display: flex;
     flex-direction: column;
@@ -249,27 +247,34 @@
     border-radius: 10px;
     padding: 12px;
     box-sizing: border-box;
+    width: 100%;
 }
 
 .member-list-header {
-    font-size: var(--f-size-label);       /* Đã đổi (12px) */
+    display: flex;
+    justify-content: space-between; 
+    align-items: center; 
+    font-size: var(--f-size-label);       
     color: var(--ts);
     border-bottom: 1px solid #f1f5f9;
     padding-bottom: 6px;
     margin-bottom: 8px;
 }
 
-/* KHU VỰC CUỘN DANH SÁCH THÀNH VIÊN */
+/* KHU VỰC CUỘN (Giữ cố định không gian thanh cuộn chống giật lệch lề) */
 .member-container-scroll {
     max-height: 280px;
     overflow-y: auto;
+    scrollbar-gutter: stable; 
     display: flex;
     flex-direction: column;
     gap: 8px;
     padding-right: 2px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
-/* THANH CUỘN SIÊU MẢNH CHUẨN HIỆN ĐẠI */
+/* THANH CUỘN SIÊU MẢNH */
 .member-container-scroll::-webkit-scrollbar {
     width: 4px;
 }
@@ -288,9 +293,10 @@
     background: #f8fafc;
     border: 1px solid #e2e8f0;
     border-radius: 6px;
-    font-size: var(--f-size-sub);         /* Đã đổi (12.5px) */
+    font-size: var(--f-size-sub);         
     cursor: pointer;
     transition: var(--transition);
+    box-sizing: border-box;
 }
 
 .member-item:hover {
@@ -308,7 +314,7 @@
 
 .member-item-name {
     display: block;
-    font-weight: var(--f-weight-semibold); /* Đã đổi (600) */
+    font-weight: var(--f-weight-semibold); 
     color: var(--t);
     white-space: nowrap;
     overflow: hidden;
@@ -316,14 +322,14 @@
 }
 
 .member-item-gid {
-    font-size: var(--f-size-xs);          /* Đã đổi (11px -> quy về xs) */
+    font-size: var(--f-size-xs);          
     color: var(--ts);
     font-family: monospace;
 }
 
 .member-item-badge {
-    font-size: var(--f-size-xs);          /* Đã đổi (11px -> quy về xs) */
-    font-weight: var(--f-weight-semibold); /* Đã đổi (600) */
+    font-size: var(--f-size-xs);          
+    font-weight: var(--f-weight-semibold); 
     color: var(--p);
     background: var(--info-light);
     padding: 2px 6px;
@@ -333,6 +339,42 @@
 .member-empty-state {
     text-align: center;
     color: var(--ts);
-    font-size: var(--f-size-sub);         /* Đã đổi (12.5px) */
+    font-size: var(--f-size-sub);         
     padding: 20px 0;
+}
+
+/* Ô CHỌN BỘ LỌC (Đã bỏ mũi tên chỉ xuống và căn giữa chữ) */
+#filterStatus {
+    width: 100px !important;      
+    min-width: 100px !important;  
+    max-width: 100px !important;  
+    box-sizing: border-box !important;
+    padding: 2px 4px;        
+    border: 1px solid #d9d9d9;
+    border-radius: 4px;      
+    font-size: 11px;         
+    font-weight: 500;
+    color: #434343;
+    background-color: #ffffff;
+    cursor: pointer;
+    outline: none;
+    height: 22px;            
+    line-height: 1;
+
+    /* FIX CHÍNH: Xóa bỏ mũi tên chỉ xuống mặc định trên mọi trình duyệt */
+    -webkit-appearance: none;  /* Cho Chrome, Safari, Edge */
+    -moz-appearance: none;     /* Cho Firefox */
+    appearance: none;          /* Chuẩn CSS chung */
+    
+    text-align: center;        /* Căn chữ ra chính giữa ô */
+    text-align-last: center;   /* Đảm bảo chữ của lựa chọn đang hiển thị cũng ra giữa */
+}
+
+#filterStatus:hover {
+    border-color: #bfbfbf;
+    background-color: #fafafa;
+}
+
+#filterStatus:focus {
+    border-color: #40a9ff;   
 }

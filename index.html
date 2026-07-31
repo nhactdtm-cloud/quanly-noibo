@@ -206,9 +206,19 @@
     <div id="member-list-group" class="cskh-wrapper d-none">
         <div class="stat-box-title"><span data-icon="community"></span> DANH SÁCH KHÁCH HÀNG</div>
         <div class="member-list-card">
-            <div class="member-list-header">
-                <span>Mới cập nhật</span>
-            </div>
+
+            
+<div class="member-list-header">
+    <span>Mới cập nhật</span>
+    <select id="filterStatus" onchange="filterCustomers()">
+        <option value="REGISTERED">ĐÃ ĐĂNG KÍ</option>
+        <option value="CANCELLED">HỦY ĐĂNG KÍ</option>
+        <option value="ALL">XEM TẤT CẢ</option>
+    </select>
+</div>
+
+
+            
             <!-- Khung chứa danh sách các item khách hàng đổ về từ JS -->
             <div id="r199k-member-container" class="member-container-scroll">
                 <div class="member-empty-state">Đang tải danh sách thành viên...</div>

@@ -194,7 +194,6 @@ const R199kModule = {
         });
     },
 
-
 taiDanhSachThanhVienTheoUser: function() {
     const container = document.getElementById('r199k-member-container');
     if (!container) return;
@@ -203,10 +202,38 @@ taiDanhSachThanhVienTheoUser: function() {
     const cacheTimeKey = 'r199k_members_cache_time';
     const CACHE_TIMEOUT = 5 * 60 * 1000; // 5 phút
 
-    // Hàm render giao diện tối ưu (Gom DOM Fragment + Event Delegation)
+    // Hàm áp dụng logic lọc dữ liệu dựa trên giá trị của thẻ <select id="filterStatus">
+    const applyFilterData = (data) => {
+        const filterElement = document.getElementById('filterStatus');
+        if (!filterElement) return data; // Nếu không tìm thấy thẻ select bộ lọc, trả về mảng gốc ban đầu
+
+        const filterValue = filterElement.value; // Lấy giá trị đang chọn (REGISTERED, ALL, CANCELLED)
+
+        return data.filter(item => {
+            const goiText = (item.goi || '').trim();
+
+            if (filterValue === "ALL") {
+                return true; // Xem tất cả dữ liệu
+            }
+            if (filterValue === "REGISTERED") {
+                // ĐÃ ĐĂNG KÍ: Nếu chuỗi chứa chữ "THÁNG" hoặc không chứa chữ "Hủy"
+                return goiText.includes("THÁNG") || !goiText.includes("Hủy");
+            }
+            if (filterValue === "CANCELLED") {
+                // HỦY ĐĂNG KÍ: Nếu chuỗi chứa chữ "Hủy"
+                return goiText.includes("Hủy");
+            }
+            return true;
+        });
+    };
+
+    // Hàm render giao diện siêu tốc đã tích hợp bộ lọc
     const renderGiaoDienSieuToc = (data) => {
+        // Áp dụng bộ lọc trạng thái trước khi vẽ giao diện lên màn hình
+        const filteredData = applyFilterData(data);
+
         const fragment = document.createDocumentFragment();
-        data.forEach(item => {
+        filteredData.forEach(item => {
             const itemDiv = document.createElement('div');
             itemDiv.className = 'member-item';
             itemDiv.setAttribute('data-gid', item.gid);
@@ -219,7 +246,12 @@ taiDanhSachThanhVienTheoUser: function() {
             `;
             fragment.appendChild(itemDiv);
         });
+        
         container.innerHTML = ''; 
+        if (filteredData.length === 0) {
+            container.innerHTML = '<div class="member-empty-state">Không có thành viên nào phù hợp bộ lọc.</div>';
+            return;
+        }
         container.appendChild(fragment);
 
         container.onclick = (e) => {
@@ -241,13 +273,24 @@ taiDanhSachThanhVienTheoUser: function() {
         };
     };
 
-    
-    // Hàm gọi API đồng bộ mạng thực tế và cập nhật đè vào cache cứng
+    // Gắn sự kiện onchange cho thẻ select để tự động re-render lại danh sách ngay lập tức khi chuyển tab
+    const filterElement = document.getElementById('filterStatus');
+    if (filterElement) {
+        filterElement.onchange = () => {
+            const cachedData = localStorage.getItem(cacheKey);
+            if (cachedData) {
+                // Đọc từ cache và re-render siêu tốc mà không cần gọi lại API mạng
+                renderGiaoDienSieuToc(JSON.parse(cachedData));
+            }
+        };
+    }
+
+
     const taiDuLieuMoiTuMang = (isBackground = false) => {
         if (this.isSubmittingMembers) return;
         this.isSubmittingMembers = true;
 
-        if (!isBackground) container.innerHTML = '<div class="member-empty-state">Đang tải dữ liệu mạng...</div>';
+        if (!isBackground) container.innerHTML = '<div class="member-empty-state">⟳ Đang tải dữ liệu khách hàng...</div>';
 
         fetch(`${this.WEB_APP_URL}?action=GET_MEMBERS`)
         .then(response => response.ok ? response.json() : Promise.reject())
@@ -295,7 +338,7 @@ taiDanhSachThanhVienTheoUser: function() {
             taiDuLieuMoiTuMang(false);
         } else {
             // BƯỚC 3: NÚT THẮT QUYẾT ĐỊNH: Nếu chưa quá 5 phút, âm thầm gọi API chạy ngầm để kiểm tra đơn mới
-            fetch(`${this.WEB_APP_URL}?action=GET_MEMBERS_COUNT`) // Hãy tạo tác vụ phụ này ở Backend nếu cần, hoặc gọi thẳng link gốc dạng nhẹ
+            fetch(`${this.WEB_APP_URL}?action=GET_MEMBERS_COUNT`)
             .then(r => r.json())
             .then(res => {
                 // Kiểm tra xem số lượng phần tử trên Sheets trả về có khác với độ dài cục cache hiện tại không
@@ -321,6 +364,7 @@ taiDanhSachThanhVienTheoUser: function() {
         taiDuLieuMoiTuMang(false);
     }
 },
+
 
 refreshRenewList: function () {
     localStorage.removeItem('r199k_members_cache');
