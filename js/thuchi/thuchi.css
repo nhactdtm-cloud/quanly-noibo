@@ -191,7 +191,7 @@
     top: 0;
     background: var(--sf);
     z-index: 10;
-    padding-top: 20px; /* BẮT BUỘC: Bù lại 20px padding vào đây để tiêu đề ôm khít lên sát mép bo góc mà không làm hở chữ */
+    padding-top: 20px; 
 }
 
 .history-mini-item {
@@ -236,7 +236,7 @@
 
 /* Làm đẹp thanh chọn Dropdown */
 .stat-filter-select {
-    padding: 5px 24px 5px 10px;
+    padding: 5px 16px; /* Đặt padding hai bên bằng nhau để ép chữ vào giữa */
     font-size: var(--f-size-label);
     font-weight: var(--f-weight-medium);
     color: var(--t);
@@ -248,14 +248,17 @@
     transition: var(--transition);
     font-family: var(--f-family);
     
-    /* Tạo mũi tên tùy biến mềm mại tương thích hệ thống */
+    /* CĂN GIỮA CHỮ TUYỆT ĐỐI */
+    text-align: center;
+    text-align-last: center;
+    -moz-text-align-last: center; /* Hỗ trợ trình duyệt Firefox cũ */
+    
+    /* ẨN MŨI TÊN MẶC ĐỊNH ĐỂ CHỮ KHÔNG BỊ LỆCH */
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://w3.org' width='12' height='12' fill='%2371717a' viewBox='0 0 24 24'><path d='M7 10l5 5 5-5z'/></svg>");
-    background-repeat: no-repeat;
-    background-position: right 6px center;
 }
+
 
 /* Hiệu ứng khi di chuột vào hoặc click chọn */
 .stat-filter-select:hover {

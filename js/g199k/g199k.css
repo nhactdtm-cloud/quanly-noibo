@@ -344,26 +344,26 @@
 }
 
 
-/* Ô CHỌN BỘ LỌC (Cỡ chữ nhỏ mảnh bằng "Hôm nay" nhưng khối nút rộng bằng "Hôm nay") */
+/* Ô CHỌN BỘ LỌC (Thu hẹp chiều ngang cho gọn gàng) */
 #filterStatus {
-    width: 110px !important;      /* TĂNG CHIỀU RỘNG bằng đúng ô "Hôm nay" */
-    min-width: 110px !important;  
-    max-width: 110px !important;  
+    width: 105px !important;      /* THU HẸP CHIỀU NGANG xuống còn 105px */
+    min-width: 105px !important;  
+    max-width: 105px !important;  
     box-sizing: border-box !important;
-    padding: 2px 6px;             /* Khoảng cách đệm bên trong rộng rãi vừa phải */
+    padding: 3px 4px;             /* Tinh chỉnh lại khoảng cách đệm bên trong */
     border: 1px solid var(--b);   
     border-radius: var(--r-sm);   
     
-    /* Cấu hình phông chữ nhỏ mảnh */
+    /* Giữ nguyên cấu hình phông chữ nhỏ mảnh */
     font-family: var(--f-family);
-    font-size: var(--f-size-xs);  /* GIỮ CỠ CHỮ NHỎ MẢNH (11px) đúng bằng chữ "Hôm nay" */
+    font-size: var(--f-size-xs);  /* GIỮ CỠ CHỮ NHỎ MẢNH (11px) */
     font-weight: var(--f-weight-medium); 
     color: var(--t);              
     background-color: var(--sf);  
     
     cursor: pointer;
     outline: none;
-    height: 24px;                 /* Chiều cao cân đối, thanh mảnh */
+    height: 26px;                 /* Giữ nguyên chiều cao 26px */
     line-height: 1;
     transition: var(--transition); 
 
