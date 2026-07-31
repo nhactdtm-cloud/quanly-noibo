@@ -1,0 +1,116 @@
+/* ==========================================================================
+   HỆ THỐNG BIẾN TOÀN CỤC (:ROOT) - GIỮ NGUYÊN ĐỂ TRA CỨU MÀU
+   ========================================================================== */
+:root {
+    --p: #000000;
+    --s: #16a34a;
+    --d: #dc2626;
+    --info: #2563eb;
+    --bg: #f4f4f5;
+    --sf: #ffffff;
+    --input-bg: #fafafa;
+    --info-light: #eff6ff;
+    --t: #09090b;
+    --ts: #71717a;
+    --white: #ffffff;
+    --b: #e4e4e7;
+    --border-light: #eef0f2;
+    --border-soft: #f0f2f5;
+    --border-extra-soft: #f5f7fa;
+    --border-hover: #cbd5e1;
+    --danger-light: #fef2f2;
+    --hover-bg: #f8fafc;
+    --r: 16px;
+    --r-sm: 6px;
+    --r-md: 10px;
+    --r-lg: 12px;
+    --r-xl: 20px;
+    --shadow-sm: 0 4px 20px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 10px rgba(0, 0, 0, 0.04);
+    --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.15);
+    --shadow-toast: 0 4px 6px -1px rgba(0, 0, 0, 0.03), 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 20px 25px -5px rgba(0, 0, 0, 0.05);
+    --transition: all .2s ease-in-out;
+    --f-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --f-size-xs-fine: 10.5px;
+    --f-size-xs: 11px;
+    --f-size-label: 12px;
+    --f-size-sub: 12.5px;
+    --f-size-sm: 13px;
+    --f-size-base: 14px;
+    --f-size-md: 15px;
+    --f-size-lg: 18px;
+    --f-size-xl: 20px;
+    --f-weight-medium: 500;
+    --f-weight-semibold: 600;
+    --f-weight-bold: 700;
+}
+
+/* ==========================================================================
+   THÀNH PHẦN: NÚT ĐÓNG MODAL (.ui-close-btn)
+   ========================================================================== */
+.ui-close-btn {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    
+    /* Đồng bộ Font chữ & Độ đậm (700) */
+    font-family: var(--f-family);
+    font-size: 30px; 
+    font-weight: var(--f-weight-bold);
+    line-height: 1;
+
+    /* Đồng bộ hệ màu chữ phụ (#71717a) */
+    color: var(--ts);
+
+    cursor: pointer;
+    user-select: none;
+    
+    /* Đồng bộ hiệu ứng chuyển động mượt */
+    transition: var(--transition);
+}
+
+.ui-close-btn:hover {
+    /* Đồng bộ màu cảnh báo nguy hiểm/đỏ khi hover (#dc2626) */
+    color: var(--d);
+    transform: scale(1.15);
+}
+
+/* ==========================================================================
+   HỆ THỐNG QUẢN LÝ ICON TỰ ĐỘNG (SVG IMAGE ROUTER)
+   ========================================================================== */
+
+/* Khung chứa thẻ span bao quanh icon */
+.ui-icon-container {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: middle;
+    
+    /* Khoảng cách đẩy text sang phải đã được tối ưu */
+    margin-right: 6px; 
+}
+
+/* Định dạng trực tiếp cho file ảnh SVG sinh ra từ thẻ <img> */
+.ui-icon-img {
+    width: 16px;   /* Kích thước mặc định mới cực kỳ vừa vặn chữ */
+    height: 16px;  
+    display: block;
+    object-fit: contain;
+    
+    /* Đồng bộ hiệu ứng chuyển đổi mượt nếu ảnh có thay đổi */
+    transition: var(--transition);
+}
+
+/* --- CÁC CLASS BỔ TRỢ KÍCH THƯỚC ICON --- */
+
+/* Icon siêu nhỏ cho badge hoặc dòng phụ */
+.ui-icon-small .ui-icon-img { 
+    width: 12px;   
+    height: 12px; 
+}
+
+/* Icon lớn cho tiêu đề trang hoặc khối lớn */
+.ui-icon-large .ui-icon-img { 
+    width: 24px;   
+    height: 24px; 
+}

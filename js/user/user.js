@@ -12,9 +12,16 @@ const UserModule = {
 
     // Hàm phụ trợ để áp dụng giao diện đã đăng nhập
     applyLoginUI: function() {
-        document.getElementById('usr-disp').innerText = `👤 Tài khoản: ${this.uName}`;
+        // ĐÃ SỬA: Đổi từ innerText thành innerHTML để trình duyệt hiểu thẻ <span>
+        document.getElementById('usr-disp').innerHTML = `<span data-icon="user"></span>  Tài khoản: ${this.uName}`;
+        
         document.getElementById('lg-sc').style.display = 'none';
         document.getElementById('ap').classList.add('auth');
+        
+        // ĐÃ THÊM: Gọi hàm quét và hiển thị icon ngay sau khi đổi giao diện
+        if (typeof renderIcons === 'function') {
+            renderIcons();
+        }
         
         // Khi đăng nhập thành công, kích hoạt tải lại dữ liệu chuẩn của tài khoản này
         if (typeof ThuChiModule !== 'undefined') {
@@ -23,6 +30,7 @@ const UserModule = {
             ThuChiModule.taiHoatDongHomNay(); // Tải đúng dữ liệu theo tài khoản mới
         }
     },
+
 
     // 1. Logic Đăng nhập
     handleLogin: async function() {
