@@ -343,47 +343,43 @@
     padding: 20px 0;
 }
 
-
-/* Ô CHỌN BỘ LỌC (Thu hẹp chiều ngang cho gọn gàng) */
+/* Ô CHỌN BỘ LỌC */
 #filterStatus {
-    width: 105px !important;      /* THU HẸP CHIỀU NGANG xuống còn 105px */
-    min-width: 105px !important;  
-    max-width: 105px !important;  
+    width: 105px !important;
+    min-width: 105px !important;
+    max-width: 105px !important;
     box-sizing: border-box !important;
-    padding: 3px 4px;             /* Tinh chỉnh lại khoảng cách đệm bên trong */
-    border: 1px solid var(--b);   
-    border-radius: var(--r-sm);   
-    
-    /* Giữ nguyên cấu hình phông chữ nhỏ mảnh */
+
+    /* Giống .stat-filter-select */
+    padding: 5px 16px;
+    font-size: var(--f-size-label);
+    font-weight: var(--f-weight-medium);
     font-family: var(--f-family);
-    font-size: var(--f-size-xs);  /* GIỮ CỠ CHỮ NHỎ MẢNH (11px) */
-    font-weight: var(--f-weight-medium); 
-    color: var(--t);              
-    background-color: var(--sf);  
-    
+
+    color: var(--t);
+    background-color: var(--input-bg);
+    border: 1px solid var(--b);
+    border-radius: var(--r-sm);
+
     cursor: pointer;
     outline: none;
-    height: 26px;                 /* Giữ nguyên chiều cao 26px */
-    line-height: 1;
-    transition: var(--transition); 
+    transition: var(--transition);
 
-    /* Xóa bỏ mũi tên chỉ xuống mặc định */
-    -webkit-appearance: none;  
-    -moz-appearance: none;     
-    appearance: none;          
-    
-    /* Căn chữ ra chính giữa ô */
-    text-align: center;        
-    text-align-last: center;   
+    text-align: center;
+    text-align-last: center;
+    -moz-text-align-last: center;
+
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
 }
 
-/* Hiệu ứng tương tác */
 #filterStatus:hover {
-    border-color: var(--border-hover);  
-    background-color: var(--hover-bg);  
+    background-color: var(--hover-bg);
+    border-color: var(--border-hover);
 }
 
 #filterStatus:focus {
-    border-color: var(--info);          
-    box-shadow: var(--shadow-sm);       
+    border-color: var(--info);
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
 }

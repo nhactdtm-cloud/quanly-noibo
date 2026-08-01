@@ -133,11 +133,25 @@ const newRecord = {
         const filtered = arr.filter(i => role === 'MASTER' || (i.adminName || '').trim().toUpperCase() === admin);
         box.innerHTML = [...filtered].reverse().map(i => {
             const isThu = ['THU TIỀN', 'THU'].includes(i.mode);
-            return `<div style="display:flex;justify-content:space-between;font-size:13px;padding:5px 0;border-bottom:1px dashed #eee;">
-                <a href="javascript:void(0);" onclick="moChiTietHoaDon('${i.hoaDon}')" style="font-weight:bold;color:#1e40af;text-decoration:none;"> ${i.hoaDon}</a>
-                <span style="color:${isThu?'green':'red'};font-weight:bold;">${isThu?'+':'-'}${Number(i.soTien || 0).toLocaleString('vi-VN')}đ</span>
+            const thoiGianNho = (i.thoiGian && i.thoiGian.trim() !== "") ? i.thoiGian : "--/-- --:--";
+
+            return `<div class="ds-item">
+                <!-- Khối bên trái: Chứa mã hóa đơn và ngày tháng nhỏ -->
+                <div class="ds-info">
+                    <a href="javascript:void(0);" onclick="moChiTietHoaDon('${i.hoaDon}')" class="ds-link">
+                        ${i.hoaDon}
+                    </a>
+                    <span class="ds-time">
+                        ${thoiGianNho}
+                    </span>
+                </div>
+
+                <!-- Khối bên phải: Số tiền -->
+                <span class="ds-amount ${isThu ? 'thu' : 'chi'}">
+                    ${isThu ? '+' : '-'}${Number(i.soTien || 0).toLocaleString('vi-VN')}đ
+                </span>
             </div>`;
-        }).join('') || '<div style="color:#888;font-size:12px;">Chưa có dữ liệu.</div>';
+        }).join('') || '<div class="ds-empty">Chưa có dữ liệu.</div>';
     },
 
     uSt() {
@@ -145,5 +159,6 @@ const newRecord = {
         if(document.getElementById('stat-total-revenue')) document.getElementById('stat-total-revenue').innerText = this.totalRevenue.toLocaleString('vi-VN') + 'đ';
         if(document.getElementById('stat-total-expense')) document.getElementById('stat-total-expense').innerText = this.totalExpense.toLocaleString('vi-VN') + 'đ';
     }
+
 };
 ThuChiModule.init();

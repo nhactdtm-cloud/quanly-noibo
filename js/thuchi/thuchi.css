@@ -271,3 +271,61 @@
     box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
 }
 
+/* ==========================================================================
+   ✨ BỔ SUNG: CÁC CLASS ĐÃ TÁCH CSS CHO KHỐI ĐỐI SOÁT VỪA NHẬP (MINI-ROWS)
+   ========================================================================== */
+
+/* Khung bọc ngoài của mỗi dòng hóa đơn trong mini-rows */
+.ds-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: var(--f-size-sm); /* Đồng bộ 13px từ biến */
+    padding: 6px 0;
+    border-bottom: 1px dashed var(--b); /* Sử dụng biến border gốc */
+}
+
+/* Khối chứa mã đơn và dòng thời gian nhỏ */
+.ds-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+/* Kiểu dáng chữ của mã hóa đơn (Link bấm mở chi tiết) */
+.ds-link {
+    font-weight: var(--f-weight-bold); /* Đồng bộ bold 700 */
+    color: #1e40af; /* Màu xanh gốc của ID lệnh */
+    text-decoration: none;
+}
+
+/* Kiểu dáng dòng chữ ngày tháng nhỏ xíu nằm dưới mã đơn */
+.ds-time {
+    font-size: var(--f-size-xs); /* Đồng bộ chữ nhỏ 11px */
+    color: var(--ts); /* Sử dụng màu chữ phụ mờ gốc */
+    font-weight: var(--f-weight-normal);
+    opacity: 0.8; /* Làm mờ nhẹ đi một chút cho tinh tế */
+}
+
+/* Cấu hình chung cho phần hiển thị số tiền khoản thu/chi */
+.ds-amount {
+    font-weight: var(--f-weight-bold); /* Đồng bộ bold 700 */
+}
+
+/* Màu sắc xanh lục khi là khoản THU TIỀN */
+.ds-amount.thu {
+    color: var(--s);
+}
+
+/* Màu sắc đỏ khi là khoản CHI TIỀN */
+.ds-amount.chi {
+    color: var(--d);
+}
+
+/* Kiểu dáng thông báo khi danh sách rỗng chưa có data */
+.ds-empty {
+    color: var(--ts);
+    font-size: var(--f-size-label);
+    text-align: center;
+    padding: 15px 0;
+}
