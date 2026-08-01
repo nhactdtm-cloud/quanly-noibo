@@ -64,6 +64,7 @@ const R199kModule = {
         const bNew = document.getElementById('r-s-new');
         const bRenew = document.getElementById('r-s-renew');
         const inputGid = document.getElementById('r-gid');
+        const optCancel = document.getElementById('opt-cancel'); 
         const selectGoi = document.getElementById('r-goi');
 
         // Các phần tử bọc cột bên phải
@@ -74,50 +75,34 @@ const R199kModule = {
         
         if (action === 'NEW') {
             bNew.classList.add('active', 'thu');
-            if (inputGid) inputGid.readOnly = true;
+            inputGid.readOnly = true;
             
+            // Hiện Chăm sóc khách hàng - Ẩn danh sách thành viên
             if (cskhGroup) cskhGroup.classList.remove('d-none');
             if (memberListGroup) memberListGroup.classList.add('d-none');
             
-            // 🌟 FIX CHÍ MẠNG CHO MOBILE: Xóa hẳn tùy chọn Hủy ĐK ra khỏi cây thư mục DOM
-            const optCancel = document.getElementById('opt-cancel');
-            if (optCancel) {
-                optCancel.remove(); 
+            if (optCancel) optCancel.style.display = 'none';
+            if (selectGoi.value === 'Hủy ĐK') {
+                selectGoi.value = '1 THÁNG';
             }
-            
-            // Đưa ô chọn về trạng thái mặc định (Chữ mờ)
-            if (selectGoi) {
-                if (selectGoi.value === 'Hủy ĐK') selectGoi.value = '';
-            }
-            
             this.tựĐộngSinhGid(); 
         } else {
             bRenew.classList.add('active', 'chi');
-            if (inputGid) {
-                inputGid.value = "";
-                inputGid.placeholder = "🔍︎ Tìm kiếm bằng GID";
-                inputGid.readOnly = false;
-            }
+            inputGid.value = "";
+            inputGid.placeholder = "🔍︎ Tìm kiếm bằng GID";
+            inputGid.readOnly = false;
             
+            // Ẩn Chăm sóc khách hàng - Hiện danh sách thành viên
             if (cskhGroup) cskhGroup.classList.add('d-none');
             if (memberListGroup) memberListGroup.classList.remove('d-none');
             
-            // 🌟 FIX CHÍ MẠNG CHO MOBILE: Kiểm tra nếu trong select chưa có Hủy ĐK thì tạo mới và add vào lại
-            if (selectGoi && !document.getElementById('opt-cancel')) {
-                const optNew = document.createElement('option');
-                optNew.value = 'Hủy ĐK';
-                optNew.id = 'opt-cancel';
-                optNew.innerText = 'HỦY ĐĂNG KÝ';
-                selectGoi.appendChild(optNew);
-            }
+            if (optCancel) optCancel.style.display = 'block';
 
-            if (selectGoi) selectGoi.value = '';
-
+            // Kích hoạt gọi nạp dữ liệu danh sách thành viên của nhân viên này
             this.taiDanhSachThanhVienTheoUser();
         }
         this.tínhNgàyKếtThúc(); 
     },
-
 
 
     tựĐộngSinhGid: function () {
@@ -388,25 +373,34 @@ refreshRenewList: function () {
     this.taiDanhSachThanhVienTheoUser();
 },
 
+
     tínhNgàyKếtThúc: function() {
         const ngàyBắtĐầuValue = document.getElementById('r-start').value;
         const gói = document.getElementById('r-goi').value;
         const inputEnd = document.getElementById('r-end');
         const inputTien = document.getElementById('r-tien');
 
+        // 🔥 FIX TRIỆT ĐỂ MOBILE: Nếu đang ĐĂNG KÝ MỚI, nhổ tận gốc option Hủy ĐK khỏi DOM
+        if (this.mode === 'NEW') {
+            const optCancel = document.getElementById('opt-cancel');
+            if (optCancel) {
+                optCancel.remove(); // Xóa hoàn toàn thẻ HTML để Native UI trên mobile không hiển thị được
+            }
+        }
+
         // 1. Nếu chưa chọn gói (hoặc giá trị trống) -> Reset sạch thông tin hiển thị
         if (!gói || gói === "") {
-            if (inputEnd) inputEnd.value = ""; // Trả về rỗng để cột phải tự hiện mốc gạch ngang --/--/----
+            if (inputEnd) inputEnd.value = ""; // Hiện mốc gạch ngang --/--/---- bên cột phải
             if (inputTien) inputTien.value = "0";
             this.capNhatKhungChamSocKhachHang();
             return;
         }
 
-        // 2. 🔥 FIX CHẶN LỖI: Chế độ ĐĂNG KÝ MỚI (NEW) không cho phép tính toán gói Hủy ĐK
+        // 2. Chặn lỗi logic dự phòng cho hệ thống
         if (this.mode === 'NEW' && gói === 'Hủy ĐK') {
             if (inputEnd) inputEnd.value = "";
             if (inputTien) inputTien.value = "0";
-            document.getElementById('r-goi').value = ""; // Đưa ô chọn về trạng thái chữ mờ mặc định
+            document.getElementById('r-goi').value = ""; // Đưa về trạng thái chữ mờ mặc định
             this.capNhatKhungChamSocKhachHang();
             if (typeof NotiModule !== 'undefined') NotiModule.show("Chế độ đăng ký mới không được chọn Hủy Đăng Ký!", "error");
             return;
@@ -444,6 +438,7 @@ refreshRenewList: function () {
 
         this.capNhatKhungChamSocKhachHang();
     },
+
 
 
     capNhatKhungChamSocKhachHang: function() {
