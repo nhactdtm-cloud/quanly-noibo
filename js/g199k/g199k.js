@@ -380,17 +380,26 @@ refreshRenewList: function () {
         const inputEnd = document.getElementById('r-end');
         const inputTien = document.getElementById('r-tien');
 
-        // 🔥 FIX TRIỆT ĐỂ MOBILE: Nếu đang ĐĂNG KÝ MỚI, nhổ tận gốc option Hủy ĐK khỏi DOM
+        // 🔥 FIX ĐỒNG BỘ MOBILE 1: Nếu ở tab ĐĂNG KÝ MỚI -> Nhổ hẳn dòng Hủy ĐK ra khỏi máy
         if (this.mode === 'NEW') {
             const optCancel = document.getElementById('opt-cancel');
-            if (optCancel) {
-                optCancel.remove(); // Xóa hoàn toàn thẻ HTML để Native UI trên mobile không hiển thị được
+            if (optCancel) optCancel.remove(); 
+        } 
+        // 🔥 FIX ĐỒNG BỘ MOBILE 2: Nếu ở tab GIA HẠN / HỦY -> Tự động chèn lại dòng Hủy ĐK vào menu
+        else if (this.mode === 'RENEW') {
+            const selectGoi = document.getElementById('r-goi');
+            if (selectGoi && !document.getElementById('opt-cancel')) {
+                const optNew = document.createElement('option');
+                optNew.value = 'Hủy ĐK';
+                optNew.id = 'opt-cancel';
+                optNew.innerText = 'HỦY ĐĂNG KÝ';
+                selectGoi.appendChild(optNew);
             }
         }
 
         // 1. Nếu chưa chọn gói (hoặc giá trị trống) -> Reset sạch thông tin hiển thị
         if (!gói || gói === "") {
-            if (inputEnd) inputEnd.value = ""; // Hiện mốc gạch ngang --/--/---- bên cột phải
+            if (inputEnd) inputEnd.value = ""; 
             if (inputTien) inputTien.value = "0";
             this.capNhatKhungChamSocKhachHang();
             return;
@@ -400,9 +409,8 @@ refreshRenewList: function () {
         if (this.mode === 'NEW' && gói === 'Hủy ĐK') {
             if (inputEnd) inputEnd.value = "";
             if (inputTien) inputTien.value = "0";
-            document.getElementById('r-goi').value = ""; // Đưa về trạng thái chữ mờ mặc định
+            document.getElementById('r-goi').value = ""; 
             this.capNhatKhungChamSocKhachHang();
-            if (typeof NotiModule !== 'undefined') NotiModule.show("Chế độ đăng ký mới không được chọn Hủy Đăng Ký!", "error");
             return;
         }
 
@@ -431,7 +439,6 @@ refreshRenewList: function () {
             if (inputEnd) inputEnd.value = địnhDạngKiểuLịch(date);
             if (inputTien) inputTien.value = "500000";
         } else if (gói === 'Hủy ĐK') {
-            // Nhánh này chỉ chạy khi hệ thống đang ở chế độ Gia hạn / Hủy (RENEW)
             if (inputEnd) inputEnd.value = "HỦY NGAY";
             if (inputTien) inputTien.value = "0";
         }
