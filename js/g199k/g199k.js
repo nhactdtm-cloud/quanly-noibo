@@ -64,7 +64,6 @@ const R199kModule = {
         const bNew = document.getElementById('r-s-new');
         const bRenew = document.getElementById('r-s-renew');
         const inputGid = document.getElementById('r-gid');
-        const optCancel = document.getElementById('opt-cancel'); 
         const selectGoi = document.getElementById('r-goi');
 
         // Các phần tử bọc cột bên phải
@@ -75,34 +74,50 @@ const R199kModule = {
         
         if (action === 'NEW') {
             bNew.classList.add('active', 'thu');
-            inputGid.readOnly = true;
+            if (inputGid) inputGid.readOnly = true;
             
-            // Hiện Chăm sóc khách hàng - Ẩn danh sách thành viên
             if (cskhGroup) cskhGroup.classList.remove('d-none');
             if (memberListGroup) memberListGroup.classList.add('d-none');
             
-            if (optCancel) optCancel.style.display = 'none';
-            if (selectGoi.value === 'Hủy ĐK') {
-                selectGoi.value = '1 THÁNG';
+            // 🌟 FIX CHÍ MẠNG CHO MOBILE: Xóa hẳn tùy chọn Hủy ĐK ra khỏi cây thư mục DOM
+            const optCancel = document.getElementById('opt-cancel');
+            if (optCancel) {
+                optCancel.remove(); 
             }
+            
+            // Đưa ô chọn về trạng thái mặc định (Chữ mờ)
+            if (selectGoi) {
+                if (selectGoi.value === 'Hủy ĐK') selectGoi.value = '';
+            }
+            
             this.tựĐộngSinhGid(); 
         } else {
             bRenew.classList.add('active', 'chi');
-            inputGid.value = "";
-            inputGid.placeholder = "🔍︎ Tìm kiếm bằng GID";
-            inputGid.readOnly = false;
+            if (inputGid) {
+                inputGid.value = "";
+                inputGid.placeholder = "🔍︎ Tìm kiếm bằng GID";
+                inputGid.readOnly = false;
+            }
             
-            // Ẩn Chăm sóc khách hàng - Hiện danh sách thành viên
             if (cskhGroup) cskhGroup.classList.add('d-none');
             if (memberListGroup) memberListGroup.classList.remove('d-none');
             
-            if (optCancel) optCancel.style.display = 'block';
+            // 🌟 FIX CHÍ MẠNG CHO MOBILE: Kiểm tra nếu trong select chưa có Hủy ĐK thì tạo mới và add vào lại
+            if (selectGoi && !document.getElementById('opt-cancel')) {
+                const optNew = document.createElement('option');
+                optNew.value = 'Hủy ĐK';
+                optNew.id = 'opt-cancel';
+                optNew.innerText = 'HỦY ĐĂNG KÝ';
+                selectGoi.appendChild(optNew);
+            }
 
-            // Kích hoạt gọi nạp dữ liệu danh sách thành viên của nhân viên này
+            if (selectGoi) selectGoi.value = '';
+
             this.taiDanhSachThanhVienTheoUser();
         }
         this.tínhNgàyKếtThúc(); 
     },
+
 
 
     tựĐộngSinhGid: function () {
