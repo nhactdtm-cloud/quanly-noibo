@@ -621,7 +621,6 @@ guiThuChi: function(hoaDon, name, goi, tien) {
         }
     },
 
-    // 🌟 HÀM SỬA ĐỔI: Tối ưu hóa luồng xử lý khi bấm nút nhập dữ liệu
     submitR199k: function() {
         if (this.isSubmitting) return; // Chặn bấm liên tiếp gây trùng đơn
 
@@ -644,7 +643,6 @@ guiThuChi: function(hoaDon, name, goi, tien) {
             return; 
         }
 
-    // 🔥 ĐOẠN BỔ SUNG MỚI: Chặn nếu chưa chọn gói đăng ký
     if (!goi || goi === "") {
         if (typeof NotiModule !== 'undefined') {
             NotiModule.show("Bạn chưa chọn gói đăng kí!", "error");
@@ -658,7 +656,7 @@ guiThuChi: function(hoaDon, name, goi, tien) {
         const btn = document.getElementById('btn-add-r199k');
         const originalText = btn ? btn.innerText : "NHẬP DỮ LIỆU BẢNG";
         if (btn) {
-            btn.innerText = "⏳ ĐANG ĐỒNG BỘ...";
+            btn.innerText = "ĐANG ĐỒNG BỘ...";
             btn.disabled = true;
         }
         this.isSubmitting = true;
