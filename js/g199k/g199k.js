@@ -381,21 +381,25 @@ tínhNgàyKếtThúc: function() {
     const inputEnd = document.getElementById('r-end');
     const inputTien = document.getElementById('r-tien');
 
-    // 1. Kiểm tra nếu không có giá trị
+    // BỔ SUNG: Nếu chưa chọn gói thì xóa trắng ngày kết thúc và tiền rồi dừng lại
+    if (!gói || gói === "") {
+        if (inputEnd) inputEnd.value = "Chưa chọn gói";
+        if (inputTien) inputTien.value = "0";
+        this.capNhatKhungChamSocKhachHang();
+        return;
+    }
+
     if (!ngàyBắtĐầuValue || ngàyBắtĐầuValue.trim() === "") {
         inputEnd.value = "";
         return;
     }
 
     let date = new Date(ngàyBắtĐầuValue);
-
-    // 2. THÊM MỚI: Kiểm tra nếu ngày tháng nhập vào bị sai định dạng (Invalid Date)
     if (isNaN(date.getTime())) {
-        inputEnd.value = "Ngày bắt đầu lỗi"; // Hoặc để trống "" tùy bạn
+        inputEnd.value = "Ngày bắt đầu lỗi";
         return;
     }
     
-    // Hàm phụ trợ định dạng ngày thành: "ngày DD thg MM, YYYY" giống Ngày bắt đầu
     const địnhDạngKiểuLịch = (dateObj) => {
         let day = dateObj.getDate();
         let month = dateObj.getMonth() + 1;
@@ -416,7 +420,6 @@ tínhNgàyKếtThúc: function() {
         inputTien.value = "0";
     }
 
-    // KÍCH HOẠT ĐỒNG BỘ: Cập nhật real-time sang cột bên phải ngay khi tính xong ngày
     this.capNhatKhungChamSocKhachHang();
 },
 
@@ -618,6 +621,17 @@ guiThuChi: function(hoaDon, name, goi, tien) {
             return; 
         }
 
+    // 🔥 ĐOẠN BỔ SUNG MỚI: Chặn nếu chưa chọn gói đăng ký
+    if (!goi || goi === "") {
+        if (typeof NotiModule !== 'undefined') {
+            NotiModule.show("Bạn chưa chọn gói đăng kí!", "error");
+        } else {
+            alert("Bạn chưa chọn gói đăng kí!");
+        }
+        document.getElementById('r-goi').focus();
+        return;
+    }
+
         const btn = document.getElementById('btn-add-r199k');
         const originalText = btn ? btn.innerText : "NHẬP DỮ LIỆU BẢNG";
         if (btn) {
@@ -667,7 +681,7 @@ guiThuChi: function(hoaDon, name, goi, tien) {
 
                     // Reset lại Form nhập liệu
                     if (document.getElementById("r-name")) document.getElementById("r-name").value = "";
-                    if (document.getElementById("r-gmail")) document.getElementById("r-gmail").value = "";
+                    if (document.getElementById("r-gmail")) document.getElementById("r-gmail").value = ""; document.getElementById("r-goi").value = "";
                     if (document.getElementById("r-start")) {
                         document.getElementById("r-start").value = new Date().toISOString().split("T")[0];
                     }

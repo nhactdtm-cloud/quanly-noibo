@@ -11,17 +11,22 @@ const ThuChiModule = {
 
     initLgdRong() {
         const sel = document.getElementById('lgd'); if (!sel) return;
-        sel.innerHTML = ''; sel.add(new Option('Chọn loại giao dịch', ''));
+        sel.innerHTML = ''; 
+        // 🌟 SỬA ĐOẠN NÀY: Tạo option mặc định ẩn, mờ và không cho bấm chọn lại
+        const opt = new Option('Chọn loại giao dịch', ''); opt.disabled = true; opt.selected = true; opt.hidden = true; sel.add(opt);
         this.oT.forEach(o => sel.add(new Option(o, o))); sel.value = '';
     },
 
     sm(m) {
         this.md = m; const bT = document.getElementById('s-thu'), bC = document.getElementById('s-chi'), sel = document.getElementById('lgd');
         if (bT && bC) bT.className = bC.className = 'seg-btn'; if (!sel) return;
-        sel.innerHTML = ''; sel.add(new Option('Chọn loại giao dịch', ''));
+        sel.innerHTML = ''; 
+        // 🌟 SỬA ĐOẠN NÀY: Tạo option mặc định ẩn, mờ khi chuyển đổi Tab Thu / Chi
+        const opt = new Option('Chọn loại giao dịch', ''); opt.disabled = true; opt.selected = true; opt.hidden = true; sel.add(opt);
         m === 'THU' ? (bT?.classList.add('active', 'thu'), this.oT.forEach(o => sel.add(new Option(o, o)))) : (bC?.classList.add('active', 'chi'), this.oC.forEach(o => sel.add(new Option(o, o))));
         sel.value = '';
     },
+
 
     subData() {
         // 🌟 CHỐT CHẶN MOBILE 1: Nếu nút đang bị khóa thì chặn đứng hoàn toàn lệnh chạm trùng lặp ngầm của Safari

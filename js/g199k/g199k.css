@@ -383,3 +383,17 @@
     border-color: var(--info);
     box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
 }
+
+/* ==========================================================================
+   SELECT OPTIONS THEME SYNC
+   ========================================================================== */
+/* Khi chưa lựa chọn (Trạng thái mặc định) -> Chữ mờ đồng bộ màu Text Secondary */
+#r-goi:invalid, #lgd:invalid {
+    color: var(--ts) !important;
+}
+
+/* Khi bấm mở danh sách lựa chọn -> Đồng bộ màu chữ mặc định và màu nền Surface */
+#r-goi option, #lgd option {
+    color: var(--t) !important;
+    background-color: var(--sf) !important; /* Triệt tiêu hoàn toàn lỗi chuyển màu xám đen của trình duyệt */
+}

@@ -329,3 +329,16 @@
     text-align: center;
     padding: 15px 0;
 }
+
+/* Trạng thái mặc định khi chưa chọn -> Ép chữ tự động mờ đi theo màu Text Secondary (--ts) */
+#r-goi:invalid, #lgd:invalid {
+    color: var(--ts) !important;
+}
+
+/* Danh sách tùy chọn xổ xuống -> Hiện chữ màu đen mặc định (--t) và nền trắng Surface (--sf) */
+#r-goi option, #lgd option {
+    color: var(--t) !important;
+    background-color: var(--sf) !important;
+}
+
+
