@@ -70,16 +70,35 @@ const ThuChiModule = {
 
     processQueue() {
         if (this.isSyncing) return;
-        let queue = JSON.parse(localStorage.getItem('thuchi_queue')) || []; if (queue.length === 0) return;
-        this.isSyncing = true; const currentItem = queue[0];
+        let queue = JSON.parse(localStorage.getItem('thuchi_queue')) || []; 
+        if (queue.length === 0) {
+            // Bảo hiểm: Nếu không còn đơn nào trong hàng đợi, chắc chắn nút bấm phải được mở khóa
+            const btnAdd = document.getElementById('btn-add-data');
+            if (btnAdd && btnAdd.disabled) {
+                btnAdd.disabled = false;
+                btnAdd.innerText = "NHẬP DỮ LIỆU";
+                btnAdd.style.background = "";
+            }
+            return;
+        }
+        
+        this.isSyncing = true; 
+        const currentItem = queue[0];
 
-        fetch(this.WEB_APP_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(currentItem) })
-        .then(r => r.ok ? r.json() : Promise.reject()).then(res => {
+        fetch(this.WEB_APP_URL, { 
+            method: "POST", 
+            headers: { "Content-Type": "text/plain;charset=utf-8" }, 
+            body: JSON.stringify(currentItem) 
+        })
+        .then(r => r.ok ? r.json() : Promise.reject())
+        .then(res => {
             if (res && res.status === "success") {
-                let uQ = JSON.parse(localStorage.getItem('thuchi_queue')) || []; uQ.shift();
+                // 1. Xóa đơn đầu tiên ra khỏi hàng đợi LocalStorage lập tức
+                let uQ = JSON.parse(localStorage.getItem('thuchi_queue')) || []; 
+                uQ.shift();
                 localStorage.setItem('thuchi_queue', JSON.stringify(uQ)); 
                 
-                // 🌟 MỞ KHÓA NÚT BẤM: Khôi phục lại trạng thái nút bấm ban đầu sau khi đồng bộ lên Sheets thành công
+                // 2. MỚ KHÓA NÚT BẤM NGAY TẠI ĐÂY - Không để nhân viên phải chờ đợi giao diện tải lại
                 const btnAdd = document.getElementById('btn-add-data');
                 if (btnAdd) {
                     btnAdd.disabled = false;
@@ -87,20 +106,52 @@ const ThuChiModule = {
                     btnAdd.style.background = ""; 
                 }
 
-                this.taiHoatDongHomNay();
-            }
-        }).catch(() => {
-            console.warn(`Đơn ${currentItem.hoaDon} đợi mạng.`);
-            // Bảo hiểm rớt mạng: Vẫn mở lại nút bấm để nhân viên nhập đơn ngoại tuyến tiếp theo
-            const btnAdd = document.getElementById('btn-add-data');
-            if (btnAdd) {
-                btnAdd.disabled = false;
-                btnAdd.innerText = "NHẬP DỮ LIỆU";
-                btnAdd.style.background = "";
+                // 3. CẬP NHẬT GIAO DIỆN TẠM THỜI (Tăng tốc hiển thị khối Hoạt động & Đối soát trong 0s)
+                this.totalOrders++;
+                if (currentItem.mode === 'THU TIỀN') {
+                    this.totalRevenue += Number(currentItem.soTien || 0);
+                } else {
+                    this.totalExpense += Number(currentItem.soTien || 0);
+                }
+                this.uSt(); // Cập nhật ngay ba ô thông số tiền toán trên đầu bên phải
+
+                // Đẩy đơn mới vào mảng dữ liệu hiện tại để khối đối soát vẽ lại tức thì
+                this.duLieuGiaoDichHomNay.push(currentItem);
+                this.capNhatKhoiDoiSoat(this.duLieuGiaoDichHomNay);
+
+                // 4. TRÌ HOÃN TẢI LẠI TỪ SHEET (Tạo khoảng nghỉ để Server Google cập nhật dữ liệu sạch)
+                setTimeout(() => {
+                    this.taiHoatDongHomNay();
+                }, 1000);
+            } else {
+                // Nếu Server trả về lỗi cấu trúc nhưng mạng vẫn chạy, vẫn giải phóng nút bấm
+                this.giaiPhongNutBamLoi();
             }
         })
-        .finally(() => { this.isSyncing = false; if ((JSON.parse(localStorage.getItem('thuchi_queue')) || []).length > 0) setTimeout(() => this.processQueue(), 500); });
+        .catch((err) => {
+            console.warn(`Đơn ${currentItem.hoaDon} đang đợi mạng ổn định lại.`, err);
+            this.giaiPhongNutBamLoi();
+        })
+        .finally(() => { 
+            this.isSyncing = false; 
+            // Nếu vẫn còn đơn khác xếp hàng trong Queue, tiếp tục xử lý sau 500ms
+            let checkQueue = JSON.parse(localStorage.getItem('thuchi_queue')) || [];
+            if (checkQueue.length > 0) {
+                setTimeout(() => this.processQueue(), 500); 
+            }
+        });
     },
+
+    // Hàm tiện ích phụ trợ giải phóng nhanh trạng thái nút bấm khi gặp lỗi đồng bộ ngầm
+    giaiPhongNutBamLoi() {
+        const btnAdd = document.getElementById('btn-add-data');
+        if (btnAdd) {
+            btnAdd.disabled = false;
+            btnAdd.innerText = "NHẬP DỮ LIỆU";
+            btnAdd.style.background = "";
+        }
+    },
+
 
     taiHoatDongHomNay() {
         if (this.isLoadingData) {
