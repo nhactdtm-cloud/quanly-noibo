@@ -1,647 +1,197 @@
-const R199kModule = {
-    // ⚠️ LINK APPS SCRIPT RIÊNG CỦA GOOGLE SHEET R199K
-    WEB_APP_URL: "https://script.google.com/macros/s/AKfycbzhh5Dzq2fuWK3zQPFB67DHf4QZE9efj0b2g6jQzsqUsXGK5hLnFgMSfdMt33hiyrAc/exec",
-    THUCHI_WEB_APP_URL: "https://script.google.com/macros/s/AKfycbwNA4KT2HEPkCCeQu8ZHLhapDREaNyOUHh9UcleiA6HrxVzLOfNRLpkEDj7zLRJ79kYsQ/exec",
-    mode: 'NEW', // Mặc định là Đăng ký mới
-    searchId: 0,
+// js/thuchi/thuchi.js - FULL MODULE 1 SHEET (TIẾT KIỆM DÒNG)
+const ThuChiModule = {
+    WEB_APP_URL: "https://script.google.com/macros/s/AKfycbwNA4KT2HEPkCCeQu8ZHLhapDREaNyOUHh9UcleiA6HrxVzLOfNRLpkEDj7zLRJ79kYsQ/exec",
+    md: 'THU', totalOrders: 0, totalRevenue: 0, totalExpense: 0, isSyncing: false, isLoadingData: false, duLieuGiaoDichHomNay: [],
+    oT: ['NHẠC LẺ', 'PHÍ ĐÀO TẠO', 'DOANH THU KHÁC'], oC: ['ADS', 'CHI PHÍ VẬN HÀNH'],
 
-    init: function() {
+    init() { this.iId(); this.initLgdRong(); this.taiHoatDongHomNay(); setInterval(() => this.processQueue(), 5000); },
+    iId() { const el = document.getElementById('id'); if (el) el.value = "CHỜ TỰ ĐỘNG"; },
+    thayDoiBoLocThoiGian() { this.taiHoatDongHomNay(); },
+    taoHoaDon() { return "HD" + Date.now().toString(36).toUpperCase() + Math.random().toString(36).substring(2, 6).toUpperCase(); },
 
-        const today = new Date().toISOString().split('T')[0];
-        document.getElementById('r-start').value = today;
-        
-        // Cập nhật tiền, ngày kết thúc và khởi tạo trạng thái hiển thị ban đầu
-        this.tựĐộngSinhGid(); 
-        this.tínhNgàyKếtThúc();
-
-        // [SỬA LỖI ĐỒNG BỘ MÃ GID LIÊN TỤC]
-        
-        // 1. Khi gõ tên khách hàng -> Sinh mã GID và đẩy ngay lập tức sang cột phải
-        document.getElementById('r-name').addEventListener('input', () => {
-            if (this.mode === 'NEW') {
-                this.tựĐộngSinhGid(); 
-            } else {
-                this.tựĐộngTìmKiếmKháchHàng('NAME'); 
-            }
-            // Ép buộc cột phải cập nhật lại Mã GID vừa sinh
-            this.capNhatKhungChamSocKhachHang(); 
-        });
-
-        // 2. Khi chọn lại gói -> Cập nhật tiền, ngày kết thúc và đồng bộ cột phải
-        document.getElementById('r-goi').addEventListener('change', () => {
-            this.tínhNgàyKếtThúc();
-        });
-
-        document.getElementById('r-start').addEventListener('change', () => {
-            this.tínhNgàyKếtThúc();
-        });
-
-        // 4. Gắn sự kiện cho các nút chuyển Tab ĐĂNG KÝ MỚI / GIA HẠN
-        document.getElementById('r-s-new').addEventListener('click', () => this.setMode('NEW'));
-        document.getElementById('r-s-renew').addEventListener('click', () => this.setMode('RENEW'));
-        
-        // 4.5. Khi gõ hoặc sửa mã GID ở tab Gia Hạn -> Tự động truy vấn và đồng bộ sang cột phải
-        document.getElementById('r-gid').addEventListener('input', () => {
-            this.tựĐộngTìmKiếmKháchHàng();
-            this.capNhatKhungChamSocKhachHang(); 
-        });
-
-        // 5. Gắn sự kiện cho nút Submit dữ liệu
-        document.getElementById('btn-add-r199k').addEventListener('click', () => this.submitR199k());
-
-        // [GIỮ LẠI ĐÂY] Kích hoạt tính năng Click-to-Copy cho các khối dữ liệu
-        this.dangKySuKienCopy();
-
-        // Ẩn tùy chọn hủy đăng ký ở chế độ Đăng ký mới
-        if (document.getElementById('opt-cancel')) {
-            document.getElementById('opt-cancel').style.display = 'none';
-        }
+    initLgdRong() {
+        const sel = document.getElementById('lgd'); if (!sel) return;
+        sel.innerHTML = ''; sel.add(new Option('Chọn loại giao dịch', ''));
+        this.oT.forEach(o => sel.add(new Option(o, o))); sel.value = '';
     },
 
-
-    setMode: function(action) {
-        this.mode = action;
-        const bNew = document.getElementById('r-s-new');
-        const bRenew = document.getElementById('r-s-renew');
-        const inputGid = document.getElementById('r-gid');
-        const optCancel = document.getElementById('opt-cancel'); 
-        const selectGoi = document.getElementById('r-goi');
-
-        // Các phần tử bọc cột bên phải
-        const cskhGroup = document.getElementById('cskh-group');
-        const memberListGroup = document.getElementById('member-list-group');
-
-        bNew.className = bRenew.className = 'seg-btn';
-        
-        if (action === 'NEW') {
-            bNew.classList.add('active', 'thu');
-            inputGid.readOnly = true;
-            
-            // Hiện Chăm sóc khách hàng - Ẩn danh sách thành viên
-            if (cskhGroup) cskhGroup.classList.remove('d-none');
-            if (memberListGroup) memberListGroup.classList.add('d-none');
-            
-            if (optCancel) optCancel.style.display = 'none';
-            if (selectGoi.value === 'Hủy ĐK') {
-                selectGoi.value = '1 THÁNG';
-            }
-            this.tựĐộngSinhGid(); 
-        } else {
-            bRenew.classList.add('active', 'chi');
-            inputGid.value = "";
-            inputGid.placeholder = "🔍︎ Tìm kiếm bằng GID";
-            inputGid.readOnly = false;
-            
-            // Ẩn Chăm sóc khách hàng - Hiện danh sách thành viên
-            if (cskhGroup) cskhGroup.classList.add('d-none');
-            if (memberListGroup) memberListGroup.classList.remove('d-none');
-            
-            if (optCancel) optCancel.style.display = 'block';
-
-            // Kích hoạt gọi nạp dữ liệu danh sách thành viên của nhân viên này
-            this.taiDanhSachThanhVienTheoUser();
-        }
-        this.tínhNgàyKếtThúc(); 
+    sm(m) {
+        this.md = m; const bT = document.getElementById('s-thu'), bC = document.getElementById('s-chi'), sel = document.getElementById('lgd');
+        if (bT && bC) bT.className = bC.className = 'seg-btn'; if (!sel) return;
+        sel.innerHTML = ''; sel.add(new Option('Chọn loại giao dịch', ''));
+        m === 'THU' ? (bT?.classList.add('active', 'thu'), this.oT.forEach(o => sel.add(new Option(o, o)))) : (bC?.classList.add('active', 'chi'), this.oC.forEach(o => sel.add(new Option(o, o))));
+        sel.value = '';
     },
 
+    subData() {
+        // 🌟 CHỐT CHẶN MOBILE 1: Nếu nút đang bị khóa thì chặn đứng hoàn toàn lệnh chạm trùng lặp ngầm của Safari
+        const btnAdd = document.getElementById('btn-add-data');
+        if (btnAdd && btnAdd.disabled) return;
 
-    tựĐộngSinhGid: function () {
-        if (this.mode !== "NEW") return;
-
-        const nameInput = document.getElementById("r-name").value.trim();
-        const inputGid = document.getElementById("r-gid");
-
-        if (nameInput === "") {
-            inputGid.value = "TỰ ĐỘNG SINH";
-            return;
+        const kh = document.getElementById('kh')?.value?.trim() || "-", gc = document.getElementById('gc')?.value?.trim() || "-", lgd = document.getElementById('lgd')?.value, st = document.getElementById('st')?.value;
+        if (!lgd || lgd === "Chọn loại giao dịch") return NotiModule.show("Vui lòng chọn Loại Giao Dịch cụ thể!", "error");
+        if (!st || isNaN(st) || Number(st) <= 0) return NotiModule.show("Vui lòng nhập số tiền hợp lệ lớn hơn 0!", "error");
+        
+        // 🌟 CHỐT CHẶN MOBILE 2: Khóa cứng nút bấm tức thì (0ms) tránh việc nhân viên chạm nhồi lệnh liên tục
+        if (btnAdd) {
+            btnAdd.disabled = true;
+            btnAdd.innerText = "ĐANG LƯU...";
+            btnAdd.style.background = "#9ca3af";
         }
 
-        const now = new Date();
-        const yy = String(now.getFullYear()).slice(-2);
-        const mm = String(now.getMonth() + 1).padStart(2, "0");
+        const numSt = Number(st), hoaDon = this.taoHoaDon();
+        // Định danh người nhập hóa đơn thực tế
+        const admin = (localStorage.getItem('loggedUser') || (typeof UserModule !== 'undefined' && UserModule.uName) || "ADMIN").trim().toUpperCase();
+        
+        // ĐÃ XÓA: Dòng lệnh tự động cộng tiền ảo tại Client cũ ở đây để chống lỗi nhân đôi con số thống kê hàng trên
 
-        // Lấy 6 số cuối của thời gian hiện tại
-        const seq = Date.now().toString().slice(-6);
+        if (typeof G199kModule !== 'undefined' && typeof G199kModule.rRow === 'function') G199kModule.rRow(hoaDon, kh, gc, lgd, numSt, this.md, admin);
+        NotiModule.show(`Đã lưu đơn ${hoaDon}! Đang đồng bộ...`, "success");
+        ['kh', 'gc', 'st'].forEach(id => { if(document.getElementById(id)) document.getElementById(id).value = ""; }); this.iId();
 
-        // Tạo thêm 2 số ngẫu nhiên để chống trùng lặp dữ liệu tuyệt đối
-        const rand = Math.floor(Math.random() * 100)
-            .toString()
-            .padStart(2, "0");
+        let queue = JSON.parse(localStorage.getItem('thuchi_queue')) || [];
+        const thoiGianTao = new Date().toLocaleDateString('vi-VN') + ' ' + new Date().toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'});
 
-        // Gán mã GID mới vào ô nhập liệu bên trái
-        inputGid.value = `G${yy}${mm}${seq}${rand}`;
+        const newRecord = { 
+            hoaDon, 
+            khachHang: kh, 
+            ghiChu: gc, 
+            loaiGd: lgd, 
+            soTien: numSt, 
+            mode: this.md === 'THU' ? 'THU TIỀN' : 'CHI TIỀN', 
+            adminName: admin,
+            thoiGian: thoiGianTao
+        };
+        queue.push(newRecord); localStorage.setItem('thuchi_queue', JSON.stringify(queue));
+        
+        // ĐÃ XÓA: Lệnh push ảo .push(newRecord) để nhường quyền tính toán cho mảng dữ liệu sạch trả về từ Google Sheets
+        this.initLgdRong(); this.processQueue();
     },
 
-    tựĐộngTìmKiếmKháchHàng: function(type = 'GID') {
-        if (this.mode !== 'RENEW') return; 
+    processQueue() {
+        if (this.isSyncing) return;
+        let queue = JSON.parse(localStorage.getItem('thuchi_queue')) || []; if (queue.length === 0) return;
+        this.isSyncing = true; const currentItem = queue[0];
 
-        if (this.isAutofilling) return; 
-
-        let url = `${this.WEB_APP_URL}?action=GET_USER`;
-        const inputGid = document.getElementById('r-gid');
-        const inputName = document.getElementById('r-name');
-        const inputGmail = document.getElementById('r-gmail');
-        const selectGoi = document.getElementById('r-goi');
-        
-        let keyword = "";
-        if (type === 'GID') {
-            keyword = inputGid.value.trim().toUpperCase();
-            if (keyword.length < 5) return; 
-            url += `&gid=${encodeURIComponent(keyword)}`;
-        } else {
-            keyword = inputName.value.trim();
-            if (keyword.length < 3) return; 
-            url += `&name=${encodeURIComponent(keyword)}`;
-        }
-
-        const currentSearchId = ++this.searchId;
-
-        fetch(url)
-        .then(response => response.json())
-        .then(res => {
-            if (currentSearchId !== this.searchId) return;
-            if (res.status === "success") {
-
-                this.currentGhiChu = res.data.ghiChu || ""; 
-
-                this.isAutofilling = true;
-
-                if (type === 'GID') {
-                    inputName.value = res.data.name;
-                } else {
-                    inputGid.value = res.data.gid;
+        fetch(this.WEB_APP_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(currentItem) })
+        .then(r => r.ok ? r.json() : Promise.reject()).then(res => {
+            if (res && res.status === "success") {
+                let uQ = JSON.parse(localStorage.getItem('thuchi_queue')) || []; uQ.shift();
+                localStorage.setItem('thuchi_queue', JSON.stringify(uQ)); 
+                
+                // 🌟 MỞ KHÓA NÚT BẤM: Khôi phục lại trạng thái nút bấm ban đầu sau khi đồng bộ lên Sheets thành công
+                const btnAdd = document.getElementById('btn-add-data');
+                if (btnAdd) {
+                    btnAdd.disabled = false;
+                    btnAdd.innerText = "NHẬP DỮ LIỆU";
+                    btnAdd.style.background = ""; 
                 }
-                
-                inputGmail.value = res.data.gmail;
-                
-                if (res.data.goi) {
-                     selectGoi.value = res.data.goi;
-                }
-                
-                // Đồng bộ tính toán lại ngày kết thúc và ép hiển thị ngay sang cột phải
-                this.tínhNgàyKếtThúc(); 
-                
-                NotiModule.show(`Đã tìm thấy khách hàng: ${res.data.name}!`, "success");
 
-                setTimeout(() => { this.isAutofilling = false; }, 100);
-            } else if (res.status === "not_found") {
-                NotiModule.show(`Không tìm thấy khách hàng với thông tin: ${keyword}`, "error");
+                this.taiHoatDongHomNay();
+            }
+        }).catch(() => {
+            console.warn(`Đơn ${currentItem.hoaDon} đợi mạng.`);
+            // Bảo hiểm rớt mạng: Vẫn mở lại nút bấm để nhân viên nhập đơn ngoại tuyến tiếp theo
+            const btnAdd = document.getElementById('btn-add-data');
+            if (btnAdd) {
+                btnAdd.disabled = false;
+                btnAdd.innerText = "NHẬP DỮ LIỆU";
+                btnAdd.style.background = "";
             }
         })
-        .catch(err => {
-            console.log("Lỗi tìm kiếm ngầm: ", err);
-            this.isAutofilling = false; 
+        .finally(() => { this.isSyncing = false; if ((JSON.parse(localStorage.getItem('thuchi_queue')) || []).length > 0) setTimeout(() => this.processQueue(), 500); });
+    },
+
+    taiHoatDongHomNay() {
+        if (this.isLoadingData) {
+            console.warn("Safari đang xếp hàng tải dữ liệu ngầm...");
+            this.isLoadingData = false; 
+        } 
+        
+        this.isLoadingData = true;
+        this.totalOrders = this.totalRevenue = this.totalExpense = 0; 
+        this.duLieuGiaoDichHomNay = [];
+        this.uSt(); 
+        this.capNhatKhoiDoiSoat([]);
+        
+        let admin = (localStorage.getItem('loggedUser') || '').trim().toUpperCase();
+        let role = (localStorage.getItem('loggedRole') || '').trim().toUpperCase();
+        
+        const rangeSelect = document.getElementById('filter-date-range');
+        const range = rangeSelect ? rangeSelect.value : 'today';
+
+        if (typeof G199kModule !== 'undefined' && document.getElementById('bảng-giao-dịch')) {
+            document.getElementById('bảng-giao-dịch').innerHTML = '';
+        }
+
+        fetch(`${this.WEB_APP_URL}?range=${range}&_nocache=${Date.now()}`)
+        .then(r => r.ok ? r.json() : Promise.reject())
+        .then(res => {
+            if (!res || res.status !== "success" || !Array.isArray(res.data) || res.data.length === 0) return;
+            this.duLieuGiaoDichHomNay = res.data;
+            
+            // 🌟 VÁ LỖI XÓA SẠCH: Ép các thông số đếm tiền về 0 trước khi chạy vòng lặp cộng dồn dữ liệu mới tinh từ mạng về
+            this.totalOrders = 0;
+            this.totalRevenue = 0;
+            this.totalExpense = 0;
+
+            res.data.forEach(item => {
+                if (role !== 'MASTER' && (item.adminName || '').trim().toUpperCase() !== admin) return;
+                this.totalOrders++; 
+                const mode = ['THU TIỀN', 'THU'].includes(item.mode) ? 'THU' : 'CHI';
+                mode === 'THU' ? this.totalRevenue += Number(item.soTien || 0) : this.totalExpense += Number(item.soTien || 0);
+                if (typeof G199kModule !== 'undefined' && typeof G199kModule.rRow === 'function') {
+                    G199kModule.rRow(item.hoaDon, item.khachHang, item.ghiChu, item.loaiGd, item.soTien, mode, admin);
+                }
+            });
+            this.capNhatKhoiDoiSoat(res.data); 
+            this.uSt();
+        })
+        .catch(err => console.error("Lỗi tải mạng Mobile:", err))
+        .finally(() => { 
+            this.isLoadingData = false; 
         });
     },
 
-taiDanhSachThanhVienTheoUser: function() {
-    const container = document.getElementById('r199k-member-container');
-    if (!container) return;
 
-    const cacheKey = 'r199k_members_cache';
-    const cacheTimeKey = 'r199k_members_cache_time';
-    const CACHE_TIMEOUT = 5 * 60 * 1000; // 5 phút
+    // ==========================================================================
+    // HÀM LỌC ĐỐI SOÁT: CHỈ DUY NHẤT MASTER ĐƯỢC NHÌN THẤY DANH SÁCH ĐƠN CỦA MỌI NGƯỜI
+    // ==========================================================================
+    capNhatKhoiDoiSoat(arr) {
+        const box = document.getElementById('mini-rows'); if (!box) return;
+        let admin = (localStorage.getItem('loggedUser') || '').trim().toUpperCase();
+        let role = (localStorage.getItem('loggedRole') || '').trim().toUpperCase();
+        
+        // Tiến hành lọc mảng hiển thị: Nếu là MASTER hiện hết, ngược lại chỉ hiện đơn trùng khớp adminName của mình
+        const filtered = arr.filter(i => role === 'MASTER' || (i.adminName || '').trim().toUpperCase() === admin);
+        box.innerHTML = [...filtered].reverse().map(i => {
+            const isThu = ['THU TIỀN', 'THU'].includes(i.mode);
+            const thoiGianNho = (i.thoiGian && i.thoiGian.trim() !== "") ? i.thoiGian : "--/-- --:--";
 
-    // Hàm áp dụng logic lọc dữ liệu dựa trên giá trị của thẻ <select id="filterStatus">
-    const applyFilterData = (data) => {
-        const filterElement = document.getElementById('filterStatus');
-        if (!filterElement) return data; // Nếu không tìm thấy thẻ select bộ lọc, trả về mảng gốc ban đầu
-
-        const filterValue = filterElement.value; // Lấy giá trị đang chọn (REGISTERED, ALL, CANCELLED)
-
-        return data.filter(item => {
-            const goiText = (item.goi || '').trim();
-
-            if (filterValue === "ALL") {
-                return true; // Xem tất cả dữ liệu
-            }
-            if (filterValue === "REGISTERED") {
-                // ĐÃ ĐĂNG KÍ: Nếu chuỗi chứa chữ "THÁNG" hoặc không chứa chữ "Hủy"
-                return goiText.includes("THÁNG") || !goiText.includes("Hủy");
-            }
-            if (filterValue === "CANCELLED") {
-                // HỦY ĐĂNG KÍ: Nếu chuỗi chứa chữ "Hủy"
-                return goiText.includes("Hủy");
-            }
-            return true;
-        });
-    };
-
-    // Hàm render giao diện siêu tốc đã tích hợp bộ lọc
-    const renderGiaoDienSieuToc = (data) => {
-        // Áp dụng bộ lọc trạng thái trước khi vẽ giao diện lên màn hình
-        const filteredData = applyFilterData(data);
-
-        const fragment = document.createDocumentFragment();
-        filteredData.forEach(item => {
-            const itemDiv = document.createElement('div');
-            itemDiv.className = 'member-item';
-            itemDiv.setAttribute('data-gid', item.gid);
-            itemDiv.innerHTML = `
-                <div class="member-item-info" data-gid="${item.gid}">
-                    <span class="member-item-name r-click-name" style="cursor: pointer;" data-action="view-history" data-gid="${item.gid}">${item.name}</span>
-                    <span class="member-item-gid" data-gid="${item.gid}">${item.gid}</span>
+            return `<div class="ds-item">
+                <!-- Khối bên trái: Chứa mã hóa đơn và ngày tháng nhỏ -->
+                <div class="ds-info">
+                    <a href="javascript:void(0);" onclick="moChiTietHoaDon('${i.hoaDon}')" class="ds-link">
+                        ${i.hoaDon}
+                    </a>
+                    <span class="ds-time">
+                        ${thoiGianNho}
+                    </span>
                 </div>
-                <span class="member-item-badge" data-gid="${item.gid}">${item.goi}</span>
-            `;
-            fragment.appendChild(itemDiv);
-        });
-        
-        container.innerHTML = ''; 
-        if (filteredData.length === 0) {
-            container.innerHTML = '<div class="member-empty-state">Không có thành viên nào phù hợp bộ lọc.</div>';
-            return;
-        }
-        container.appendChild(fragment);
 
-        container.onclick = (e) => {
-            const target = e.target;
-            const gid = target.getAttribute('data-gid');
-            if (!gid) return;
-
-            if (target.getAttribute('data-action') === 'view-history') {
-                e.stopPropagation();
-                if (typeof RenewalModule !== 'undefined' && typeof RenewalModule.hienThiLichSuGiaHan === 'function') {
-                    RenewalModule.hienThiLichSuGiaHan(gid);
-                } else {
-                    NotiModule.show(`Lịch sử: ${target.innerText} (${gid})`, "success");
-                }
-            } else {
-                const inputGid = document.getElementById('r-gid');
-                if (inputGid) { inputGid.value = gid; this.tựĐộngTìmKiếmKháchHàng('GID'); }
-            }
-        };
-    };
-
-    // Gắn sự kiện onchange cho thẻ select để tự động re-render lại danh sách ngay lập tức khi chuyển tab
-    const filterElement = document.getElementById('filterStatus');
-    if (filterElement) {
-        filterElement.onchange = () => {
-            const cachedData = localStorage.getItem(cacheKey);
-            if (cachedData) {
-                // Đọc từ cache và re-render siêu tốc mà không cần gọi lại API mạng
-                renderGiaoDienSieuToc(JSON.parse(cachedData));
-            }
-        };
-    }
-
-
-    const taiDuLieuMoiTuMang = (isBackground = false) => {
-        if (this.isSubmittingMembers) return;
-        this.isSubmittingMembers = true;
-
-        if (!isBackground) container.innerHTML = '<div class="member-empty-state">Đang tải dữ liệu khách hàng...</div>';
-
-        fetch(`${this.WEB_APP_URL}?action=GET_MEMBERS`)
-        .then(response => response.ok ? response.json() : Promise.reject())
-        .then(res => {
-            if (res.status === "success" && Array.isArray(res.data) && res.data.length > 0) {
-                // Đóng dấu cục cache mới tinh vào máy
-                localStorage.setItem(cacheKey, JSON.stringify(res.data));
-                localStorage.setItem(cacheTimeKey, Date.now().toString());
-                
-                // Vẽ lại giao diện theo dữ liệu mới
-                renderGiaoDienSieuToc(res.data);
-                
-                if (isBackground && typeof NotiModule !== 'undefined') {
-                    NotiModule.show("Hệ thống đã tự động cập nhật dữ liệu mới tinh!", "success");
-                }
-            } else if (!isBackground) {
-                container.innerHTML = '<div class="member-empty-state">Chưa có thành viên nào.</div>';
-            }
-        })
-        .catch(err => {
-            console.error("Lỗi tải mạng:", err);
-            if (!isBackground) container.innerHTML = '<div class="member-empty-state">❌ Không thể tải danh sách.</div>';
-        })
-        .finally(() => {
-            this.isSubmittingMembers = false;
-        });
-    };
-
-    // ==========================================================================
-    // LOGIC XỬ LÝ CACHE THÔNG MINH CHO THIẾT BỊ MOBILE
-    // ==========================================================================
-    const cachedData = localStorage.getItem(cacheKey);
-    const cachedTime = localStorage.getItem(cacheTimeKey);
-    const now = Date.now();
-
-    if (cachedData && cachedTime) {
-        const parsedCache = JSON.parse(cachedData);
-        
-        // BƯỚC 1: Lập tức lôi dữ liệu cũ ra vẽ lên màn hình luôn (Tải tức thì 0ms cho mobile đỡ lag)
-        renderGiaoDienSieuToc(parsedCache);
-
-        // BƯỚC 2: Kiểm tra xem thời gian cache đã quá 5 phút chưa
-        if (now - cachedTime > CACHE_TIMEOUT) {
-            // Nếu quá 5 phút, tiến hành quét mới công khai
-            taiDuLieuMoiTuMang(false);
-        } else {
-            // BƯỚC 3: NÚT THẮT QUYẾT ĐỊNH: Nếu chưa quá 5 phút, âm thầm gọi API chạy ngầm để kiểm tra đơn mới
-            fetch(`${this.WEB_APP_URL}?action=GET_MEMBERS_COUNT`)
-            .then(r => r.json())
-            .then(res => {
-                // Kiểm tra xem số lượng phần tử trên Sheets trả về có khác với độ dài cục cache hiện tại không
-                if (res.status === "success" && res.count !== parsedCache.length) {
-                    console.log("🔔 Phát hiện có thành viên mới hoặc cập nhật mới trên Sheets! Tiến hành đồng bộ ngầm...");
-                    taiDuLieuMoiTuMang(true); // Gọi cập nhật ngầm đè giao diện
-                }
-            }).catch(() => {
-                // Nếu Backend không có hàm GET_MEMBERS_COUNT, ta fetch ngầm luôn link gốc để check dữ liệu
-                fetch(`${this.WEB_APP_URL}?action=GET_MEMBERS`)
-                .then(r => r.json())
-                .then(res => {
-                    if (res.status === "success" && res.data && res.data.length !== parsedCache.length) {
-                        localStorage.setItem(cacheKey, JSON.stringify(res.data));
-                        localStorage.setItem(cacheTimeKey, Date.now().toString());
-                        renderGiaoDienSieuToc(res.data);
-                    }
-                });
-            });
-        }
-    } else {
-        // Nếu trong máy hoàn toàn chưa có cache, bắt buộc tải công khai lần đầu
-        taiDuLieuMoiTuMang(false);
-    }
-},
-
-
-refreshRenewList: function () {
-    localStorage.removeItem('r199k_members_cache');
-    localStorage.removeItem('r199k_members_cache_time');
-
-    this.taiDanhSachThanhVienTheoUser();
-},
-
-
-    
-tínhNgàyKếtThúc: function() {
-    const ngàyBắtĐầuValue = document.getElementById('r-start').value;
-    const gói = document.getElementById('r-goi').value;
-    const inputEnd = document.getElementById('r-end');
-    const inputTien = document.getElementById('r-tien');
-
-    // 1. Kiểm tra nếu không có giá trị
-    if (!ngàyBắtĐầuValue || ngàyBắtĐầuValue.trim() === "") {
-        inputEnd.value = "";
-        return;
-    }
-
-    let date = new Date(ngàyBắtĐầuValue);
-
-    // 2. THÊM MỚI: Kiểm tra nếu ngày tháng nhập vào bị sai định dạng (Invalid Date)
-    if (isNaN(date.getTime())) {
-        inputEnd.value = "Ngày bắt đầu lỗi"; // Hoặc để trống "" tùy bạn
-        return;
-    }
-    
-    // Hàm phụ trợ định dạng ngày thành: "ngày DD thg MM, YYYY" giống Ngày bắt đầu
-    const địnhDạngKiểuLịch = (dateObj) => {
-        let day = dateObj.getDate();
-        let month = dateObj.getMonth() + 1;
-        let year = dateObj.getFullYear();
-        return `ngày ${day} thg ${month}, ${year}`;
-    };
-    
-    if (gói === '1 THÁNG') {
-        date.setMonth(date.getMonth() + 1);
-        inputEnd.value = địnhDạngKiểuLịch(date); 
-        inputTien.value = "199000"; 
-    } else if (gói === '3 THÁNG') {
-        date.setMonth(date.getMonth() + 3);
-        inputEnd.value = địnhDạngKiểuLịch(date);
-        inputTien.value = "500000";
-    } else {
-        inputEnd.value = "HỦY NGAY";
-        inputTien.value = "0";
-    }
-
-    // KÍCH HOẠT ĐỒNG BỘ: Cập nhật real-time sang cột bên phải ngay khi tính xong ngày
-    this.capNhatKhungChamSocKhachHang();
-},
-
-
-
-    capNhatKhungChamSocKhachHang: function() {
-        const gid = document.getElementById('r-gid').value || 'TỰ ĐỘNG SINH';
-        const name = document.getElementById('r-name').value.trim() || 'Chưa nhập tên';
-        const goi = document.getElementById('r-goi').value;
-        const startVal = document.getElementById('r-start').value; // Định dạng HTML5: YYYY-MM-DD
-        const endVal = document.getElementById('r-end').value;     
-        const tienVal = document.getElementById('r-tien').value || 0;
-
-        // Cập nhật Dòng 1: Mã GID ( Tên Khách Hàng )
-        document.getElementById('display-customer-info').innerText = `${gid} ( ${name} )`;
-
-        // 1. Định dạng Ngày bắt đầu (Luôn đảm bảo ra DD/MM/YYYY)
-        let startFormatted = '--/--/----';
-        if (startVal) {
-            const [y, m, d] = startVal.split('-');
-            startFormatted = `${d.padStart(2, '0')}/${m.padStart(2, '0')}/${y}`;
-        }
-
-        // 2. SỬA ĐỊNH DẠNG LỊCH SAI & TÍNH NGÀY CÒN LẠI
-        let endFormatted = '--/--/----';
-        let endDateObj = null;
-
-        if (endVal && endVal !== "HỦY NGAY") {
-            // Dùng Regex trích xuất tất cả các cụm số bất kể chuỗi là "ngày 29 thg 8, 2026" hay "29/08/2026"
-            const parts = endVal.match(/\d+/g);
-            
-            if (parts && parts.length >= 3) {
-                const d = parseInt(parts[0], 10);
-                const m = parseInt(parts[1], 10); // Tháng thực tế (1 - 12)
-                const y = parseInt(parts[2], 10);
-                
-                // Ép lịch hiển thị quay trở lại dạng số truyền thống DD/MM/YYYY 
-                const dayStr = String(d).padStart(2, '0');
-                const monthStr = String(m).padStart(2, '0');
-                endFormatted = `${dayStr}/${monthStr}/${y}`;
-                
-                // Khởi tạo đối tượng Date phục vụ tính toán (tháng trong JS trừ đi 1)
-                endDateObj = new Date(y, m - 1, d);
-            } else {
-                endFormatted = endVal;
-            }
-        } else if (endVal === "HỦY NGAY") {
-            endFormatted = "HỦY NGAY";
-        }
-
-        // 3. Tính số ngày còn lại thực tế từ HÔM NAY đến NGÀY KẾT THÚC
-        let diffDays = 0;
-        if (endDateObj && !isNaN(endDateObj.getTime())) {
-            const today = new Date();
-            today.setHours(0, 0, 0, 0); // Đưa mốc hôm nay về 00:00:00 để tính chính xác theo ngày
-            
-            const diffTime = endDateObj - today;
-            diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            if (diffDays < 0) diffDays = 0; 
-        }
-
-        document.getElementById('lbl-goi').innerText = goi;
-        document.getElementById('lbl-time').innerText = `${startFormatted} → ${endFormatted}`;
-        document.getElementById('lbl-days').innerText = (goi === 'Hủy ĐK' || endVal === "HỦY NGAY") ? '0 ngày' : `${diffDays} ngày`;
-        document.getElementById('lbl-tien').innerText = Number(tienVal).toLocaleString('vi-VN') + 'đ';
+                <!-- Khối bên phải: Số tiền -->
+                <span class="ds-amount ${isThu ? 'thu' : 'chi'}">
+                    ${isThu ? '+' : '-'}${Number(i.soTien || 0).toLocaleString('vi-VN')}đ
+                </span>
+            </div>`;
+        }).join('') || '<div class="ds-empty">Chưa có dữ liệu.</div>';
     },
 
-
-
-    // HÀM MỚI: Đăng ký sự kiện Click là tự động sao chép văn bản
-    dangKySuKienCopy: function() {
-        // 1. Copy nhanh dữ liệu dòng Mã GID (Tên Khách Hàng)
-        const copyGidBox = document.getElementById('copy-gid-box');
-        if (copyGidBox) {
-            copyGidBox.addEventListener('click', () => {
-                const textToCopy = document.getElementById('display-customer-info').innerText;
-                this.thucHienCopy(textToCopy, "Đã copy Mã GID & Tên khách hàng!");
-            });
-        }
-
-        // 2. Copy nhanh toàn bộ khối văn bản "GIA HẠN THANH TOÁN NHÓM" gửi khách hàng
-        const copyTextBox = document.getElementById('copy-text-box');
-        if (copyTextBox) {
-            copyTextBox.addEventListener('click', () => {
-                const goi = document.getElementById('lbl-goi').innerText;
-                const time = document.getElementById('lbl-time').innerText;
-                const days = document.getElementById('lbl-days').innerText;
-                const tien = document.getElementById('lbl-tien').innerText;
-
-                const fullText = `GIA HẠN THANH TOÁN NHÓM\n• Gói: ${goi}\n• Thời gian: ${time}\n• Còn lại: ${days}\n• Số tiền: ${tien}`;
-                this.thucHienCopy(fullText, "Đã copy mẫu văn bản gia hạn nhóm!");
-            });
-        }
-    },
-
-    // Hàm thực thi lệnh nạp chuỗi văn bản vào Clipboard hệ thống
-    thucHienCopy: function(text, successMsg) {
-        navigator.clipboard.writeText(text).then(() => {
-            // Sử dụng hệ thống thông báo NotiModule có sẵn của bạn để hiển thị thay vì dùng alert thô sơ
-            if (typeof NotiModule !== 'undefined') {
-                NotiModule.show(successMsg, "success");
-            } else {
-                alert(successMsg);
-            }
-        }).catch(err => {
-            console.error('Lỗi bộ nhớ đệm: ', err);
-        });
-    },
-
-    taoHoaDon: function () {
-        const now = new Date();
-        const y = now.getFullYear();
-        const m = String(now.getMonth() + 1).padStart(2, "0");
-        const d = String(now.getDate()).padStart(2, "0");
-        const h = String(now.getHours()).padStart(2, "0");
-        const i = String(now.getMinutes()).padStart(2, "0");
-        const s = String(now.getSeconds()).padStart(2, "0");
-        const rand = Math.floor(Math.random() * 900 + 100);
-        return `HD${y}${m}${d}${h}${i}${s}${rand}`;
-    },
-
-guiThuChi: function(hoaDon, name, goi, tien) {
-
-    if (goi === "Hủy ĐK") {
-        return Promise.resolve();
+    uSt() {
+        if(document.getElementById('stat-total-orders')) document.getElementById('stat-total-orders').innerText = this.totalOrders;
+        if(document.getElementById('stat-total-revenue')) document.getElementById('stat-total-revenue').innerText = this.totalRevenue.toLocaleString('vi-VN') + 'đ';
+        if(document.getElementById('stat-total-expense')) document.getElementById('stat-total-expense').innerText = this.totalExpense.toLocaleString('vi-VN') + 'đ';
     }
 
-    return fetch(this.THUCHI_WEB_APP_URL, {
-        method: "POST",
-        headers: {
-            "Content-Type": "text/plain"
-        },
-        body: JSON.stringify({
-            hoaDon,
-            khachHang: name,
-            ghiChu: goi,
-            loaiGd: "R-199",
-            soTien: Number(tien),
-            mode: "THU TIỀN",
-            adminName: UserModule.uName || "ADMIN"
-        })
-    }).catch(err => {
-        console.log("Lỗi ghi Thu Chi:", err);
-    });
-},
-
-
-    submitR199k: function() {
-        const gid = document.getElementById('r-gid').value.trim().toUpperCase();
-        const name = document.getElementById('r-name').value.trim();
-        const gmail = document.getElementById('r-gmail').value.trim();
-        const goi = document.getElementById('r-goi').value;
-        const start = document.getElementById('r-start').value;
-        const end = document.getElementById('r-end').value;
-        const tien = document.getElementById('r-tien').value;
-        const hoaDon = this.taoHoaDon();
-
-        if (this.mode === 'RENEW' && (!gid || gid === "TỰ ĐỘNG SINH")) {
-            NotiModule.show("Vui lòng gõ mã GID để tìm kiếm khách hàng gia hạn!", "error");
-            return;
-        }
-        if (!name) { NotiModule.show("Vui lòng gõ tên khách hàng!", "error");  return; }
-
-        const btn = document.getElementById('btn-add-r199k');
-        btn.innerText = "ĐANG ĐỒNG BỘ...";
-        btn.disabled = true;
-
-        const payload = {
-            action: this.mode,
-            gid: gid,
-            name: name,
-            gmail: gmail,
-            goi: goi,
-            start: start,
-            end: end,
-            tien: tien,
-            hoaDon: hoaDon,
-            adminName: UserModule.uName || "ADMIN"
-        };
-
-fetch(this.WEB_APP_URL, {
-            method: "POST",
-            headers: { "Content-Type": "text/plain" },
-            body: JSON.stringify(payload)
-        })
-        .then(response => response.json())
-        .then(res => {
-if (res.status === "success") {
-
-    this.guiThuChi(hoaDon, name, goi, tien)
-    .finally(() => {
-
-        // Reload dữ liệu Thu Chi giống lúc mở lần đầu
-        if (typeof ThuChiModule !== "undefined") {
-            ThuChiModule.taiHoatDongHomNay();
-        }
-
-        NotiModule.show("Đã đồng bộ thành viên vào bảng R-199K thành công!", "success");
-
-        // Xóa cache danh sách gia hạn
-        localStorage.removeItem("r199k_members_cache");
-        localStorage.removeItem("r199k_members_cache_time");
-
-        // Reset form
-        document.getElementById("r-name").value = "";
-        document.getElementById("r-gmail").value = "";
-
-        document.getElementById("r-start").value =
-            new Date().toISOString().split("T")[0];
-
-        this.setMode("NEW");
-        this.tựĐộngSinhGid();
-        this.tínhNgàyKếtThúc();
-    });
-
-}
-        })
-        .finally(() => {
-            btn.innerText = "NHẬP DỮ LIỆU BẢNG";
-            btn.disabled = false;
-        });
-    }
 };
-
-
-document.addEventListener("DOMContentLoaded", () => {
-    R199kModule.init();
-});
+ThuChiModule.init();
