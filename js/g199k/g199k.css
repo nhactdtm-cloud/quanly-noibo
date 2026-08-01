@@ -345,9 +345,9 @@
 
 /* Ô CHỌN BỘ LỌC */
 #filterStatus {
-    width: 105px !important;
-    min-width: 105px !important;
-    max-width: 105px !important;
+    width: 125px !important;      /* TĂNG CHIỀU RỘNG LÊN ĐÂY */
+    min-width: 125px !important;  /* TĂNG CHIỀU RỘNG LÊN ĐÂY */
+    max-width: 125px !important;  /* TĂNG CHIỀU RỘNG LÊN ĐÂY */
     box-sizing: border-box !important;
 
     /* Giống .stat-filter-select */
