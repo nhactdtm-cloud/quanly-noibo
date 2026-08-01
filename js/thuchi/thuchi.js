@@ -36,6 +36,7 @@ const ThuChiModule = {
         }).catch(err => console.error(err)).finally(() => this.isLoadingData = false);
     },
 
+    // Hàm quản lý render trung tâm: Tự động tính tiền và kích hoạt đẩy danh sách đối soát chuẩn phân quyền
     renderLocal(admin, role) {
         this.totalOrders = this.totalRevenue = this.totalExpense = 0;
         this.duLieuGiaoDichHomNay.forEach(item => {
@@ -57,7 +58,11 @@ const ThuChiModule = {
         const thoiGianTao = new Date().toLocaleDateString('vi-VN') + ' ' + new Date().toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'});
 
         const newRecord = { hoaDon, khachHang: kh, ghiChu: gc, loaiGd: lgd, soTien: numSt, mode: this.md === 'THU' ? 'THU TIỀN' : 'CHI TIỀN', adminName: admin, thoiGian: thoiGianTao };
-        this.duLieuGiaoDichHomNay.push(newRecord); this.renderLocal(admin, role);
+        
+        // 🌟 ĐỒNG BỘ MỚI: Đẩy vào mảng và gọi qua hàm điều phối renderLocal để tránh bị lỗi "Chưa có dữ liệu"
+        this.duLieuGiaoDichHomNay.push(newRecord); 
+        this.renderLocal(admin, role);
+        
         NotiModule.show(`Đã lưu đơn ${hoaDon}!`, "success");
         ['kh', 'gc', 'st'].forEach(id => { if(document.getElementById(id)) document.getElementById(id).value = ""; }); this.iId();
 
@@ -91,7 +96,8 @@ const ThuChiModule = {
         const box = document.getElementById('mini-rows'); if (!box) return;
         let admin = (localStorage.getItem('loggedUser') || '').trim().toUpperCase(), role = (localStorage.getItem('loggedRole') || '').trim().toUpperCase();
         
-        const filtered = arr.filter(i => role === 'MASTER' || (i.adminName || '').trim().toUpperCase() === admin);
+        // SỬA LỖI CHỐT: Lọc sạch dòng trống dở dang và phân quyền danh sách hiển thị
+        const filtered = arr.filter(i => i.hoaDon && i.hoaDon.trim() !== "" && (role === 'MASTER' || (i.adminName || '').trim().toUpperCase() === admin));
         box.innerHTML = [...filtered].reverse().map(i => {
             const isThu = ['THU TIỀN', 'THU'].includes(i.mode);
             return `<div class="ds-item"><div class="ds-info"><a href="javascript:void(0);" onclick="moChiTietHoaDon('${i.hoaDon}')" class="ds-link">${i.hoaDon}</a><span class="ds-time">${i.thoiGian || "--/-- --:--"}</span></div><span class="ds-amount ${isThu?'thu':'chi'}">${isThu?'+':'-'}${Number(i.soTien || 0).toLocaleString('vi-VN')}đ</span></div>`;
