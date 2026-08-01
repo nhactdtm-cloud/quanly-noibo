@@ -114,22 +114,32 @@ function xoaHoaDon(maHD) {
 let thoiGianThongBaoXoaGanNhat = 0;
 
 function xuLyDongBoSauKhiXoa(maHD) {
-    if (typeof NotiModule !== 'undefined' && typeof NotiModule.show === 'function') {
-        NotiModule.show(`Đã xóa thành công hóa đơn ${maHD}!`, "success");
+    const bayGio = Date.now();
+    
+    // CHẶN LẶP: Nếu thông báo trước đó vừa hiển thị cách đây chưa đầy 2 giây, bỏ qua không hiện lại
+    if (bayGio - thoiGianThongBaoXoaGanNhat > 2000) {
+        if (typeof NotiModule !== 'undefined' && typeof NotiModule.show === 'function') {
+            NotiModule.show(`Đã xóa thành công hóa đơn ${maHD}!`, "success");
+        }
+        thoiGianThongBaoXoaGanNhat = bayGio; // Cập nhật lại mốc thời gian vừa thông báo
     }
 
-    // 1. Xóa trực tiếp hóa đơn khỏi mảng dữ liệu RAM cục bộ của máy
+    // Xóa đơn hàng khỏi bộ nhớ đệm cache cục bộ trên Web
     if (ThuChiModule.duLieuGiaoDichHomNay) {
         ThuChiModule.duLieuGiaoDichHomNay = ThuChiModule.duLieuGiaoDichHomNay.filter(d => d.hoaDon !== maHD);
     }
 
-    // 2. Tự tính toán lại tiền và render lại giao diện tức thì (0ms), không fetch mạng
-    let admin = (localStorage.getItem('loggedUser') || '').trim().toUpperCase();
-    let role = (localStorage.getItem('loggedRole') || '').trim().toUpperCase();
-    if (typeof ThuChiModule.renderLocal === 'function') {
-        ThuChiModule.renderLocal(admin, role);
+    // Tải lại dữ liệu ngày hôm nay để cập nhật bảng giao dịch và tổng số tiền Thu/Chi
+    if (typeof ThuChiModule.taiHoatDongHomNay === 'function') {
+        ThuChiModule.taiHoatDongHomNay();
     }
 
-    dongModalChiTiet(); // Đóng Modal chi tiết hóa đơn
+    // ĐÓNG MODAL THEO CƠ CHẾ CỦA UIBUTTON NHÚNG TRÊN INDEX.HTML
+    // Bạn hãy thay 'detailModal' bằng đúng ID của thẻ div Modal chi tiết trong file index.html của bạn nhé
+    const modalChiTiet = document.getElementById('detailModal'); 
+    if (modalChiTiet) {
+        modalChiTiet.classList.remove('active');
+        modalChiTiet.classList.remove('show');
+    }
 }
 

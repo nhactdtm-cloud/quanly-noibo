@@ -91,14 +91,12 @@ const ThuChiModule = {
         const box = document.getElementById('mini-rows'); if (!box) return;
         let admin = (localStorage.getItem('loggedUser') || '').trim().toUpperCase(), role = (localStorage.getItem('loggedRole') || '').trim().toUpperCase();
         
-        // 🌟 CHỐT CHẶN: Loại bỏ hoàn toàn bản ghi rác nếu mã hóa đơn trống
-        const filtered = arr.filter(i => i.hoaDon && i.hoaDon.trim() !== "" && (role === 'MASTER' || (i.adminName || '').trim().toUpperCase() === admin));
+        const filtered = arr.filter(i => role === 'MASTER' || (i.adminName || '').trim().toUpperCase() === admin);
         box.innerHTML = [...filtered].reverse().map(i => {
             const isThu = ['THU TIỀN', 'THU'].includes(i.mode);
             return `<div class="ds-item"><div class="ds-info"><a href="javascript:void(0);" onclick="moChiTietHoaDon('${i.hoaDon}')" class="ds-link">${i.hoaDon}</a><span class="ds-time">${i.thoiGian || "--/-- --:--"}</span></div><span class="ds-amount ${isThu?'thu':'chi'}">${isThu?'+':'-'}${Number(i.soTien || 0).toLocaleString('vi-VN')}đ</span></div>`;
         }).join('') || '<div class="ds-empty">Chưa có dữ liệu.</div>';
     },
-
 
     uSt() {
         if(document.getElementById('stat-total-orders')) document.getElementById('stat-total-orders').innerText = this.totalOrders;
