@@ -564,7 +564,41 @@ guiThuChi: function(hoaDon, name, goi, tien) {
 },
 
 
+    // 🌟 HÀM MỚI BỔ SUNG: Cập nhật dữ liệu vào bộ nhớ đệm (Cache) không cần tải lại mạng
+    capNhatKhachHangVaoCacheCucBo: function(newMember) {
+        const cacheKey = 'r199k_members_cache';
+        let cachedData = localStorage.getItem(cacheKey);
+        let list = [];
+
+        if (cachedData) {
+            try { list = JSON.parse(cachedData); } catch(e) { list = []; }
+        }
+
+        // Kiểm tra xem thành viên đã có trong danh sách chưa (Tìm theo mã GID)
+        const index = list.findIndex(item => item.gid === newMember.gid);
+        
+        if (index !== -1) {
+            // Nếu là GIA HẠN -> Cập nhật đè thông tin mới lên dòng cũ
+            list[index] = { ...list[index], ...newMember };
+        } else {
+            // Nếu là ĐĂNG KÝ MỚI -> Đẩy lên đầu danh sách để thấy luôn đơn vừa nhập
+            list.unshift(newMember);
+        }
+
+        // Lưu lại cục cache mới xuống máy
+        localStorage.setItem(cacheKey, JSON.stringify(list));
+        localStorage.setItem('r199k_members_cache_time', Date.now().toString());
+
+        // Ép danh sách bên phải vẽ lại giao diện ngay lập tức trong 0ms
+        if (typeof this.taiDanhSachThanhVienTheoUser === 'function') {
+            this.taiDanhSachThanhVienTheoUser(); 
+        }
+    },
+
+    // 🌟 HÀM SỬA ĐỔI: Tối ưu hóa luồng xử lý khi bấm nút nhập dữ liệu
     submitR199k: function() {
+        if (this.isSubmitting) return; // Chặn bấm liên tiếp gây trùng đơn
+
         const gid = document.getElementById('r-gid').value.trim().toUpperCase();
         const name = document.getElementById('r-name').value.trim();
         const gmail = document.getElementById('r-gmail').value.trim();
@@ -573,16 +607,24 @@ guiThuChi: function(hoaDon, name, goi, tien) {
         const end = document.getElementById('r-end').value;
         const tien = document.getElementById('r-tien').value;
         const hoaDon = this.taoHoaDon();
+        const adminName = (typeof UserModule !== 'undefined' ? UserModule.uName : "ADMIN");
 
         if (this.mode === 'RENEW' && (!gid || gid === "TỰ ĐỘNG SINH")) {
-            NotiModule.show("Vui lòng gõ mã GID để tìm kiếm khách hàng gia hạn!", "error");
+            if (typeof NotiModule !== 'undefined') NotiModule.show("Vui lòng gõ mã GID để tìm kiếm khách hàng gia hạn!", "error");
             return;
         }
-        if (!name) { NotiModule.show("Vui lòng gõ tên khách hàng!", "error");  return; }
+        if (!name) { 
+            if (typeof NotiModule !== 'undefined') NotiModule.show("Vui lòng gõ tên khách hàng!", "error");  
+            return; 
+        }
 
         const btn = document.getElementById('btn-add-r199k');
-        btn.innerText = "ĐANG ĐỒNG BỘ...";
-        btn.disabled = true;
+        const originalText = btn ? btn.innerText : "NHẬP DỮ LIỆU BẢNG";
+        if (btn) {
+            btn.innerText = "⏳ ĐANG ĐỒNG BỘ...";
+            btn.disabled = true;
+        }
+        this.isSubmitting = true;
 
         const payload = {
             action: this.mode,
@@ -594,51 +636,63 @@ guiThuChi: function(hoaDon, name, goi, tien) {
             end: end,
             tien: tien,
             hoaDon: hoaDon,
-            adminName: UserModule.uName || "ADMIN"
+            adminName: adminName
         };
 
-fetch(this.WEB_APP_URL, {
+        fetch(this.WEB_APP_URL, {
             method: "POST",
             headers: { "Content-Type": "text/plain" },
             body: JSON.stringify(payload)
         })
         .then(response => response.json())
         .then(res => {
-if (res.status === "success") {
+            if (res.status === "success") {
+                this.guiThuChi(hoaDon, name, goi, tien)
+                .finally(() => {
+                    if (typeof ThuChiModule !== "undefined" && typeof ThuChiModule.taiHoatDongHomNay === 'function') {
+                        ThuChiModule.taiHoatDongHomNay();
+                    }
 
-    this.guiThuChi(hoaDon, name, goi, tien)
-    .finally(() => {
+                    if (typeof NotiModule !== 'undefined') {
+                        NotiModule.show("Đã đồng bộ thành viên vào bảng R-199K thành công!", "success");
+                    }
 
-        // Reload dữ liệu Thu Chi giống lúc mở lần đầu
-        if (typeof ThuChiModule !== "undefined") {
-            ThuChiModule.taiHoatDongHomNay();
-        }
+                    // 🔥 THAY THẾ LỆNH XÓA CACHE CŨ BẰNG LỆNH CẬP NHẬT TỨC THÌ NÀY:
+                    this.capNhatKhachHangVaoCacheCucBo({
+                        gid: gid,
+                        name: name,
+                        gmail: gmail,
+                        goi: goi
+                    });
 
-        NotiModule.show("Đã đồng bộ thành viên vào bảng R-199K thành công!", "success");
+                    // Reset lại Form nhập liệu
+                    if (document.getElementById("r-name")) document.getElementById("r-name").value = "";
+                    if (document.getElementById("r-gmail")) document.getElementById("r-gmail").value = "";
+                    if (document.getElementById("r-start")) {
+                        document.getElementById("r-start").value = new Date().toISOString().split("T")[0];
+                    }
 
-        // Xóa cache danh sách gia hạn
-        localStorage.removeItem("r199k_members_cache");
-        localStorage.removeItem("r199k_members_cache_time");
-
-        // Reset form
-        document.getElementById("r-name").value = "";
-        document.getElementById("r-gmail").value = "";
-
-        document.getElementById("r-start").value =
-            new Date().toISOString().split("T")[0];
-
-        this.setMode("NEW");
-        this.tựĐộngSinhGid();
-        this.tínhNgàyKếtThúc();
-    });
-
-}
+                    this.setMode("NEW");
+                    this.tựĐộngSinhGid();
+                    this.tínhNgàyKếtThúc();
+                });
+            } else {
+                if (typeof NotiModule !== 'undefined') NotiModule.show("Có lỗi xảy ra từ máy chủ Google Sheets!", "error");
+            }
+        })
+        .catch(err => {
+            console.error("Lỗi đồng bộ hệ thống:", err);
+            if (typeof NotiModule !== 'undefined') NotiModule.show("Mất kết nối mạng, vui lòng kiểm tra lại!", "error");
         })
         .finally(() => {
-            btn.innerText = "NHẬP DỮ LIỆU BẢNG";
-            btn.disabled = false;
+            this.isSubmitting = false;
+            if (btn) {
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }
         });
     }
+
 };
 
 
