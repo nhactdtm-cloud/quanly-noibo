@@ -21,7 +21,7 @@ function moChiTietHoaDon(maHD) {
     if (item) {
         const isThu = item.mode === 'THU TIỀN';
         const dinhDangTien = (item.soTien || 0).toLocaleString('vi-VN') + 'đ';
-        const thoiGianHienThi = item.thoiGian || (new Date().toLocaleDateString('vi-VN') + ' ' + new Date().toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'}));
+        const thoiGianHienThi = (item.thoiGian && item.thoiGian.trim() !== "") ? item.thoiGian : "Không có dữ liệu thời gian";
 
         // Đổ dữ liệu thật lấy từ mảng nguồn
         container.innerHTML = `
@@ -71,7 +71,7 @@ function khoiTaoModalHTML() {
     modalDiv.innerHTML = `
         <div class="detail-content">
             ${closeButtonHtml}
-            <h3>🔍 Chi Tiết Giao Dịch</h3>
+            <h3>Chi Tiết Giao Dịch</h3>
             <div id="detailRowsContainer"></div>
             <button id="detailDeleteBtn" class="detail-delete-btn">XÓA HÓA ĐƠN</button>
         </div>

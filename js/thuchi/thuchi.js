@@ -75,7 +75,18 @@ const ThuChiModule = {
         ['kh', 'gc', 'st'].forEach(id => { if(document.getElementById(id)) document.getElementById(id).value = ""; }); this.iId();
 
         let queue = JSON.parse(localStorage.getItem('thuchi_queue')) || [];
-        const newRecord = { hoaDon, khachHang: kh, ghiChu: gc, loaiGd: lgd, soTien: numSt, mode: this.md === 'THU' ? 'THU TIỀN' : 'CHI TIỀN', adminName: admin };
+const thoiGianTao = new Date().toLocaleDateString('vi-VN') + ' ' + new Date().toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'});
+
+const newRecord = { 
+    hoaDon, 
+    khachHang: kh, 
+    ghiChu: gc, 
+    loaiGd: lgd, 
+    soTien: numSt, 
+    mode: this.md === 'THU' ? 'THU TIỀN' : 'CHI TIỀN', 
+    adminName: admin,
+    thoiGian: thoiGianTao // <-- BỔ SUNG DÒNG NÀY
+};
         queue.push(newRecord); localStorage.setItem('thuchi_queue', JSON.stringify(queue));
         
         this.duLieuGiaoDichHomNay.push(newRecord); this.capNhatKhoiDoiSoat(this.duLieuGiaoDichHomNay);
