@@ -373,56 +373,62 @@ refreshRenewList: function () {
     this.taiDanhSachThanhVienTheoUser();
 },
 
+    tínhNgàyKếtThúc: function() {
+        const ngàyBắtĐầuValue = document.getElementById('r-start').value;
+        const gói = document.getElementById('r-goi').value;
+        const inputEnd = document.getElementById('r-end');
+        const inputTien = document.getElementById('r-tien');
 
-    
-tínhNgàyKếtThúc: function() {
-    const ngàyBắtĐầuValue = document.getElementById('r-start').value;
-    const gói = document.getElementById('r-goi').value;
-    const inputEnd = document.getElementById('r-end');
-    const inputTien = document.getElementById('r-tien');
+        // 1. Nếu chưa chọn gói (hoặc giá trị trống) -> Reset sạch thông tin hiển thị
+        if (!gói || gói === "") {
+            if (inputEnd) inputEnd.value = ""; // Trả về rỗng để cột phải tự hiện mốc gạch ngang --/--/----
+            if (inputTien) inputTien.value = "0";
+            this.capNhatKhungChamSocKhachHang();
+            return;
+        }
 
-    // BỔ SUNG: Nếu chưa chọn gói thì xóa trắng ngày kết thúc và tiền rồi dừng lại
-    if (!gói || gói === "") {
-        if (inputEnd) inputEnd.value = "Chưa chọn gói";
-        if (inputTien) inputTien.value = "0";
+        // 2. 🔥 FIX CHẶN LỖI: Chế độ ĐĂNG KÝ MỚI (NEW) không cho phép tính toán gói Hủy ĐK
+        if (this.mode === 'NEW' && gói === 'Hủy ĐK') {
+            if (inputEnd) inputEnd.value = "";
+            if (inputTien) inputTien.value = "0";
+            document.getElementById('r-goi').value = ""; // Đưa ô chọn về trạng thái chữ mờ mặc định
+            this.capNhatKhungChamSocKhachHang();
+            if (typeof NotiModule !== 'undefined') NotiModule.show("Chế độ đăng ký mới không được chọn Hủy Đăng Ký!", "error");
+            return;
+        }
+
+        if (!ngàyBắtĐầuValue || ngàyBắtĐầuValue.trim() === "") {
+            if (inputEnd) inputEnd.value = "";
+            return;
+        }
+
+        let date = new Date(ngàyBắtĐầuValue);
+        if (isNaN(date.getTime())) {
+            if (inputEnd) inputEnd.value = "";
+            return;
+        }
+        
+        const địnhDạngKiểuLịch = (dateObj) => {
+            return `ngày ${dateObj.getDate()} thg ${dateObj.getMonth() + 1}, ${dateObj.getFullYear()}`;
+        };
+        
+        // 3. Tiến hành xử lý tính toán thời hạn theo các gói hợp lệ
+        if (gói === '1 THÁNG') {
+            date.setMonth(date.getMonth() + 1);
+            if (inputEnd) inputEnd.value = địnhDạngKiểuLịch(date); 
+            if (inputTien) inputTien.value = "199000"; 
+        } else if (gói === '3 THÁNG') {
+            date.setMonth(date.getMonth() + 3);
+            if (inputEnd) inputEnd.value = địnhDạngKiểuLịch(date);
+            if (inputTien) inputTien.value = "500000";
+        } else if (gói === 'Hủy ĐK') {
+            // Nhánh này chỉ chạy khi hệ thống đang ở chế độ Gia hạn / Hủy (RENEW)
+            if (inputEnd) inputEnd.value = "HỦY NGAY";
+            if (inputTien) inputTien.value = "0";
+        }
+
         this.capNhatKhungChamSocKhachHang();
-        return;
-    }
-
-    if (!ngàyBắtĐầuValue || ngàyBắtĐầuValue.trim() === "") {
-        inputEnd.value = "";
-        return;
-    }
-
-    let date = new Date(ngàyBắtĐầuValue);
-    if (isNaN(date.getTime())) {
-        inputEnd.value = "Ngày bắt đầu lỗi";
-        return;
-    }
-    
-    const địnhDạngKiểuLịch = (dateObj) => {
-        let day = dateObj.getDate();
-        let month = dateObj.getMonth() + 1;
-        let year = dateObj.getFullYear();
-        return `ngày ${day} thg ${month}, ${year}`;
-    };
-    
-    if (gói === '1 THÁNG') {
-        date.setMonth(date.getMonth() + 1);
-        inputEnd.value = địnhDạngKiểuLịch(date); 
-        inputTien.value = "199000"; 
-    } else if (gói === '3 THÁNG') {
-        date.setMonth(date.getMonth() + 3);
-        inputEnd.value = địnhDạngKiểuLịch(date);
-        inputTien.value = "500000";
-    } else {
-        inputEnd.value = "HỦY NGAY";
-        inputTien.value = "0";
-    }
-
-    this.capNhatKhungChamSocKhachHang();
-},
-
+    },
 
 
     capNhatKhungChamSocKhachHang: function() {
