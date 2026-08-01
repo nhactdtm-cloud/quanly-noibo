@@ -92,11 +92,12 @@
 
     <div class="stat-box-header">
         <div class="stat-box-title"><span data-icon="tang-truong"></span>HOẠT ĐỘNG</div>
-        <select id="filter-date-range" onchange="ThuChiModule.thayDoiBoLocThoiGian()" class="stat-filter-select">
+        <select id="filter-date-range" onchange="if(typeof ThuChiModule !== 'undefined') { ThuChiModule.isLoadingData = false; } ThuChiModule.thayDoiBoLocThoiGian();" class="stat-filter-select">
             <option value="today" selected>Hôm nay</option>
             <option value="30days">30 ngày qua</option>
         </select>
-    </div>                            
+    </div>
+                   
         
                             <div class="stat-card">
                                 <span class="stat-label">Hóa đơn đã duyệt</span>

@@ -23,40 +23,53 @@ const ThuChiModule = {
         sel.value = '';
     },
 
-    // ==========================================================================
-    // HÀM TẢI DATA: GỌI CHUNG 1 SHEET - TỰ ĐỘNG PHÂN QUYỀN TRÊN BÁO CÁO CLIENT
-    // ==========================================================================
     taiHoatDongHomNay() {
-        if (this.isLoadingData) return; this.isLoadingData = true;
-        this.totalOrders = this.totalRevenue = this.totalExpense = 0; this.duLieuGiaoDichHomNay = [];
-        this.uSt(); this.capNhatKhoiDoiSoat([]);
+        // SỬA LỖI SAFARI PWA: Ép giải phóng cờ loading nếu bộ lọc thời gian thay đổi để tránh bị khựng lệnh
+        if (this.isLoadingData) {
+            console.warn("Safari đang xếp hàng tải dữ liệu ngầm...");
+            this.isLoadingData = false; // Phá vỡ vòng lặp kẹt cờ loading trên Mobile
+        } 
+        
+        this.isLoadingData = true;
+        this.totalOrders = this.totalRevenue = this.totalExpense = 0; 
+        this.duLieuGiaoDichHomNay = [];
+        this.uSt(); 
+        this.capNhatKhoiDoiSoat([]);
         
         let admin = (localStorage.getItem('loggedUser') || '').trim().toUpperCase();
         let role = (localStorage.getItem('loggedRole') || '').trim().toUpperCase();
-        const range = document.getElementById('filter-date-range')?.value || 'today';
+        
+        // Đọc giá trị trực tiếp từ DOM thay vì dùng cache biến
+        const rangeSelect = document.getElementById('filter-date-range');
+        const range = rangeSelect ? rangeSelect.value : 'today';
 
-        if (typeof G199kModule !== 'undefined' && document.getElementById('bảng-giao-dịch')) document.getElementById('bảng-giao-dịch').innerHTML = '';
+        if (typeof G199kModule !== 'undefined' && document.getElementById('bảng-giao-dịch')) {
+            document.getElementById('bảng-giao-dịch').innerHTML = '';
+        }
 
-        // TỐI ƯU CỐT LÕI: Kéo thẳng dữ liệu từ sheet tập trung, không phân mảnh link theo tên
-        fetch(`${this.WEB_APP_URL}?range=${range}`)
-        .then(r => r.ok ? r.json() : Promise.reject()).then(res => {
+        // Bổ sung tham số thời gian ngẫu nhiên (_nocache) để ép Safari PWA quét dữ liệu mới tinh, không lấy dữ liệu cũ trong RAM điện thoại
+        fetch(`${this.WEB_APP_URL}?range=${range}&_nocache=${Date.now()}`)
+        .then(r => r.ok ? r.json() : Promise.reject())
+        .then(res => {
             if (!res || res.status !== "success" || !Array.isArray(res.data) || res.data.length === 0) return;
             this.duLieuGiaoDichHomNay = res.data;
             
             res.data.forEach(item => {
-                // CHẶN BẢO MẬT: Nếu KHÔNG PHẢI MASTER -> Ẩn số liệu đơn của người khác, chỉ tính toán đơn của chính mình
                 if (role !== 'MASTER' && (item.adminName || '').trim().toUpperCase() !== admin) return;
-
                 this.totalOrders++; 
                 const mode = ['THU TIỀN', 'THU'].includes(item.mode) ? 'THU' : 'CHI';
                 mode === 'THU' ? this.totalRevenue += Number(item.soTien || 0) : this.totalExpense += Number(item.soTien || 0);
-                
                 if (typeof G199kModule !== 'undefined' && typeof G199kModule.rRow === 'function') {
                     G199kModule.rRow(item.hoaDon, item.khachHang, item.ghiChu, item.loaiGd, item.soTien, mode, admin);
                 }
             });
-            this.capNhatKhoiDoiSoat(res.data); this.uSt();
-        }).catch(err => console.error("Lỗi tải data:", err)).finally(() => this.isLoadingData = false);
+            this.capNhatKhoiDoiSoat(res.data); 
+            this.uSt();
+        })
+        .catch(err => console.error("Lỗi tải mạng Mobile:", err))
+        .finally(() => { 
+            this.isLoadingData = false; // Luôn giải phóng bộ gõ lệnh
+        });
     },
 
     subData() {
