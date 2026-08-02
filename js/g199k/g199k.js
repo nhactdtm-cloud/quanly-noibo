@@ -85,7 +85,7 @@ const R199kModule = {
             if (memberListGroup) memberListGroup.classList.add('d-none');
             
             if (optCancel) optCancel.style.display = 'none';
-            if (selectGoi.value === 'Hủy ĐK') {
+            if (selectGoi.value === 'HẾT HẠN') {
                 selectGoi.value = '1 THÁNG';
             }
             this.tựĐộngSinhGid(); 
@@ -208,7 +208,7 @@ const R199kModule = {
 
         const applyFilterData = (data) => {
             const f = document.getElementById('filterStatus'); if (!f) return data;
-            return data.filter(item => { const g = (item.goi || '').trim(); return f.value === "ALL" ? true : f.value === "REGISTERED" ? (g.includes("THÁNG") || !g.includes("Hủy")) : g.includes("Hủy"); });
+            return data.filter(item => { const g = (item.goi || '').trim(); return f.value === "ALL" ? true : f.value === "REGISTERED" ? (g.includes("THÁNG") || !g.includes("HẾT HẠN")) : g.includes("HẾT HẠN"); });
         };
 
         const renderGiaoDienSieuToc = (data) => {
@@ -261,10 +261,10 @@ Object.keys(this.rawFbMembers)
             let invs = Object.values(this.rawFbMembers[gid]).filter(inv => inv && inv.gid && inv.hoaDon);
             
             if (invs.length > 0) {
-                // 🌟 GIẢI PHÁP ĐỘT PHÁ TRIỆT ĐỂ: Nếu có hóa đơn hủy, ưu tiên lấy hóa đơn hủy lên đầu
+
                 invs.sort((a, b) => {
-                    const isCancelA = (a.goi === "Hủy ĐK" || a.end === "HỦY NGAY") ? 1 : 0;
-                    const isCancelB = (b.goi === "Hủy ĐK" || b.end === "HỦY NGAY") ? 1 : 0;
+                    const isCancelA = (a.goi === "HẾT HẠN" || a.end === "HỦY NGAY") ? 1 : 0;
+                    const isCancelB = (b.goi === "HẾT HẠN" || b.end === "HỦY NGAY") ? 1 : 0;
                     
                     // Nếu một trong hai là hóa đơn hủy, đẩy hóa đơn hủy lên đầu (vị trí)
                     if (isCancelB !== isCancelA) {
@@ -305,11 +305,11 @@ renderGiaoDienSieuToc(allInvoices);
 
         if (this.mode === 'NEW') { const oC = document.getElementById('opt-cancel'); if (oC) oC.remove(); } 
         else if (this.mode === 'RENEW' && !document.getElementById('opt-cancel')) {
-            const sG = document.getElementById('r-goi'); if (sG) { const opt = new Option('HỦY ĐĂNG KÝ', 'Hủy ĐK'); opt.id = 'opt-cancel'; sG.add(opt); }
+            const sG = document.getElementById('r-goi'); if (sG) { const opt = new Option('HỦY ĐĂNG KÝ', 'HẾT HẠN'); opt.id = 'opt-cancel'; sG.add(opt); }
         }
 
-        if (!gói || gói === "" || (this.mode === 'NEW' && gói === 'Hủy ĐK') || !ngàyBắtĐầuValue || ngàyBắtĐầuValue.trim() === "") {
-            if (inputEnd) inputEnd.value = ""; if (inputTien) inputTien.value = "0"; if (this.mode === 'NEW' && gói === 'Hủy ĐK') document.getElementById('r-goi').value = "";
+        if (!gói || gói === "" || (this.mode === 'NEW' && gói === 'HẾT HẠN') || !ngàyBắtĐầuValue || ngàyBắtĐầuValue.trim() === "") {
+            if (inputEnd) inputEnd.value = ""; if (inputTien) inputTien.value = "0"; if (this.mode === 'NEW' && gói === 'HẾT HẠN') document.getElementById('r-goi').value = "";
             this.ngayConLaiThucTe = 0; this.capNhatKhungChamSocKhachHang(); return;
         }
 
@@ -318,11 +318,10 @@ renderGiaoDienSieuToc(allInvoices);
         
         if (gói === '1 THÁNG') { date.setMonth(date.getMonth() + 1); if (inputEnd) inputEnd.value = địnhDạngKiểuLịch(date); if (inputTien) inputTien.value = "199000"; } 
         else if (gói === '3 THÁNG') { date.setMonth(date.getMonth() + 3); if (inputEnd) inputEnd.value = địnhDạngKiểuLịch(date); if (inputTien) inputTien.value = "500000"; } 
-        else if (gói === 'Hủy ĐK') { if (inputEnd) inputEnd.value = "HỦY NGAY"; if (inputTien) inputTien.value = "0"; }
+        else if (gói === 'HẾT HẠN') { if (inputEnd) inputEnd.value = "HỦY NGAY"; if (inputTien) inputTien.value = "0"; }
 
-        // 🌟 TÍNH SỐ NGÀY CÒN LẠI THỰC TẾ ĐỂ ĐẨY LÊN FIREBASE
         let diffDays = 0;
-        if (gói !== 'Hủy ĐK') {
+        if (gói !== 'HẾT HẠN') {
             const today = new Date(); today.setHours(0, 0, 0, 0);
             const diffTime = date - today; diffDays = Math.ceil(diffTime / 86400000);
             if (diffDays < 0) diffDays = 0;
@@ -392,7 +391,7 @@ renderGiaoDienSieuToc(allInvoices);
 
         document.getElementById('lbl-goi').innerText = goi;
         document.getElementById('lbl-time').innerText = `${startFormatted} → ${endFormatted}`;
-        document.getElementById('lbl-days').innerText = (goi === 'Hủy ĐK' || endVal === "HỦY NGAY") ? '0 ngày' : `${diffDays} ngày`;
+        document.getElementById('lbl-days').innerText = (goi === 'HẾT HẠN' || endVal === "HỦY NGAY") ? '0 ngày' : `${diffDays} ngày`;
         document.getElementById('lbl-tien').innerText = Number(tienVal).toLocaleString('vi-VN') + 'đ';
     },
 
@@ -445,7 +444,7 @@ renderGiaoDienSieuToc(allInvoices);
 
 
     guiThuChi(hD, name, goi, tien) {
-        if (goi === "Hủy ĐK") return Promise.resolve(); const cleanUrl = this.FB_URL.replace(/\/$/, ''); const bY = new Date();
+        if (goi === "HẾT HẠN") return Promise.resolve(); const cleanUrl = this.FB_URL.replace(/\/$/, ''); const bY = new Date();
         const thoiGianTao = bY.toLocaleDateString('vi-VN') + ' ' + bY.toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'});
         const ngayGiaoDich = bY.getFullYear() + '-' + String(bY.getMonth() + 1).padStart(2, '0') + '-' + String(bY.getDate()).padStart(2, '0');
         
@@ -553,7 +552,7 @@ renderGiaoDienSieuToc(allInvoices);
                     this.setMode("NEW"); this.tựĐộngSinhGid(); this.tínhNgàyKếtThúc();
                 });
             } else {
-                if (typeof NotiModule !== 'undefined') NotiModule.show("Lỗi cấu trúc phản hồi từ Firebase!", "error");
+                if (typeof NotiModule !== 'undefined') NotiModule.show("Lỗi cấu trúc phản hồi!", "error");
             }
         })
         .catch(err => {

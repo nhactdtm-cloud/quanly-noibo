@@ -42,13 +42,13 @@ const RenewalModule = {
             
             // Vì mảng đã được sắp xếp sẵn mới nhất lên đầu ở bước 1, chúng ta lặp render trực tiếp ra giao diện luôn
             data.forEach((item) => {
-                const rowDiv = document.createElement('div'); rowDiv.className = `renewal-history-item ${item.goi === 'Hủy ĐK' ? 'cancelled' : ''}`;
+                const rowDiv = document.createElement('div'); rowDiv.className = `renewal-history-item ${item.goi === 'HẾT HẠN' ? 'cancelled' : ''}`;
                 const startFmt = item.start ? item.start.split('-').reverse().join('/') : '--/--/----';
                 
                 let diff = Number(item.ngayConLai !== undefined ? item.ngayConLai : 0);
                 
                 let labelDays = "";
-                if (item.goi === 'Hủy ĐK' || item.end === 'HỦY NGAY') {
+                if (item.goi === 'HẾT HẠN' || item.end === 'HỦY NGAY') {
                     labelDays = 'Hủy';
                 } else if (diff < 0) {
                     labelDays = `Quá hạn: ${Math.abs(diff)} ngày`;
@@ -66,7 +66,7 @@ const RenewalModule = {
                         <div class="renewal-time-line">
                             <div class="time-line-row"><span>📅 Bắt đầu:</span> <b>${startFmt}</b></div>
                             <div class="time-line-row"><span>⌛ Kết thúc:</span> <b>${item.end || '--/--/----'}</b></div>
-                            <div class="time-line-row"><span class="renewal-days-left ${diff < 0 || item.goi === 'Hủy ĐK' ? 'expired' : 'active'}">⏱️ ${labelDays}</span></div>
+                            <div class="time-line-row"><span class="renewal-days-left ${diff < 0 || item.goi === 'HẾT HẠN' ? 'expired' : 'active'}">⏱️ ${labelDays}</span></div>
                             <div class="renewal-invoice-text">Mã HD: ${item.hoaDon || 'Không có'}</div>
                         </div>
                         <div class="renewal-action-area">

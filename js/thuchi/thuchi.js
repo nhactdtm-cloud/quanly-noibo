@@ -130,7 +130,6 @@ const ThuChiModule = {
         box.innerHTML = filtered.map(i => {
             const isThu = ['THU TIỀN', 'THU'].includes(i.mode), t = (i.thoiGian && i.thoiGian.trim() !== "") ? i.thoiGian : "--/-- --:--";
             
-            // 🛠️ TỐI ƯU HIỂN THỊ: Rút gọn mã hóa đơn trên giao diện (Ẩn chuỗi số kỹ thuật của Firebase đi)
             // Ví dụ: "HD-2WTLZL019-THUCHI" -> "HD-THUCHI"
             let maHienThi = i.hoaDon;
             if (maHienThi && maHienThi.startsWith("HD-")) {
@@ -140,7 +139,6 @@ const ThuChiModule = {
                 }
             }
 
-            // Giao diện render sử dụng maHienThi để hiển thị trực quan, nhưng onclick vẫn giữ i.hoaDon gốc để tra cứu Firebase
             return `<div class="ds-item">
                 <div class="ds-info">
                     <a href="javascript:void(0);" onclick="moChiTietHoaDon('${i.hoaDon}')" class="ds-link">${maHienThi}</a>
