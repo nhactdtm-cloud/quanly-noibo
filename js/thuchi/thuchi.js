@@ -7,7 +7,10 @@ const ThuChiModule = {
     init() { this.iId(); this.initLgdRong(); this.taiHoatDongHomNay(); setInterval(() => this.processQueue(), 5000); },
     iId() { const el = document.getElementById('id'); if (el) el.value = "CHỜ TỰ ĐỘNG"; },
     thayDoiBoLocThoiGian() { this.taiHoatDongHomNay(); },
-    taoHoaDon() { return "THUCHI-" + Date.now().toString() + Math.floor(100 + Math.random() * 900).toString(); },
+    taoHoaDon() { 
+    return IdHoaDonModule.sinhMaDuyNhat(); 
+},
+
 
     initLgdRong() {
         const sel = document.getElementById('lgd'); if (!sel) return; sel.innerHTML = ''; 
@@ -102,11 +105,10 @@ const ThuChiModule = {
         let admin = (localStorage.getItem('loggedUser') || '').trim().toUpperCase(), role = (localStorage.getItem('loggedRole') || '').trim().toUpperCase();
         const filtered = arr.filter(i => role === 'MASTER' || (i.adminName || '').trim().toUpperCase() === admin);
         
-        // 🌟 ĐÃ CẬP NHẬT: Sắp xếp theo mốc thời gian thực hiển thị (Giờ muộn nhất lên đầu bảng)
+        // 🌟 SẮP XẾP: Giờ muộn nhất luôn lên đầu bảng (Lựa chọn nào cũng thế)
         filtered.sort((a, b) => {
             const quyDoiThoiGian = (str) => {
                 if (!str || str.trim() === "") return 0;
-                // Chuỗi đầu vào có dạng "2/8/2026 14:46" -> Tách thành ngày tháng năm và giờ phút
                 const parts = str.split(' ');
                 const datePart = parts[0]; if (!datePart) return 0;
                 const timePart = parts[1] || "00:00";
@@ -120,7 +122,6 @@ const ThuChiModule = {
                 const h = parseInt(tArr[0], 10) || 0;
                 const i = parseInt(tArr[1], 10) || 0;
                 
-                // Trả về số mili-giây tĩnh để thực hiện phép so sánh lớn/nhỏ
                 return new Date(y, m - 1, d, h, i).getTime();
             };
             return quyDoiThoiGian(b.thoiGian) - quyDoiThoiGian(a.thoiGian);
@@ -128,9 +129,28 @@ const ThuChiModule = {
 
         box.innerHTML = filtered.map(i => {
             const isThu = ['THU TIỀN', 'THU'].includes(i.mode), t = (i.thoiGian && i.thoiGian.trim() !== "") ? i.thoiGian : "--/-- --:--";
-            return `<div class="ds-item"><div class="ds-info"><a href="javascript:void(0);" onclick="moChiTietHoaDon('${i.hoaDon}')" class="ds-link">${i.hoaDon}</a><span class="ds-time">${t}</span></div><span class="ds-amount ${isThu ? 'thu' : 'chi'}">${isThu ? '+' : '-'}${Number(i.soTien || 0).toLocaleString('vi-VN')}đ</span></div>`;
+            
+            // 🛠️ TỐI ƯU HIỂN THỊ: Rút gọn mã hóa đơn trên giao diện (Ẩn chuỗi số kỹ thuật của Firebase đi)
+            // Ví dụ: "HD-2WTLZL019-THUCHI" -> "HD-THUCHI"
+            let maHienThi = i.hoaDon;
+            if (maHienThi && maHienThi.startsWith("HD-")) {
+                const parts = maHienThi.split('-');
+                if (parts.length >= 3) {
+                    maHienThi = `${parts[0]}-${parts[2]}`; // Ghép chữ HD và Loại đơn lại với nhau
+                }
+            }
+
+            // Giao diện render sử dụng maHienThi để hiển thị trực quan, nhưng onclick vẫn giữ i.hoaDon gốc để tra cứu Firebase
+            return `<div class="ds-item">
+                <div class="ds-info">
+                    <a href="javascript:void(0);" onclick="moChiTietHoaDon('${i.hoaDon}')" class="ds-link">${maHienThi}</a>
+                    <span class="ds-time">${t}</span>
+                </div>
+                <span class="ds-amount ${isThu ? 'thu' : 'chi'}">${isThu ? '+' : '-'}${Number(i.soTien || 0).toLocaleString('vi-VN')}đ</span>
+            </div>`;
         }).join('') || '<div class="ds-empty">Chưa có dữ liệu.</div>';
     },
+
 
 
     uSt() {

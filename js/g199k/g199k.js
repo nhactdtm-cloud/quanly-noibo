@@ -386,7 +386,10 @@ refreshRenewList: function () {
         });
     },
 
-    taoHoaDon: function () { const n = new Date(); return `R199K-${n.getFullYear()}${String(n.getMonth() + 1).padStart(2, "0")}${String(n.getDate()).padStart(2, "0")}${String(n.getHours()).padStart(2, "0")}${String(n.getMinutes()).padStart(2, "0")}${String(n.getSeconds()).padStart(2, "0")}${Math.floor(Math.random() * 900 + 100)}`; },
+    taoHoaDon: function () { 
+    return IdHoaDonModule.sinhMaDuyNhat(); 
+},
+
 
 
     guiThuChi(hD, name, goi, tien) {

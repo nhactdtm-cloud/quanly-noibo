@@ -10,7 +10,15 @@ function moChiTietHoaDon(maHD) {
     if (item) {
         const isThu = ['THU TIỀN', 'THU'].includes(item.mode);
         c.innerHTML = `
-            <div class="detail-row"><span class="detail-label">Mã ID Lệnh:</span><span class="detail-value" style="color:#1e40af;">${item.hoaDon}</span></div>
+            <div class="detail-row">
+                <span class="detail-label">Mã ID Lệnh:</span>
+                <span class="detail-value" 
+                      style="color:#1e40af; cursor:pointer; font-weight:bold;" 
+                      title="Click để sao chép"
+                      onclick="navigator.clipboard.writeText('${item.hoaDon}'); alert('Đã sao chép: ${item.hoaDon}');">
+                    ${item.hoaDon} 📋
+                </span>
+            </div>
             <div class="detail-row"><span class="detail-label">Thời Gian:</span><span class="detail-value">${item.thoiGian || 'Không có dữ liệu'}</span></div>
             <div class="detail-row"><span class="detail-label">Khách Hàng:</span><span class="detail-value">${item.khachHang || '-'}</span></div>
             <div class="detail-row"><span class="detail-label">Ghi Chú:</span><span class="detail-value">${item.ghiChu || '-'}</span></div>
@@ -22,6 +30,7 @@ function moChiTietHoaDon(maHD) {
         `;
     } else { c.innerHTML = '<div style="text-align:center;color:red;padding:20px 0;font-size:14px;">Không tìm thấy thông tin đơn hàng!</div>'; }
 }
+
 
 function khoiTaoModalHTML() {
     if (document.getElementById('detailModal')) return; const mD = document.createElement('div');

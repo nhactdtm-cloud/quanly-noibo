@@ -25,3 +25,21 @@ window.addEventListener('DOMContentLoaded', () => {
     document.getElementById('s-chi').addEventListener('click', () => ThuChiModule.sm('CHI'));
     document.getElementById('btn-add-data').addEventListener('click', () => ThuChiModule.subData());
 });
+
+
+const IdHoaDonModule = {
+    sinhMaDuyNhat() {
+        // 1. Lấy số đảo ngược thời gian (số càng lớn đơn càng cũ, số nhỏ đơn càng mới)
+        const soDaoNguoc = 9999999999999 - Date.now();
+        
+        // 2. Chuyển dãy số này thành chuỗi chữ cái bằng hệ cơ số 36
+        // Số đảo ngược nhỏ đi (theo thời gian) sẽ sinh ra chữ cái đứng trước trong bảng (A->Z)
+        const chuoiFirebase = soDaoNguoc.toString(36).toUpperCase();
+        
+        // 3. Chuỗi ngẫu nhiên 3 ký tự chống trùng đơn
+        const randomShort = Math.random().toString(36).slice(2, 5).toUpperCase();
+        
+        // Trả về kết quả: Chữ HD đứng đầu, tiếp theo là chuỗi sắp xếp và chuỗi ngẫu nhiên
+        return `HD${chuoiFirebase}${randomShort}`;
+    }
+};
