@@ -16,14 +16,35 @@ const RenewalModule = {
         fetch(`${cfg.url}/r199k_members/${gid}.json?_nocache=${Date.now()}${cfg.key ? '&auth='+cfg.key : ''}`)
         .then(r => r.ok ? r.json() : Promise.reject()).then(res => {
             if (!res) { hC.innerHTML = '<div class="renewal-empty">⚠️ Không có lịch sử dữ liệu.</div>'; return; }
-            let data = Object.values(res); tC.innerText = `KHÁCH HÀNG: ${data[0]?.name || "Thành viên"} (${gid})`; hC.innerHTML = '';
+            
+            let invoiceObj = res;
+            if (res.history) {
+                invoiceObj = res.history; 
+            }
+            
+            // Chuyển đối tượng Object từ Firebase thành mảng các hóa đơn sạch
+            let data = Object.values(invoiceObj).filter(item => item && typeof item === 'object' && item.hoaDon);
+            
+            if (data.length === 0) {
+                hC.innerHTML = '<div class="renewal-empty">⚠️ Không tìm thấy bản ghi hóa đơn hợp lệ.</div>';
+                return;
+            }
+
+            tC.innerText = `KHÁCH HÀNG: ${res.name || data[0]?.name || "Thành viên"} (${gid})`; hC.innerHTML = '';
+            
+            // 🌟 1. THUẬT TOÁN MỚI: Sắp xếp GIẢM DẦN theo mã Hóa Đơn (Hóa đơn mới nhất, sinh sau cùng sẽ lên ĐẦU mảng)
             data.sort((a, b) => (b.hoaDon || '').localeCompare(a.hoaDon || ''));
             
-            data.forEach((item, index) => {
+            // 🌟 2. Đánh số Lần: Phần tử đầu tiên (Mới nhất) sẽ là Lần 1, cũ hơn tăng dần thành Lần 2, Lần 3... khớp 100% hình vẽ
+            data.forEach((item, idx) => {
+                item.soLanGiaHanThucTe = idx + 1; 
+            });
+            
+            // Vì mảng đã được sắp xếp sẵn mới nhất lên đầu ở bước 1, chúng ta lặp render trực tiếp ra giao diện luôn
+            data.forEach((item) => {
                 const rowDiv = document.createElement('div'); rowDiv.className = `renewal-history-item ${item.goi === 'Hủy ĐK' ? 'cancelled' : ''}`;
                 const startFmt = item.start ? item.start.split('-').reverse().join('/') : '--/--/----';
                 
-                // 🌟 ĐÃ FIX TRIỆT ĐỂ: Lấy trực tiếp số ngày thực tế lưu trên Firebase (88 ngày), chống kẹt số 92
                 let diff = Number(item.ngayConLai !== undefined ? item.ngayConLai : 0);
                 
                 let labelDays = "";
@@ -37,7 +58,8 @@ const RenewalModule = {
 
                 rowDiv.innerHTML = `
                     <div class="renewal-item-header">
-                        <span class="renewal-badge-count">Lần ${data.length - index}</span>
+                        <!-- Hiển thị số lần thực tế đã băm ngược: Mới nhất = Lần 1 -->
+                        <span class="renewal-badge-count">Lần ${item.soLanGiaHanThucTe}</span>
                         <span class="renewal-item-package">${item.goi || '1 THÁNG'}</span>
                     </div>
                     <div class="renewal-item-body">
@@ -53,7 +75,11 @@ const RenewalModule = {
                     </div>
                 `;
                 const btnDel = rowDiv.querySelector('.renewal-delete-item-btn');
-                if (btnDel) btnDel.addEventListener('click', () => this.xoaGiaoDichLoiByHoaDon(item.hoaDon, data.length - index, rowDiv, item.adminName));
+                if (btnDel) {
+                    btnDel.addEventListener('click', () => {
+                        this.xoaGiaoDichLoiByHoaDon(item.hoaDon, item.soLanGiaHanThucTe, rowDiv, item.adminName);
+                    });
+                }
                 hC.appendChild(rowDiv);
             });
         }).catch(err => { console.error("Lỗi:", err); tC.innerText = `📜 Lịch Sử Gia Hạn: ${gid}`; hC.innerHTML = '<div class="renewal-empty">⚠️ Không thể kết nối dữ liệu.</div>'; });

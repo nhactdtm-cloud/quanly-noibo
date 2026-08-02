@@ -204,11 +204,19 @@ const R199kModule = {
             const res = JSON.parse(e.data); if (!res) return;
             
             if (res.path !== "/") {
-                const parts = res.path.split('/'); const targetGid = parts, targetHd = parts;
+                const parts = res.path.split('/').filter(Boolean); 
+                const targetGid = parts[0]; 
+                const targetHd = parts[1];
+                
                 if (!targetGid) return; if (!this.rawFbMembers) this.rawFbMembers = {};
+                
                 if (res.data === null) {
-                    if (targetHd && this.rawFbMembers[targetGid]) delete this.rawFbMembers[targetGid][targetHd];
-                    if (!targetHd || Object.keys(this.rawFbMembers[targetGid] || {}).length === 0) delete this.rawFbMembers[targetGid];
+                    if (targetHd && this.rawFbMembers[targetGid]) {
+                        delete this.rawFbMembers[targetGid][targetHd];
+                    }
+                    if (!targetHd || Object.keys(this.rawFbMembers[targetGid] || {}).length === 0) {
+                        delete this.rawFbMembers[targetGid];
+                    }
                 } else {
                     if (!this.rawFbMembers[targetGid]) this.rawFbMembers[targetGid] = {};
                     targetHd ? (this.rawFbMembers[targetGid][targetHd] = res.data) : (this.rawFbMembers[targetGid] = res.data);
@@ -216,33 +224,42 @@ const R199kModule = {
             } else { this.rawFbMembers = res.data || {}; }
 
             let allInvoices = [];
-            Object.keys(this.rawFbMembers).forEach(gid => {
-                if (this.rawFbMembers[gid]) {
-                    let invs = Object.values(this.rawFbMembers[gid]).filter(inv => inv && inv.gid && inv.hoaDon);
-                    if (invs.length > 0) { 
-                        // Sắp xếp các hóa đơn bên trong của 1 khách hàng lấy đơn mới nhất
-                        invs.sort((a, b) => (b.hoaDon || '').localeCompare(a.hoaDon || '')); 
-                        allInvoices.push(invs[0]); 
+            Object.keys(this.rawFbMembers)
+                .sort((a, b) => b.localeCompare(a)) 
+                .forEach(gid => {
+                    if (this.rawFbMembers[gid]) {
+                        let invs = Object.values(this.rawFbMembers[gid]).filter(inv => inv && inv.gid && inv.hoaDon);
+                        
+                        if (invs.length > 0) {
+                            // 🌟 GIẢI PHÁP ĐỘT PHÁ: Chuyển đổi chuỗi ngày bắt đầu sang timestamp để sắp xếp số thực tế giảm dần (Mới nhất lên đầu)
+                            invs.sort((a, b) => {
+                                const timeA = a.start ? new Date(a.start).getTime() : 0;
+                                const timeB = b.start ? new Date(b.start).getTime() : 0;
+                                
+                                // Nếu trùng ngày bắt đầu, đối chiếu tiếp theo trường số lần gia hạn (Lần lớn hơn = mới hơn)
+                                if (timeB === timeA) {
+                                    return Number(b.lanGiaHan || 0) - Number(a.lanGiaHan || 0);
+                                }
+                                return timeB - timeA;
+                            });
+                            
+                            // Nạp hóa đơn mới nhất vừa được lọc lên đầu mảng vào danh sách tổng
+                            const newestInvoice = invs[0];
+                            allInvoices.push(newestInvoice);
+                        }
                     }
-                }
-            });
-
-            // 🌟 ĐÃ FIX: Sắp xếp toàn sàn danh sách khách hàng - Khách có hóa đơn mới nhất bay lên đầu bảng lập tức
-            allInvoices.sort((a, b) => (b.hoaDon || '').localeCompare(a.hoaDon || ''));
+                });
 
             this.cachedMembers = allInvoices; renderGiaoDienSieuToc(allInvoices);
         });
-
     },
 
+    refreshRenewList: function () {
+        localStorage.removeItem('r199k_members_cache');
+        localStorage.removeItem('r199k_members_cache_time');
 
-
-refreshRenewList: function () {
-    localStorage.removeItem('r199k_members_cache');
-    localStorage.removeItem('r199k_members_cache_time');
-
-    this.taiDanhSachThanhVienTheoUser();
-},
+        this.taiDanhSachThanhVienTheoUser();
+    },
 
 
     tínhNgàyKếtThúc: function() {
@@ -439,7 +456,7 @@ refreshRenewList: function () {
         const btn = document.getElementById('btn-add-r199k');
         const originalText = btn ? btn.innerText : "NHẬP DỮ LIỆU BẢNG";
         if (btn) {
-            btn.innerText = "⏳ ĐANG ĐỒNG BỘ...";
+            btn.innerText = "ĐANG ĐỒNG BỘ...";
             btn.disabled = true;
         }
         this.isSubmitting = true;

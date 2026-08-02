@@ -16,7 +16,7 @@ function moChiTietHoaDon(maHD) {
                       style="color:#1e40af; cursor:pointer; font-weight:bold;" 
                       title="Click để sao chép"
                       onclick="navigator.clipboard.writeText('${item.hoaDon}'); alert('Đã sao chép: ${item.hoaDon}');">
-                    ${item.hoaDon} 📋
+                    ${item.hoaDon}
                 </span>
             </div>
             <div class="detail-row"><span class="detail-label">Thời Gian:</span><span class="detail-value">${item.thoiGian || 'Không có dữ liệu'}</span></div>
