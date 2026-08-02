@@ -386,17 +386,8 @@ refreshRenewList: function () {
         });
     },
 
-    taoHoaDon: function () {
-        const now = new Date();
-        const y = now.getFullYear();
-        const m = String(now.getMonth() + 1).padStart(2, "0");
-        const d = String(now.getDate()).padStart(2, "0");
-        const h = String(now.getHours()).padStart(2, "0");
-        const i = String(now.getMinutes()).padStart(2, "0");
-        const s = String(now.getSeconds()).padStart(2, "0");
-        const rand = Math.floor(Math.random() * 900 + 100);
-        return `HD${y}${m}${d}${h}${i}${s}${rand}`;
-    },
+    taoHoaDon: function () { const n = new Date(); return `R199K-${n.getFullYear()}${String(n.getMonth() + 1).padStart(2, "0")}${String(n.getDate()).padStart(2, "0")}${String(n.getHours()).padStart(2, "0")}${String(n.getMinutes()).padStart(2, "0")}${String(n.getSeconds()).padStart(2, "0")}${Math.floor(Math.random() * 900 + 100)}`; },
+
 
     guiThuChi(hD, name, goi, tien) {
         if (goi === "Hủy ĐK") return Promise.resolve(); const cleanUrl = this.FB_URL.replace(/\/$/, ''); const bY = new Date();
@@ -405,27 +396,6 @@ refreshRenewList: function () {
         
         const payload = { hoaDon: hD, khachHang: name, ghiChu: goi, loaiGd: "R-199", soTien: Number(tien), mode: "THU TIỀN", adminName: (typeof UserModule !== 'undefined' ? UserModule.uName : "ADMIN"), thoiGian: thoiGianTao, ngayGiaoDich };
         return fetch(`${cleanUrl}/thuchi/${hD}.json${this.FB_KEY?'?auth='+this.FB_KEY:''}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) }).catch(e => console.log("Lỗi ghi Thu Chi:", e));
-    },
-
-
-    capNhatKhachHangVaoCacheCucBo: function(newMember) {
-        const cacheKey = 'r199k_members_cache';
-        let list = []; try { list = JSON.parse(localStorage.getItem(cacheKey)) || []; } catch(e) { list = []; }
-
-        const index = list.findIndex(item => item.gid === newMember.gid);
-        if (index !== -1) {
-            // Gia hạn: Cập nhật đè gói mới lên bộ nhớ đệm của khách hàng cũ
-            list[index] = { ...list[index], goi: newMember.goi, name: newMember.name };
-        } else {
-            // Đăng ký mới: Đẩy thực thể mới lên đầu mảng hiển thị
-            list.unshift(newMember);
-        }
-
-        localStorage.setItem(cacheKey, JSON.stringify(list));
-        localStorage.setItem('r199k_members_cache_time', Date.now().toString());
-
-        // Ép danh sách bên phải re-render lại giao diện ngay lập tức trong 0ms
-        this.taiDanhSachThanhVienTheoUser(); 
     },
 
 
@@ -481,8 +451,8 @@ refreshRenewList: function () {
         .then(res => {
             if (res) {
                 this.guiThuChi(hoaDon, name, goi, tien).finally(() => {
-
-                    this.capNhatKhachHangVaoCacheCucBo(payload);
+                    if (typeof ThuChiModule !== "undefined" && typeof ThuChiModule.taiHoatDongHomNay === 'function')
+                        ThuChiModule.taiHoatDongHomNay();
 
                     if (document.getElementById("r-name")) document.getElementById("r-name").value = "";
                     if (document.getElementById("r-gmail")) document.getElementById("r-gmail").value = "";

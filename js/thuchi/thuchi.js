@@ -7,7 +7,7 @@ const ThuChiModule = {
     init() { this.iId(); this.initLgdRong(); this.taiHoatDongHomNay(); setInterval(() => this.processQueue(), 5000); },
     iId() { const el = document.getElementById('id'); if (el) el.value = "CHỜ TỰ ĐỘNG"; },
     thayDoiBoLocThoiGian() { this.taiHoatDongHomNay(); },
-    taoHoaDon() { return "HD" + Date.now().toString(36).toUpperCase() + Math.random().toString(36).substring(2, 6).toUpperCase(); },
+    taoHoaDon() { return "THUCHI-" + Date.now().toString() + Math.floor(100 + Math.random() * 900).toString(); },
 
     initLgdRong() {
         const sel = document.getElementById('lgd'); if (!sel) return; sel.innerHTML = ''; 
@@ -102,8 +102,29 @@ const ThuChiModule = {
         let admin = (localStorage.getItem('loggedUser') || '').trim().toUpperCase(), role = (localStorage.getItem('loggedRole') || '').trim().toUpperCase();
         const filtered = arr.filter(i => role === 'MASTER' || (i.adminName || '').trim().toUpperCase() === admin);
         
-        // 🌟 SIÊU TỐI ƯU: Sắp xếp giảm dần theo Mã hóa đơn, tốc độ xử lý nhanh gấp 10 lần bóc tách ngày giờ
-        filtered.sort((a, b) => (b.hoaDon || '').localeCompare(a.hoaDon || ''));
+        // 🌟 ĐÃ CẬP NHẬT: Sắp xếp theo mốc thời gian thực hiển thị (Giờ muộn nhất lên đầu bảng)
+        filtered.sort((a, b) => {
+            const quyDoiThoiGian = (str) => {
+                if (!str || str.trim() === "") return 0;
+                // Chuỗi đầu vào có dạng "2/8/2026 14:46" -> Tách thành ngày tháng năm và giờ phút
+                const parts = str.split(' ');
+                const datePart = parts[0]; if (!datePart) return 0;
+                const timePart = parts[1] || "00:00";
+                
+                const dArr = datePart.split('/');
+                const tArr = timePart.split(':');
+                
+                const d = parseInt(dArr[0], 10) || 1;
+                const m = parseInt(dArr[1], 10) || 1;
+                const y = parseInt(dArr[2], 10) || 2026;
+                const h = parseInt(tArr[0], 10) || 0;
+                const i = parseInt(tArr[1], 10) || 0;
+                
+                // Trả về số mili-giây tĩnh để thực hiện phép so sánh lớn/nhỏ
+                return new Date(y, m - 1, d, h, i).getTime();
+            };
+            return quyDoiThoiGian(b.thoiGian) - quyDoiThoiGian(a.thoiGian);
+        });
 
         box.innerHTML = filtered.map(i => {
             const isThu = ['THU TIỀN', 'THU'].includes(i.mode), t = (i.thoiGian && i.thoiGian.trim() !== "") ? i.thoiGian : "--/-- --:--";
