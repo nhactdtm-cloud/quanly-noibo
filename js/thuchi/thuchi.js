@@ -80,13 +80,27 @@ const ThuChiModule = {
         fetch(`${cleanUrl}/thuchi.json?_nocache=${Date.now()}${this.FB_KEY ? '&auth='+this.FB_KEY : ''}`)
         .then(r => r.ok ? r.json() : Promise.reject()).then(res => {
             if (!res) return; let raw = Object.values(res);
-            const hN = new Date(), cN = hN.getFullYear() + '-' + String(hN.getMonth() + 1).padStart(2, '0') + '-' + String(hN.getDate()).padStart(2, '0');
+            
+            // Tạo đối tượng ngày hiện tại và đặt về 00:00:00 để tránh lệch múi giờ
+            const hN = new Date(); hN.setHours(0, 0, 0, 0); 
+            const cN = hN.getFullYear() + '-' + String(hN.getMonth() + 1).padStart(2, '0') + '-' + String(hN.getDate()).padStart(2, '0');
             
             if (range === 'today') {
                 raw = raw.filter(i => i.ngayGiaoDich === cN);
             } else if (range === '30days') {
-                const mốc = new Date(); mốc.setDate(hN.getDate() - 30);
-                raw = raw.filter(i => i.ngayGiaoDich && new Date(i.ngayGiaoDich) >= mốc && new Date(i.ngayGiaoDich) <= hN);
+                // Tạo mốc 30 ngày trước tại thời điểm 00:00:00
+                const mốc = new Date(hN); 
+                mốc.setDate(hN.getDate() - 30);
+                
+                raw = raw.filter(i => {
+                    if (!i.ngayGiaoDich) return false;
+                    // Chuyển chuỗi YYYY-MM-DD thành Date object dạng Local Time thay vì UTC
+                    const [y, m, d] = i.ngayGiaoDich.split('-').map(Number);
+                    const ngayGiaodichObj = new Date(y, m - 1, d);
+                    
+                    // Bao gồm cả ngày mốc (30 ngày trước) và ngày hôm nay
+                    return ngayGiaodichObj >= mốc && ngayGiaodichObj <= hN;
+                });
             }
 
             this.duLieuGiaoDichHomNay = raw; this.totalOrders = this.totalRevenue = this.totalExpense = 0;
@@ -99,6 +113,7 @@ const ThuChiModule = {
             this.capNhatKhoiDoiSoat(raw); this.uSt();
         }).catch(err => console.error("Lỗi tải:", err)).finally(() => this.isLoadingData = false);
     },
+
 
     capNhatKhoiDoiSoat(arr) {
         const box = document.getElementById('mini-rows'); if (!box) return;
