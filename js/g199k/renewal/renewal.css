@@ -24,14 +24,29 @@
 
 /* Tiêu đề Popup */
 .renewal-popup-header {
-    padding: 16px 20px; border-bottom: 1px solid var(--b);
-    display: flex; justify-content: space-between; align-items: center;
-    background-color: var(--sf); position: relative;
+    padding: 16px 45px 16px 20px; /* TĂNG PADDING PHẢI LÊN 45px để nhường chỗ cho nút X */
+    border-bottom: 1px solid var(--b);
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center;
+    background-color: var(--sf); 
+    position: relative;
+    box-sizing: border-box;       /* Đảm bảo padding không làm lệch kích thước khung */
 }
+
 .renewal-popup-header h3 {
-    margin: 0; font-size: var(--f-size-md);
-    font-weight: var(--f-weight-semibold); color: var(--t);
+    margin: 0; 
+    font-size: var(--f-size-md);
+    font-weight: var(--f-weight-semibold); 
+    color: var(--t);
+    
+    /* ÉP BUỘC HIỂN THỊ DẤU BA CHẤM */
+    width: 100%;                  /* Sử dụng toàn bộ chiều ngang an toàn còn lại */
+    white-space: nowrap;          /* Tuyệt đối không cho chữ tự động xuống dòng */
+    overflow: hidden;              /* Ẩn hoàn toàn phần chữ bị tràn ra ngoài */
+    text-overflow: ellipsis;       /* Tự động biến phần chữ ẩn thành dấu ba chấm (...) */
 }
+
 
 /* Vùng danh sách cuộn mượt trên Mobile */
 .renewal-popup-body { padding: 16px 20px; overflow-y: auto; flex: 1; }
