@@ -1,210 +1,139 @@
+// js/r199k/renewal.js - FULL RENEWAL MODULE FIREBASE COMPLETE (SIÊU TIẾT KIỆM DÒNG)
 const RenewalModule = {
-    // ⚠️ Link App Script riêng của Google Sheet R199K quản lý thành viên
-    WEB_APP_URL: "https://script.google.com/macros/s/AKfycbzhh5Dzq2fuWK3zQPFB67DHf4QZE9efj0b2g6jQzsqUsXGK5hLnFgMSfdMt33hiyrAc/exec",
-    
-    // ⚠️ Link App Script riêng của Google Sheet QL (Thu Chi)
-    THUCHI_WEB_APP_URL: "https://script.google.com/macros/s/AKfycbwNA4KT2HEPkCCeQu8ZHLhapDREaNyOUHh9UcleiA6HrxVzLOfNRLpkEDj7zLRJ79kYsQ/exec",
+    getFBConfig() {
+        return {
+            url: (typeof R199kModule !== 'undefined' ? R199kModule.FB_URL : "https://firebasedatabase.app").replace(/\/$/, ''),
+            key: typeof R199kModule !== 'undefined' ? R199kModule.FB_KEY : ""
+        };
+    },
 
-    hienThiLichSuGiaHan: function(gid) {
-        if (!gid) return;
-        this.khoiTaoKhungGiaoDien();
+    hienThiLichSuGiaHan(gid) {
+        if (!gid) return; this.khoiTaoKhungGiaoDien();
+        const hC = document.getElementById('renewal-history-list'), tC = document.getElementById('renewal-history-title');
+        tC.innerText = `Đang tải lịch sử: ${gid}...`; hC.innerHTML = '<div class="renewal-loading">Đang tải lịch sử...</div>';
 
-        const historyContainer = document.getElementById('renewal-history-list');
-        const titleContainer = document.getElementById('renewal-history-title');
-        
-        titleContainer.innerText = `Đang tải lịch sử: ${gid}...`;
-        historyContainer.innerHTML = '<div class="renewal-loading">Đang tải lịch sử gia hạn khách hàng...</div>';
+        const cfg = this.getFBConfig();
+        fetch(`${cfg.url}/r199k_members/${gid}.json?_nocache=${Date.now()}${cfg.key ? '&auth='+cfg.key : ''}`)
+        .then(r => r.ok ? r.json() : Promise.reject()).then(res => {
+            if (!res) { hC.innerHTML = '<div class="renewal-empty">⚠️ Không có lịch sử dữ liệu.</div>'; return; }
+            let data = Object.values(res); tC.innerText = `KHÁCH HÀNG: ${data[0]?.name || "Thành viên"} (${gid})`; hC.innerHTML = '';
+            data.sort((a, b) => (b.hoaDon || '').localeCompare(a.hoaDon || ''));
+            
+            data.forEach((item, index) => {
+                const rowDiv = document.createElement('div'); rowDiv.className = `renewal-history-item ${item.goi === 'Hủy ĐK' ? 'cancelled' : ''}`;
+                const startFmt = item.start ? item.start.split('-').reverse().join('/') : '--/--/----';
+                
+                // 🌟 ĐÃ FIX TRIỆT ĐỂ: Lấy trực tiếp số ngày thực tế lưu trên Firebase (88 ngày), chống kẹt số 92
+                let diff = Number(item.ngayConLai !== undefined ? item.ngayConLai : 0);
+                
+                let labelDays = "";
+                if (item.goi === 'Hủy ĐK' || item.end === 'HỦY NGAY') {
+                    labelDays = 'Hủy';
+                } else if (diff < 0) {
+                    labelDays = `Quá hạn: ${Math.abs(diff)} ngày`;
+                } else {
+                    labelDays = `Còn lại: ${diff} ngày`;
+                }
 
-        const url = `${this.WEB_APP_URL}?action=GET_HISTORY&gid=${encodeURIComponent(gid)}`;
-
-        fetch(url)
-        .then(response => response.json())
-        .then(res => {
-            if (res.status === "success" && Array.isArray(res.data) && res.data.length > 0) {
-                const customerName = res.name || "Khách hàng";
-                titleContainer.innerText = `KHÁCH HÀNG: ${customerName} (${gid})`;
-                historyContainer.innerHTML = ''; 
-
-                res.data.sort((a, b) => Number(b.lanGiaHan || 0) - Number(a.lanGiaHan || 0));
-
-                res.data.forEach(item => {
-                    const rowDiv = document.createElement('div');
-                    rowDiv.className = `renewal-history-item ${item.goi === 'Hủy ĐK' ? 'cancelled' : ''}`;
-                    
-                    const startFormatted = this.dinhDangNgay(item.start);
-                    const endFormatted = (item.end === "01/01/1970" || item.end === "HỦY NGAY" || item.goi === 'Hủy ĐK') ? "HỦY NGAY" : this.dinhDangNgay(item.end);
-
-                    rowDiv.innerHTML = `
-                        <div class="renewal-item-header">
-                            <span class="renewal-badge-count">Lần ${item.lanGiaHan || 1}</span>
-                            <span class="renewal-item-package">${item.goi || '1 THÁNG'}</span>
+                rowDiv.innerHTML = `
+                    <div class="renewal-item-header">
+                        <span class="renewal-badge-count">Lần ${data.length - index}</span>
+                        <span class="renewal-item-package">${item.goi || '1 THÁNG'}</span>
+                    </div>
+                    <div class="renewal-item-body">
+                        <div class="renewal-time-line">
+                            <div class="time-line-row"><span>📅 Bắt đầu:</span> <b>${startFmt}</b></div>
+                            <div class="time-line-row"><span>⌛ Kết thúc:</span> <b>${item.end || '--/--/----'}</b></div>
+                            <div class="time-line-row"><span class="renewal-days-left ${diff < 0 || item.goi === 'Hủy ĐK' ? 'expired' : 'active'}">⏱️ ${labelDays}</span></div>
+                            <div class="renewal-invoice-text">Mã HD: ${item.hoaDon || 'Không có'}</div>
                         </div>
-                        <div class="renewal-item-body">
-                            <div class="renewal-time-line">
-                                <span>📅 Bắt đầu: <b>${startFormatted}</b></span>
-                                <span>⌛ Kết thúc: <b>${endFormatted}</b></span>
-                                <div class="renewal-invoice-text">Mã HD: ${item.hoaDon || 'Không có'}</div>
-                            </div>
-                            <button class="renewal-delete-item-btn" title="Xóa giao dịch lỗi">
-                                🗑️ Xóa
-                            </button>
+                        <div class="renewal-action-area">
+                            <button class="renewal-delete-item-btn" title="Xóa giao dịch lỗi">🗑️ Xóa</button>
                         </div>
-                    `;
+                    </div>
+                `;
+                const btnDel = rowDiv.querySelector('.renewal-delete-item-btn');
+                if (btnDel) btnDel.addEventListener('click', () => this.xoaGiaoDichLoiByHoaDon(item.hoaDon, data.length - index, rowDiv, item.adminName));
+                hC.appendChild(rowDiv);
+            });
+        }).catch(err => { console.error("Lỗi:", err); tC.innerText = `📜 Lịch Sử Gia Hạn: ${gid}`; hC.innerHTML = '<div class="renewal-empty">⚠️ Không thể kết nối dữ liệu.</div>'; });
+    },
 
-                    const deleteBtn = rowDiv.querySelector('.renewal-delete-item-btn');
-                    if (deleteBtn) {
-                        deleteBtn.addEventListener('click', () => {
-                            // 🌟 Truyền hoaDon và adminName (Cột L) vào hàm xóa đồng bộ
-                            this.xoaGiaoDichLoiByHoaDon(item.hoaDon, item.lanGiaHan, rowDiv, item.adminName);
-                        });
-                    }
-                    historyContainer.appendChild(rowDiv);
+
+
+    xoaGiaoDichLoiByHoaDon(hoaDon, lanGiaHan, elementDiv, adminName) {
+        const role = (localStorage.getItem('loggedRole') || '').trim().toUpperCase();
+        if (role !== "MASTER" && role !== "MANAGER") return typeof NotiModule !== 'undefined' ? NotiModule.show("Từ chối quyền xóa!", "error") : alert("Từ chối quyền xóa!");
+        if (!hoaDon) return alert("Giao dịch không có mã hóa đơn!");
+        if (!confirm(`Bạn có chắc chắn muốn xóa lịch sử giao dịch [Lần ${lanGiaHan}] không?`)) return;
+
+        elementDiv.style.opacity = "0.4"; elementDiv.style.pointerEvents = "none"; const cfg = this.getFBConfig();
+        const titleText = document.getElementById('renewal-history-title').innerText;
+        const match = titleText.match(/\(([^)]+)\)/); const gid = match ? match[1] : null;
+
+        // 🌟 LUỒNG XÓA ĐỒNG BỘ: Xóa song song hóa đơn ở cả nhánh dòng tiền và nhánh lịch sử nhóm
+        Promise.all([
+            fetch(`${cfg.url}/thuchi/${hoaDon}.json${cfg.key ? '?auth='+cfg.key : ''}`, { method: "DELETE" }),
+            gid ? fetch(`${cfg.url}/r199k_members/${gid}/${hoaDon}.json${cfg.key ? '?auth='+cfg.key : ''}`, { method: "DELETE" }) : Promise.resolve()
+        ])
+        .then(() => {
+            if (typeof ThuChiModule !== "undefined" && typeof ThuChiModule.taiHoatDongHomNay === 'function') ThuChiModule.taiHoatDongHomNay();
+            if (typeof R199kModule !== "undefined" && typeof R199kModule.refreshRenewList === 'function') R199kModule.refreshRenewList();
+            NotiModule.show("Đã xóa giao dịch rác thành công!", "success"); elementDiv.remove();
+            
+            const container = document.getElementById('renewal-history-list');
+            if (container && container.children.length === 0) container.innerHTML = '<div class="renewal-empty">⚠️ Không còn lịch sử gia hạn nào.</div>';
+        })
+        .catch(err => { elementDiv.style.opacity = "1"; elementDiv.style.pointerEvents = "auto"; alert("Lỗi mạng xóa thất bại!"); });
+    },
+
+
+    xoaKhachHangR199kNeuCần(gid, hoaDon) {
+        if (!gid) return; const cfg = this.getFBConfig();
+        fetch(`${cfg.url}/r199k_members/${gid}.json${cfg.key ? '?auth='+cfg.key : ''}`)
+        .then(r => r.json()).then(res => {
+            // 🌟 LUỒNG ĐỒNG BỘ CACHE NGẦM: Tìm và xóa phần tử lỗi trong LocalStorage của máy
+            const cacheKey = 'r199k_members_cache';
+            let localData = []; try { localData = JSON.parse(localStorage.getItem(cacheKey)) || []; } catch(e) { localData = []; }
+
+            if (!res || Object.keys(res).length === 0) {
+                // Nếu trên Firebase không còn hóa đơn nào -> Xóa trắng node GID trên Server
+                fetch(`${cfg.url}/r199k_members/${gid}.json${cfg.key ? '?auth='+cfg.key : ''}`, { method: "DELETE" })
+                .then(() => {
+                    // Đồng thời xóa sổ khách hàng này khỏi bộ nhớ lưu ngầm LocalStorage
+                    localData = localData.filter(item => item.gid !== gid);
+                    localStorage.setItem(cacheKey, JSON.stringify(localData));
+                    if (typeof R199kModule !== "undefined") R199kModule.taiDanhSachThanhVienTheoUser();
                 });
-            } else {
-                titleContainer.innerText = `📜 Lịch Sử Gia Hạn: ${gid}`;
-                historyContainer.innerHTML = '<div class="renewal-empty">⚠️ Không tìm thấy lịch sử gia hạn nào cho khách hàng này.</div>';
+            } else if (res[hoaDon]) {
+                // Nếu vẫn còn các lần gia hạn cũ -> Chỉ xóa hóa đơn lỗi hiện tại trên Server
+                fetch(`${cfg.url}/r199k_members/${gid}/${hoaDon}.json${cfg.key ? '?auth='+cfg.key : ''}`, { method: "DELETE" })
+                .then(() => {
+                    // Cập nhật lại thông tin gói lưu ngầm trong máy bằng dữ liệu của hóa đơn còn lại mới nhất
+                    let invoices = Object.values(res).filter(inv => inv && inv.hoaDon !== hoaDon);
+                    invoices.sort((a, b) => (b.hoaDon || '').localeCompare(a.hoaDon || ''));
+                    
+                    let idx = localData.findIndex(item => item.gid === gid);
+                    if (idx !== -1 && invoices.length > 0) {
+                        localData[idx] = { ...localData[idx], goi: invoices[0].goi, name: invoices[0].name };
+                    } else if (idx !== -1) {
+                        localData = localData.filter(item => item.gid !== gid);
+                    }
+                    localStorage.setItem(cacheKey, JSON.stringify(localData));
+                    if (typeof R199kModule !== "undefined") R199kModule.taiDanhSachThanhVienTheoUser();
+                });
             }
-        })
-        .catch(err => {
-            console.error("Lỗi tải lịch sử gia hạn:", err);
-            historyContainer.innerHTML = '<div class="renewal-empty">❌ Lỗi kết nối máy chủ!</div>';
-        });
-    },
-
-    xoaGiaoDichLoiByHoaDon: function(hoaDon, lanGiaHan, elementDiv, adminName) {
-        // ==========================================================================
-        // KHỐI CHẶN BẢO MẬT: CHỈ MASTER VÀ MANAGER ĐƯỢC PHÉP XÓA (STAFF BỊ CHẶN)
-        // ==========================================================================
-        const savedRole = localStorage.getItem('loggedRole');
-        const currentRole = (savedRole || '').trim().toUpperCase();
-
-        if (currentRole !== "MASTER" && currentRole !== "MANAGER") {
-            if (typeof NotiModule !== 'undefined') {
-                NotiModule.show("Từ chối: Tài khoản STAFF không đủ thẩm quyền để thực hiện thao tác XÓA hóa đơn này!", "error");
-            } else {
-                alert("Từ chối: Tài khoản STAFF không đủ thẩm quyền để thực hiện thao tác XÓA hóa đơn này!");
-            }
-            return; // NGẮT HÀM LẬP TỨC: Chặn đứng hoàn toàn, không chạy lệnh fetch API xóa ở dưới
-        }
-
-        // ==========================================================================
-        // CÁC LUỒNG KIỂM TRA VÀ LOGIC XỬ LÝ XÓA GỐC CỦA BẠN (GIỮ NGUYÊN)
-        // ==========================================================================
-        if (!hoaDon) {
-            alert("Giao dịch này không có mã hóa đơn nên không thể xóa đích danh!");
-            return;
-        }
-        if (!confirm(`Bạn có chắc chắn muốn xóa lịch sử giao dịch [Lần ${lanGiaHan}] và ĐỒNG BỘ XÓA dòng tiền Thu Chi tương ứng không?`)) return;
-
-        elementDiv.style.opacity = "0.4";
-        elementDiv.style.pointerEvents = "none";
-
-        // 🌟 BƯỚC 1: Gửi yêu cầu POST xóa dòng trên Sheet G_199K
-        fetch(this.WEB_APP_URL, {
-            method: "POST",
-            headers: { "Content-Type": "text/plain" },
-            body: JSON.stringify({
-                action: "DELETE_HISTORY_ROW",
-                hoaDon: hoaDon
-            })
-        })
-        .then(response => response.json())
-        .then(res => {
-            if (res.status === "success") {
-                
-                // 🌟 BƯỚC 2: Xóa G_199K thành công -> Gọi hàm xóa đồng bộ Thu Chi theo định dạng GET của bạn
-                var targetAdmin = adminName ? adminName.toString().trim() : "ADMIN";
-                this.xoaDongTienThuChiByGet(hoaDon, targetAdmin);
-
-                if (typeof ThuChiModule !== "undefined") {
-                    ThuChiModule.taiHoatDongHomNay();
-                }
-
-                if (typeof R199kModule !== "undefined") {
-                    R199kModule.refreshRenewList();
-                }
-
-                if (typeof NotiModule !== 'undefined') {
-                    NotiModule.show("Đã dọn dẹp thành viên và dòng tiền thành công!", "success");
-                }
-                
-                elementDiv.remove();
-                
-                const container = document.getElementById('renewal-history-list');
-                if (container && container.children.length === 0) {
-                    container.innerHTML = '<div class="renewal-empty">⚠️ Không còn lịch sử gia hạn nào.</div>';
-                }
-            } else {
-                elementDiv.style.opacity = "1";
-                elementDiv.style.pointerEvents = "auto";
-                alert("Lỗi từ hệ thống G_199K: " + res.message);
-            }
-        })
-        .catch(err => {
-            elementDiv.style.opacity = "1";
-            elementDiv.style.pointerEvents = "auto";
-            alert("Không thể kết nối máy chủ để xử lý xóa!");
-        });
+        }).catch(e => console.error("Lỗi dọn cache ngầm:", e));
     },
 
 
-    /**
-     * 🌟 HÀM ĐỒNG BỘ MỚI: Gọi lệnh GET khớp 100% với TÁC VỤ 1 (action=delete) trong hàm doGet của bảng Thu Chi
-     */
-    xoaDongTienThuChiByGet: function(hoaDon, adminName) {
-        // Build chuỗi URL tham số theo đúng định dạng Backend yêu cầu: action=delete&maId=...&adminName=...
-        const thuChiUrl = `${this.THUCHI_WEB_APP_URL}?action=delete&maId=${encodeURIComponent(hoaDon)}&adminName=${encodeURIComponent(adminName)}`;
-        console.log("[LOG THU CHI] Đang đồng bộ lệnh xóa sang URL:", thuChiUrl);
-
-        fetch(thuChiUrl)
-        .then(response => response.json())
-        .then(res => {
-            console.log("[LOG THU CHI KẾT QUẢ]:", res.message);
-        })
-        .catch(err => {
-            console.error("[LOG THU CHI ERROR] Lỗi truyền dữ liệu xóa ngầm:", err);
-        });
+    khoiTaoKhungGiaoDien() {
+        if (document.getElementById('renewal-history-popup')) { document.getElementById('renewal-history-popup').classList.add('show'); return; }
+        const p = document.createElement('div'); p.id = 'renewal-history-popup'; p.className = 'renewal-popup-overlay show';
+        p.innerHTML = `<div class="renewal-popup-content"><div class="renewal-popup-header"><h3 id="renewal-history-title">📜 Lịch Sử Gia Hạn</h3>${UIButton.closeModal("btn-close-renewal")}</div><div id="renewal-history-list" class="renewal-popup-body"></div></div>`;
+        document.body.appendChild(p); UIButton.setupCloseEvent("btn-close-renewal", "renewal-history-popup");
     },
 
-    khoiTaoKhungGiaoDien: function() {
-        if (document.getElementById('renewal-history-popup')) {
-            document.getElementById('renewal-history-popup').classList.add('show');
-            return;
-        }
-
-        const popup = document.createElement('div');
-        popup.id = 'renewal-history-popup';
-        popup.className = 'renewal-popup-overlay show';
-
-        const closeButtonHtml = UIButton.closeModal("btn-close-renewal");
-
-        popup.innerHTML = `
-            <div class="renewal-popup-content">
-                <div class="renewal-popup-header">
-                    <h3 id="renewal-history-title">📜 Lịch Sử Gia Hạn</h3>
-                    ${closeButtonHtml}
-                </div>
-                <div id="renewal-history-list" class="renewal-popup-body"></div>
-            </div>
-        `;
-
-        document.body.appendChild(popup);
-
-        // Gọi UIButton để lo việc click nút x và click vùng nền tối
-        UIButton.setupCloseEvent("btn-close-renewal", "renewal-history-popup");
-    },
-
-    // BẮT BUỘC KHÔI PHỤC HÀM NÀY: Để các logic kết nối máy chủ gọi ẩn popup không bị lỗi sập mã nguồn
-    dongPopup: function() {
-        const popup = document.getElementById('renewal-history-popup');
-        if (popup) popup.classList.remove('show');
-    },
-
-    dinhDangNgay: function(dateStr) {
-        if (!dateStr) return '--/--/----';
-        if (dateStr.includes('/')) return dateStr; 
-        const [y, m, d] = dateStr.split('-');
-        return y && m && d ? `${d}/${m}/${y}` : dateStr;
-    }
-
+    dongPopup() { const p = document.getElementById('renewal-history-popup'); if (p) p.classList.remove('show'); },
+    dinhDangNgay(dStr) { if (!dStr) return '--/--/----'; if (dStr.includes('/')) return dStr; const [y, m, d] = dStr.split('-'); return y && m && d ? `${d}/${m}/${y}` : dStr; }
 };

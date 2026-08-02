@@ -1,175 +1,107 @@
-/* Khung nền mờ phủ toàn màn hình */
+/* ==========================================================================
+   FULL CSS CĂN CHỈNH NGAY NGẮN KHUNG LỊCH SỬ GIA HẠN (MOBILE OPTIMIZED)
+   ========================================================================== */
+
+/* Nền phủ toàn màn hình */
 .renewal-popup-overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    top: 0; left: 0; width: 100%; height: 100%;
     background-color: rgba(0, 0, 0, 0.4);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.25s ease;
+    display: flex; justify-content: center; align-items: center;
+    z-index: 9999; opacity: 0; pointer-events: none;
+    transition: var(--transition);
 }
+.renewal-popup-overlay.show { opacity: 1; pointer-events: auto; }
 
-.renewal-popup-overlay.show {
-    opacity: 1;
-    pointer-events: auto;
-}
-
-/* Khung nội dung hộp thoại chuẩn Light Mode châu Âu */
+/* Hộp thoại nội dung chính */
 .renewal-popup-content {
-    background-color: var(--sf);
-    color: var(--t);
-    width: 90%;
-    max-width: 440px;
-    border-radius: var(--r);          /* Đã đồng bộ bo góc popup (16px) */
-    box-shadow: var(--shadow-lg);       /* Đã đồng bộ bóng đổ lớn của popup */
-    border: 1px solid var(--b);
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    max-height: 80vh;
+    background-color: var(--sf); color: var(--t);
+    width: 92%; max-width: 400px;
+    border-radius: var(--r); box-shadow: var(--shadow-lg);
+    border: 1px solid var(--b); overflow: hidden;
+    display: flex; flex-direction: column; max-height: 82vh;
 }
 
 /* Tiêu đề Popup */
 .renewal-popup-header {
-    padding: 18px 24px;
-    border-bottom: 1px solid var(--b);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #ffffff;
+    padding: 16px 20px; border-bottom: 1px solid var(--b);
+    display: flex; justify-content: space-between; align-items: center;
+    background-color: var(--sf); position: relative;
 }
-
 .renewal-popup-header h3 {
-    margin: 0;
-    font-size: var(--f-size-md);        /* Đã đổi (16px -> quy về md cho cân đối tiêu đề h3) */
-    font-weight: var(--f-weight-semibold); /* Đã đổi (600) */
-    color: var(--t);
+    margin: 0; font-size: var(--f-size-md);
+    font-weight: var(--f-weight-semibold); color: var(--t);
 }
 
-.renewal-popup-header {
-    position: relative;
-}
-
-/* Vùng chứa danh sách */
-.renewal-popup-body {
-    padding: 20px 24px;
-    overflow-y: auto;
-    flex: 1;
-}
+/* Vùng danh sách cuộn mượt trên Mobile */
+.renewal-popup-body { padding: 16px 20px; overflow-y: auto; flex: 1; }
 
 /* Thẻ bọc từng dòng lịch sử */
 .renewal-history-item {
-    background-color: #ffffff;
-    border: 1px solid var(--b);
-    padding: 14px;
-    margin-bottom: 14px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+    background-color: var(--sf); border: 1px solid var(--b);
+    padding: 14px; margin-bottom: 12px; border-radius: var(--r-md);
+    box-shadow: var(--shadow-md);
 }
-
-.renewal-history-item.cancelled {
-    background-color: #ffffff;
-    border-color: var(--b);
-}
+.renewal-history-item.cancelled { background-color: var(--sf); border-color: var(--b); }
 
 /* Header dòng lịch sử */
 .renewal-item-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid var(--bg);
-    padding-bottom: 8px;
-    margin-bottom: 10px;
+    display: flex; justify-content: space-between; align-items: center;
+    border-bottom: 1px solid var(--bg); padding-bottom: 8px; margin-bottom: 10px;
 }
-
-/* Badge số lần gia hạn */
 .renewal-badge-count {
-    background-color: var(--b);
-    color: var(--ts);
-    font-size: var(--f-size-xs);       /* Đã đổi (11px) */
-    padding: 3px 10px;
-    border-radius: 20px;
-    font-weight: var(--f-weight-semibold); /* Đã đổi (600) */
+    background-color: var(--b); color: var(--ts); font-size: var(--f-size-xs);
+    padding: 3px 10px; border-radius: var(--r-xl); font-weight: var(--f-weight-semibold);
 }
+.renewal-item-package { font-weight: var(--f-weight-bold); font-size: var(--f-size-sm); color: var(--t); }
+.renewal-history-item.cancelled .renewal-item-package { color: var(--d); }
 
-/* Tên gói đăng ký */
-.renewal-item-package {
-    font-weight: var(--f-weight-bold);  /* Đã đổi (700) */
-    font-size: var(--f-size-sm);        /* Đã đổi (13px) */
-    color: var(--t);
-}
-
-.renewal-history-item.cancelled .renewal-item-package {
-    color: var(--d);
-}
-
-/* Bố cục vùng chứa Timeline và nút bấm */
+/* BỐ CỤC CHÍNH: Tách rời vùng chữ bên trái và vùng nút bên phải rộng rãi */
 .renewal-item-body {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
+    display: flex; justify-content: space-between; align-items: flex-end; gap: 12px;
 }
 
-/* Khung chữ thời gian */
+/* KHUNG CHỮ TIMELINE: Ép phân tách từng dòng rạch ròi, căn lề trái đều tăm tắp */
 .renewal-time-line {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    font-size: var(--f-size-sm);        /* Đã đổi (13px) */
-    color: var(--ts);
+    display: flex; flex-direction: column; gap: 6px; flex: 1;
 }
-
-.renewal-time-line b {
-    color: var(--t);
+.time-line-row {
+    display: flex; justify-content: flex-start; align-items: center;
+    font-size: var(--f-size-sm); color: var(--ts); gap: 6px;
 }
+.time-line-row span { min-width: 80px; display: inline-block; } /* Cố định độ rộng nhãn chữ để b thẳng hàng */
+.renewal-time-line b { color: var(--t); font-weight: var(--f-weight-medium); }
 
-/* Chữ hiển thị mã hóa đơn mảnh */
+/* NHÃN CHỮ NGÀY CÒN LẠI THU NHỎ MẢNH NGĂN NẮP THEO THEME SYSTEM */
+.renewal-days-left {
+    font-size: var(--f-size-xs); font-weight: var(--f-weight-semibold);
+    padding: 2px 0; display: inline-block; margin-top: 2px;
+}
+.renewal-days-left.active { color: var(--s); }
+.renewal-days-left.expired { color: var(--d); }
+
+/* Mã hóa đơn nhỏ nằm dưới cùng */
 .renewal-invoice-text {
-    font-size: var(--f-size-xs);       /* Đã đổi (11px) */
-    color: var(--ts);
-    margin-top: 2px;
+    font-size: var(--f-size-xs); color: var(--ts);
+    margin-top: 4px; border-top: 1px dashed var(--bg); padding-top: 4px;
 }
 
-/* NÚT XÓA PHONG CÁCH CHÂU ÂU (LIGHT MODE MODAL) */
+/* Vùng nút bấm bên phải */
+.renewal-action-area { display: flex; align-items: flex-end; justify-content: flex-end; }
+
+/* Nút xóa tinh gọn không lo tràn text */
 .renewal-delete-item-btn {
-    background-color: transparent;
-    border: 1px solid var(--b);
-    color: #555555;
-    cursor: pointer;
-    font-size: var(--f-size-label);     /* Đã đổi (12px) */
-    font-weight: var(--f-weight-medium); /* Đã đổi (500) */
-    padding: 6px 12px;
-    border-radius: var(--r-sm);         /* Đã đồng bộ bo góc nút nhỏ (6px) */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: fit-content;
-    font-family: inherit;
-    transition: var(--transition);       /* Đã đồng bộ biến hiệu ứng chuyển động mượt */
+    background-color: transparent; border: 1px solid var(--b); color: var(--ts);
+    cursor: pointer; font-size: var(--f-size-label); font-weight: var(--f-weight-medium);
+    padding: 6px 12px; border-radius: var(--r-sm); display: flex;
+    align-items: center; justify-content: center; height: 32px;
+    font-family: var(--f-family); transition: var(--transition);
 }
-
-/* Hiệu ứng di chuột đổi sang màu đỏ san hô cảnh báo */
 .renewal-delete-item-btn:hover {
-    background-color: var(--d);
-    color: #ffffff;
-    border-color: var(--d);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12 rgba(255, 77, 79, 0.15);
+    background-color: var(--danger-light); color: var(--d); border-color: var(--d);
+    transform: translateY(-1px); box-shadow: var(--shadow-sm);
 }
+.renewal-delete-item-btn:active { transform: translateY(0) scale(0.96); }
 
-.renewal-delete-item-btn:active {
-    transform: translateY(0) scale(0.96);
-}
-
-/* Các trạng thái chờ và trống */
-.renewal-loading, .renewal-empty {
-    text-align: center;
-    padding: 40px 10px;
-    color: var(--ts);
-    font-size: var(--f-size-sm);        /* Đã đổi (13px) */
-}
+/* Trạng thái chờ */
+.renewal-loading, .renewal-empty { text-align: center; padding: 30px 10px; color: var(--ts); font-size: var(--f-size-sm); }

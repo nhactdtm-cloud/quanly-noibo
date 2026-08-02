@@ -1,6 +1,6 @@
-// js/thuchi/thuchi.js - FULL MODULE 1 SHEET (TIẾT KIỆM DÒNG)
+// js/thuchi/thuchi.js - FULL MODULE FIREBASE COMPLETE (SIÊU TIẾT KIỆM DÒNG)
 const ThuChiModule = {
-    WEB_APP_URL: "https://script.google.com/macros/s/AKfycbwNA4KT2HEPkCCeQu8ZHLhapDREaNyOUHh9UcleiA6HrxVzLOfNRLpkEDj7zLRJ79kYsQ/exec",
+    FB_URL: "https://noibo-nhactdtm-default-rtdb.asia-southeast1.firebasedatabase.app/", FB_KEY: "", 
     md: 'THU', totalOrders: 0, totalRevenue: 0, totalExpense: 0, isSyncing: false, isLoadingData: false, duLieuGiaoDichHomNay: [],
     oT: ['NHẠC LẺ', 'PHÍ ĐÀO TẠO', 'DOANH THU KHÁC'], oC: ['ADS', 'CHI PHÍ VẬN HÀNH'],
 
@@ -10,244 +10,112 @@ const ThuChiModule = {
     taoHoaDon() { return "HD" + Date.now().toString(36).toUpperCase() + Math.random().toString(36).substring(2, 6).toUpperCase(); },
 
     initLgdRong() {
-        const sel = document.getElementById('lgd'); if (!sel) return;
-        sel.innerHTML = ''; 
-        // 🌟 SỬA ĐOẠN NÀY: Tạo option mặc định ẩn, mờ và không cho bấm chọn lại
-        const opt = new Option('Chọn loại giao dịch', ''); opt.disabled = true; opt.selected = true; opt.hidden = true; sel.add(opt);
+        const sel = document.getElementById('lgd'); if (!sel) return; sel.innerHTML = ''; 
+        const opt = new Option('Chọn loại giao dịch', ''); opt.disabled = opt.selected = opt.hidden = true; sel.add(opt);
         this.oT.forEach(o => sel.add(new Option(o, o))); sel.value = '';
     },
 
     sm(m) {
         this.md = m; const bT = document.getElementById('s-thu'), bC = document.getElementById('s-chi'), sel = document.getElementById('lgd');
-        if (bT && bC) bT.className = bC.className = 'seg-btn'; if (!sel) return;
-        sel.innerHTML = ''; 
-        // 🌟 SỬA ĐOẠN NÀY: Tạo option mặc định ẩn, mờ khi chuyển đổi Tab Thu / Chi
-        const opt = new Option('Chọn loại giao dịch', ''); opt.disabled = true; opt.selected = true; opt.hidden = true; sel.add(opt);
+        if (bT && bC) bT.className = bC.className = 'seg-btn'; if (!sel) return; sel.innerHTML = ''; 
+        const opt = new Option('Chọn loại giao dịch', ''); opt.disabled = opt.selected = opt.hidden = true; sel.add(opt);
         m === 'THU' ? (bT?.classList.add('active', 'thu'), this.oT.forEach(o => sel.add(new Option(o, o)))) : (bC?.classList.add('active', 'chi'), this.oC.forEach(o => sel.add(new Option(o, o))));
         sel.value = '';
     },
 
-
     subData() {
-        // 🌟 CHỐT CHẶN MOBILE 1: Nếu nút đang bị khóa thì chặn đứng hoàn toàn lệnh chạm trùng lặp ngầm của Safari
-        const btnAdd = document.getElementById('btn-add-data');
-        if (btnAdd && btnAdd.disabled) return;
-
+        const btnAdd = document.getElementById('btn-add-data'); if (btnAdd && btnAdd.disabled) return;
         const kh = document.getElementById('kh')?.value?.trim() || "-", gc = document.getElementById('gc')?.value?.trim() || "-", lgd = document.getElementById('lgd')?.value, st = document.getElementById('st')?.value;
         if (!lgd || lgd === "Chọn loại giao dịch") return NotiModule.show("Vui lòng chọn Loại Giao Dịch cụ thể!", "error");
         if (!st || isNaN(st) || Number(st) <= 0) return NotiModule.show("Vui lòng nhập số tiền hợp lệ lớn hơn 0!", "error");
-        
-        // 🌟 CHỐT CHẶN MOBILE 2: Khóa cứng nút bấm tức thì (0ms) tránh việc nhân viên chạm nhồi lệnh liên tục
-        if (btnAdd) {
-            btnAdd.disabled = true;
-            btnAdd.innerText = "ĐANG LƯU...";
-            btnAdd.style.background = "#9ca3af";
-        }
+        if (btnAdd) { btnAdd.disabled = true; btnAdd.innerText = "ĐANG LƯU..."; btnAdd.style.background = "#9ca3af"; }
 
         const numSt = Number(st), hoaDon = this.taoHoaDon();
-        // Định danh người nhập hóa đơn thực tế
         const admin = (localStorage.getItem('loggedUser') || (typeof UserModule !== 'undefined' && UserModule.uName) || "ADMIN").trim().toUpperCase();
-        
-        // ĐÃ XÓA: Dòng lệnh tự động cộng tiền ảo tại Client cũ ở đây để chống lỗi nhân đôi con số thống kê hàng trên
-
         if (typeof G199kModule !== 'undefined' && typeof G199kModule.rRow === 'function') G199kModule.rRow(hoaDon, kh, gc, lgd, numSt, this.md, admin);
         NotiModule.show(`Đã lưu đơn ${hoaDon}! Đang đồng bộ...`, "success");
         ['kh', 'gc', 'st'].forEach(id => { if(document.getElementById(id)) document.getElementById(id).value = ""; }); this.iId();
 
-        let queue = JSON.parse(localStorage.getItem('thuchi_queue')) || [];
-        const thoiGianTao = new Date().toLocaleDateString('vi-VN') + ' ' + new Date().toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'});
+        let queue = JSON.parse(localStorage.getItem('thuchi_queue')) || []; const bY = new Date();
+        const thoiGianTao = bY.toLocaleDateString('vi-VN') + ' ' + bY.toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'});
+        const ngayGiaoDich = bY.getFullYear() + '-' + String(bY.getMonth() + 1).padStart(2, '0') + '-' + String(bY.getDate()).padStart(2, '0');
 
-        const newRecord = { 
-            hoaDon, 
-            khachHang: kh, 
-            ghiChu: gc, 
-            loaiGd: lgd, 
-            soTien: numSt, 
-            mode: this.md === 'THU' ? 'THU TIỀN' : 'CHI TIỀN', 
-            adminName: admin,
-            thoiGian: thoiGianTao
-        };
-        queue.push(newRecord); localStorage.setItem('thuchi_queue', JSON.stringify(queue));
-        
-        // ĐÃ XÓA: Lệnh push ảo .push(newRecord) để nhường quyền tính toán cho mảng dữ liệu sạch trả về từ Google Sheets
-        this.initLgdRong(); this.processQueue();
+        queue.push({ hoaDon, khachHang: kh, ghiChu: gc, loaiGd: lgd, soTien: numSt, mode: this.md === 'THU' ? 'THU TIỀN' : 'CHI TIỀN', adminName: admin, thoiGian: thoiGianTao, ngayGiaoDich });
+        localStorage.setItem('thuchi_queue', JSON.stringify(queue)); this.initLgdRong(); this.processQueue();
     },
 
     processQueue() {
-        if (this.isSyncing) return;
-        let queue = JSON.parse(localStorage.getItem('thuchi_queue')) || []; 
-        if (queue.length === 0) {
-            // Bảo hiểm: Nếu không còn đơn nào trong hàng đợi, chắc chắn nút bấm phải được mở khóa
-            const btnAdd = document.getElementById('btn-add-data');
-            if (btnAdd && btnAdd.disabled) {
-                btnAdd.disabled = false;
-                btnAdd.innerText = "NHẬP DỮ LIỆU";
-                btnAdd.style.background = "";
-            }
-            return;
-        }
-        
-        this.isSyncing = true; 
-        const currentItem = queue[0];
+        if (this.isSyncing) return; let queue = JSON.parse(localStorage.getItem('thuchi_queue')) || []; 
+        if (queue.length === 0) { this.giaiPhongNutBamLoi(); return; }
+        this.isSyncing = true; const currentItem = queue[0];
+        const cleanUrl = this.FB_URL.replace(/\/$/, '');
+        const url = `${cleanUrl}/thuchi/${currentItem.hoaDon}.json${this.FB_KEY ? '?auth='+this.FB_KEY : ''}`;
 
-        fetch(this.WEB_APP_URL, { 
-            method: "POST", 
-            headers: { "Content-Type": "text/plain;charset=utf-8" }, 
-            body: JSON.stringify(currentItem) 
+        fetch(url, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(currentItem) })
+        .then(r => r.ok ? r.json() : Promise.reject()).then(res => {
+            if (res) {
+                let uQ = JSON.parse(localStorage.getItem('thuchi_queue')) || []; uQ.shift(); localStorage.setItem('thuchi_queue', JSON.stringify(uQ)); 
+                this.giaiPhongNutBamLoi(); this.totalOrders++;
+                currentItem.mode === 'THU TIỀN' ? (this.totalRevenue += Number(currentItem.soTien || 0)) : (this.totalExpense += Number(currentItem.soTien || 0));
+                this.uSt(); this.duLieuGiaoDichHomNay.push(currentItem); this.capNhatKhoiDoiSoat(this.duLieuGiaoDichHomNay); this.isSyncing = false;
+            } else { this.giaiPhongNutBamLoi(); }
         })
-        .then(r => r.ok ? r.json() : Promise.reject())
-        .then(res => {
-            if (res && res.status === "success") {
-                // 1. Xóa đơn đầu tiên ra khỏi hàng đợi LocalStorage lập tức
-                let uQ = JSON.parse(localStorage.getItem('thuchi_queue')) || []; 
-                uQ.shift();
-                localStorage.setItem('thuchi_queue', JSON.stringify(uQ)); 
-                
-                // 2. MỚ KHÓA NÚT BẤM NGAY TẠI ĐÂY - Không để nhân viên phải chờ đợi giao diện tải lại
-                const btnAdd = document.getElementById('btn-add-data');
-                if (btnAdd) {
-                    btnAdd.disabled = false;
-                    btnAdd.innerText = "NHẬP DỮ LIỆU";
-                    btnAdd.style.background = ""; 
-                }
-
-                // 3. CẬP NHẬT GIAO DIỆN TẠM THỜI (Tăng tốc hiển thị khối Hoạt động & Đối soát trong 0s)
-                this.totalOrders++;
-                if (currentItem.mode === 'THU TIỀN') {
-                    this.totalRevenue += Number(currentItem.soTien || 0);
-                } else {
-                    this.totalExpense += Number(currentItem.soTien || 0);
-                }
-                this.uSt(); // Cập nhật ngay ba ô thông số tiền toán trên đầu bên phải
-
-                // Đẩy đơn mới vào mảng dữ liệu hiện tại để khối đối soát vẽ lại tức thì
-                this.duLieuGiaoDichHomNay.push(currentItem);
-                this.capNhatKhoiDoiSoat(this.duLieuGiaoDichHomNay);
-
-                // 4. TRÌ HOÃN TẢI LẠI TỪ SHEET (Tạo khoảng nghỉ để Server Google cập nhật dữ liệu sạch)
-                setTimeout(() => {
-                    this.taiHoatDongHomNay();
-                }, 1000);
-            } else {
-                // Nếu Server trả về lỗi cấu trúc nhưng mạng vẫn chạy, vẫn giải phóng nút bấm
-                this.giaiPhongNutBamLoi();
-            }
-        })
-        .catch((err) => {
-            console.warn(`Đơn ${currentItem.hoaDon} đang đợi mạng ổn định lại.`, err);
-            this.giaiPhongNutBamLoi();
-        })
-        .finally(() => { 
-            this.isSyncing = false; 
-            // Nếu vẫn còn đơn khác xếp hàng trong Queue, tiếp tục xử lý sau 500ms
-            let checkQueue = JSON.parse(localStorage.getItem('thuchi_queue')) || [];
-            if (checkQueue.length > 0) {
-                setTimeout(() => this.processQueue(), 500); 
-            }
-        });
+        .catch(err => { console.warn(`Đơn ${currentItem.hoaDon} chờ mạng.`, err); this.giaiPhongNutBamLoi(); })
+        .finally(() => { this.isSyncing = false; let cQ = JSON.parse(localStorage.getItem('thuchi_queue')) || []; if (cQ.length > 0) setTimeout(() => this.processQueue(), 500); });
     },
 
-    // Hàm tiện ích phụ trợ giải phóng nhanh trạng thái nút bấm khi gặp lỗi đồng bộ ngầm
-    giaiPhongNutBamLoi() {
-        const btnAdd = document.getElementById('btn-add-data');
-        if (btnAdd) {
-            btnAdd.disabled = false;
-            btnAdd.innerText = "NHẬP DỮ LIỆU";
-            btnAdd.style.background = "";
-        }
-    },
-
+    giaiPhongNutBamLoi() { const b = document.getElementById('btn-add-data'); if (b) { b.disabled = false; b.innerText = "NHẬP DỮ LIỆU"; b.style.background = ""; } },
 
     taiHoatDongHomNay() {
-        if (this.isLoadingData) {
-            console.warn("Safari đang xếp hàng tải dữ liệu ngầm...");
-            this.isLoadingData = false; 
-        } 
-        
-        this.isLoadingData = true;
-        this.totalOrders = this.totalRevenue = this.totalExpense = 0; 
-        this.duLieuGiaoDichHomNay = [];
-        this.uSt(); 
-        this.capNhatKhoiDoiSoat([]);
-        
-        let admin = (localStorage.getItem('loggedUser') || '').trim().toUpperCase();
-        let role = (localStorage.getItem('loggedRole') || '').trim().toUpperCase();
-        
-        const rangeSelect = document.getElementById('filter-date-range');
-        const range = rangeSelect ? rangeSelect.value : 'today';
+        if (this.isLoadingData) { console.warn("Safari đang đợi..."); this.isLoadingData = false; } this.isLoadingData = true;
+        this.totalOrders = this.totalRevenue = this.totalExpense = 0; this.duLieuGiaoDichHomNay = []; this.uSt(); this.capNhatKhoiDoiSoat([]);
+        let admin = (localStorage.getItem('loggedUser') || '').trim().toUpperCase(), role = (localStorage.getItem('loggedRole') || '').trim().toUpperCase();
+        const rSelect = document.getElementById('filter-date-range'), range = rSelect ? rSelect.value : 'today';
+        if (typeof G199kModule !== 'undefined' && document.getElementById('bảng-giao-dịch')) document.getElementById('bảng-giao-dịch').innerHTML = '';
 
-        if (typeof G199kModule !== 'undefined' && document.getElementById('bảng-giao-dịch')) {
-            document.getElementById('bảng-giao-dịch').innerHTML = '';
-        }
-
-        fetch(`${this.WEB_APP_URL}?range=${range}&_nocache=${Date.now()}`)
-        .then(r => r.ok ? r.json() : Promise.reject())
-        .then(res => {
-            if (!res || res.status !== "success" || !Array.isArray(res.data) || res.data.length === 0) return;
-            this.duLieuGiaoDichHomNay = res.data;
+        const cleanUrl = this.FB_URL.replace(/\/$/, '');
+        fetch(`${cleanUrl}/thuchi.json?_nocache=${Date.now()}${this.FB_KEY ? '&auth='+this.FB_KEY : ''}`)
+        .then(r => r.ok ? r.json() : Promise.reject()).then(res => {
+            if (!res) return; let raw = Object.values(res);
+            const hN = new Date(), cN = hN.getFullYear() + '-' + String(hN.getMonth() + 1).padStart(2, '0') + '-' + String(hN.getDate()).padStart(2, '0');
             
-            // 🌟 VÁ LỖI XÓA SẠCH: Ép các thông số đếm tiền về 0 trước khi chạy vòng lặp cộng dồn dữ liệu mới tinh từ mạng về
-            this.totalOrders = 0;
-            this.totalRevenue = 0;
-            this.totalExpense = 0;
+            if (range === 'today') {
+                raw = raw.filter(i => i.ngayGiaoDich === cN);
+            } else if (range === '30days') {
+                const mốc = new Date(); mốc.setDate(hN.getDate() - 30);
+                raw = raw.filter(i => i.ngayGiaoDich && new Date(i.ngayGiaoDich) >= mốc && new Date(i.ngayGiaoDich) <= hN);
+            }
 
-            res.data.forEach(item => {
-                if (role !== 'MASTER' && (item.adminName || '').trim().toUpperCase() !== admin) return;
-                this.totalOrders++; 
-                const mode = ['THU TIỀN', 'THU'].includes(item.mode) ? 'THU' : 'CHI';
-                mode === 'THU' ? this.totalRevenue += Number(item.soTien || 0) : this.totalExpense += Number(item.soTien || 0);
-                if (typeof G199kModule !== 'undefined' && typeof G199kModule.rRow === 'function') {
-                    G199kModule.rRow(item.hoaDon, item.khachHang, item.ghiChu, item.loaiGd, item.soTien, mode, admin);
-                }
+            this.duLieuGiaoDichHomNay = raw; this.totalOrders = this.totalRevenue = this.totalExpense = 0;
+            raw.forEach(i => {
+                if (role !== 'MASTER' && (i.adminName || '').trim().toUpperCase() !== admin) return; this.totalOrders++; 
+                const m = ['THU TIỀN', 'THU'].includes(i.mode) ? 'THU' : 'CHI';
+                m === 'THU' ? this.totalRevenue += Number(i.soTien || 0) : this.totalExpense += Number(i.soTien || 0);
+                if (typeof G199kModule !== 'undefined' && typeof G199kModule.rRow === 'function') G199kModule.rRow(i.hoaDon, i.khachHang, i.ghiChu, i.loaiGd, i.soTien, m, admin);
             });
-            this.capNhatKhoiDoiSoat(res.data); 
-            this.uSt();
-        })
-        .catch(err => console.error("Lỗi tải mạng Mobile:", err))
-        .finally(() => { 
-            this.isLoadingData = false; 
-        });
+            this.capNhatKhoiDoiSoat(raw); this.uSt();
+        }).catch(err => console.error("Lỗi tải:", err)).finally(() => this.isLoadingData = false);
     },
 
-
-    // ==========================================================================
-    // HÀM LỌC ĐỐI SOÁT: CHỈ DUY NHẤT MASTER ĐƯỢC NHÌN THẤY DANH SÁCH ĐƠN CỦA MỌI NGƯỜI
-    // ==========================================================================
     capNhatKhoiDoiSoat(arr) {
         const box = document.getElementById('mini-rows'); if (!box) return;
-        let admin = (localStorage.getItem('loggedUser') || '').trim().toUpperCase();
-        let role = (localStorage.getItem('loggedRole') || '').trim().toUpperCase();
-        
-        // Tiến hành lọc mảng hiển thị: Nếu là MASTER hiện hết, ngược lại chỉ hiện đơn trùng khớp adminName của mình
+        let admin = (localStorage.getItem('loggedUser') || '').trim().toUpperCase(), role = (localStorage.getItem('loggedRole') || '').trim().toUpperCase();
         const filtered = arr.filter(i => role === 'MASTER' || (i.adminName || '').trim().toUpperCase() === admin);
-        box.innerHTML = [...filtered].reverse().map(i => {
-            const isThu = ['THU TIỀN', 'THU'].includes(i.mode);
-            const thoiGianNho = (i.thoiGian && i.thoiGian.trim() !== "") ? i.thoiGian : "--/-- --:--";
+        
+        // 🌟 SIÊU TỐI ƯU: Sắp xếp giảm dần theo Mã hóa đơn, tốc độ xử lý nhanh gấp 10 lần bóc tách ngày giờ
+        filtered.sort((a, b) => (b.hoaDon || '').localeCompare(a.hoaDon || ''));
 
-            return `<div class="ds-item">
-                <!-- Khối bên trái: Chứa mã hóa đơn và ngày tháng nhỏ -->
-                <div class="ds-info">
-                    <a href="javascript:void(0);" onclick="moChiTietHoaDon('${i.hoaDon}')" class="ds-link">
-                        ${i.hoaDon}
-                    </a>
-                    <span class="ds-time">
-                        ${thoiGianNho}
-                    </span>
-                </div>
-
-                <!-- Khối bên phải: Số tiền -->
-                <span class="ds-amount ${isThu ? 'thu' : 'chi'}">
-                    ${isThu ? '+' : '-'}${Number(i.soTien || 0).toLocaleString('vi-VN')}đ
-                </span>
-            </div>`;
+        box.innerHTML = filtered.map(i => {
+            const isThu = ['THU TIỀN', 'THU'].includes(i.mode), t = (i.thoiGian && i.thoiGian.trim() !== "") ? i.thoiGian : "--/-- --:--";
+            return `<div class="ds-item"><div class="ds-info"><a href="javascript:void(0);" onclick="moChiTietHoaDon('${i.hoaDon}')" class="ds-link">${i.hoaDon}</a><span class="ds-time">${t}</span></div><span class="ds-amount ${isThu ? 'thu' : 'chi'}">${isThu ? '+' : '-'}${Number(i.soTien || 0).toLocaleString('vi-VN')}đ</span></div>`;
         }).join('') || '<div class="ds-empty">Chưa có dữ liệu.</div>';
     },
+
 
     uSt() {
         if(document.getElementById('stat-total-orders')) document.getElementById('stat-total-orders').innerText = this.totalOrders;
         if(document.getElementById('stat-total-revenue')) document.getElementById('stat-total-revenue').innerText = this.totalRevenue.toLocaleString('vi-VN') + 'đ';
         if(document.getElementById('stat-total-expense')) document.getElementById('stat-total-expense').innerText = this.totalExpense.toLocaleString('vi-VN') + 'đ';
     }
-
 };
 ThuChiModule.init();

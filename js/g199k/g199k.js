@@ -1,18 +1,21 @@
 const R199kModule = {
-    // ⚠️ LINK APPS SCRIPT RIÊNG CỦA GOOGLE SHEET R199K
-    WEB_APP_URL: "https://script.google.com/macros/s/AKfycbzhh5Dzq2fuWK3zQPFB67DHf4QZE9efj0b2g6jQzsqUsXGK5hLnFgMSfdMt33hiyrAc/exec",
-    THUCHI_WEB_APP_URL: "https://script.google.com/macros/s/AKfycbwNA4KT2HEPkCCeQu8ZHLhapDREaNyOUHh9UcleiA6HrxVzLOfNRLpkEDj7zLRJ79kYsQ/exec",
-    mode: 'NEW', // Mặc định là Đăng ký mới
-    searchId: 0,
+    // 🌟 ĐÃ SỬA: Điền chính xác link tên miền Firebase Singapore của dự án, KHÔNG CÓ DẤU / Ở CUỐI
+    FB_URL: "https://noibo-nhactdtm-default-rtdb.asia-southeast1.firebasedatabase.app/", 
+    FB_KEY: "", // Để trống nếu Firebase của bạn cấu hình Rules là public công khai
+    mode: 'NEW', searchId: 0, isSubmitting: false, isAutofilling: false, isSubmittingMembers: false, currentGhiChu: "",
+
+    // ĐÃ XÓA: Dòng khai báo searchId: 0 bị trùng lặp ở đây để chống lỗi crash code
 
     init: function() {
-
         const today = new Date().toISOString().split('T')[0];
         document.getElementById('r-start').value = today;
         
         // Cập nhật tiền, ngày kết thúc và khởi tạo trạng thái hiển thị ban đầu
         this.tựĐộngSinhGid(); 
         this.tínhNgàyKếtThúc();
+
+        // 1. Khi gõ tên khách hàng -> Sinh mã GID và đẩy ngay lập tức sang cột phải
+
 
         // [SỬA LỖI ĐỒNG BỘ MÃ GID LIÊN TỤC]
         
@@ -132,238 +135,101 @@ const R199kModule = {
         inputGid.value = `G${yy}${mm}${seq}${rand}`;
     },
 
-    tựĐộngTìmKiếmKháchHàng: function(type = 'GID') {
-        if (this.mode !== 'RENEW') return; 
+    tựĐộngTìmKiếmKháchHàng(type = 'GID') {
+        if (this.mode !== 'RENEW' || this.isAutofilling) return;
+        const iG = document.getElementById('r-gid'), iN = document.getElementById('r-name'), iGm = document.getElementById('r-gmail'), sG = document.getElementById('r-goi');
+        let kw = type === 'GID' ? iG.value.trim().toUpperCase() : iN.value.trim(); if ((type === 'GID' && kw.length < 5) || (type === 'NAME' && kw.length < 3)) return;
 
-        if (this.isAutofilling) return; 
+        const cId = ++this.searchId, cleanUrl = this.FB_URL.replace(/\/$/, '');
+        fetch(`${cleanUrl}/r199k_members.json${this.FB_KEY ? '?auth='+this.FB_KEY : ''}`)
+        .then(r => r.ok ? r.json() : Promise.reject()).then(res => {
+            if (cId !== this.searchId || !res) return;
+            
+            // 🌟 GIẢI NÉN CẤU TRÚC LỒNG: Biến đổi tất cả các hóa đơn nằm bên trong mọi GID thành mảng phẳng dạng dòng
+            let allInvoices = [];
+            Object.keys(res).forEach(gidKey => {
+                if (res[gidKey] && typeof res[gidKey] === 'object') {
+                    Object.values(res[gidKey]).forEach(inv => { if(inv && inv.gid) allInvoices.push(inv); });
+                }
+            });
 
-        let url = `${this.WEB_APP_URL}?action=GET_USER`;
-        const inputGid = document.getElementById('r-gid');
-        const inputName = document.getElementById('r-name');
-        const inputGmail = document.getElementById('r-gmail');
-        const selectGoi = document.getElementById('r-goi');
-        
-        let keyword = "";
-        if (type === 'GID') {
-            keyword = inputGid.value.trim().toUpperCase();
-            if (keyword.length < 5) return; 
-            url += `&gid=${encodeURIComponent(keyword)}`;
-        } else {
-            keyword = inputName.value.trim();
-            if (keyword.length < 3) return; 
-            url += `&name=${encodeURIComponent(keyword)}`;
-        }
+            // Tìm tất cả các dòng giao dịch của khách hàng này
+            let customerRows = allInvoices.filter(i => type === 'GID' ? (i.gid || '').toUpperCase() === kw : (i.name || '').toLowerCase().includes(kw.toLowerCase()));
+            if (customerRows.length > 0) {
+                // Sắp xếp lấy dòng giao dịch có mã hóa đơn mới nhất (mã HD tạo theo thời gian thực nên HD lớn hơn sẽ mới hơn)
+                customerRows.sort((a, b) => (b.hoaDon || '').localeCompare(a.hoaDon || ''));
+                let found = customerRows[0];
 
-        const currentSearchId = ++this.searchId;
+                this.currentGhiChu = found.ghiChu || ""; this.isAutofilling = true;
+                type === 'GID' ? (iN.value = found.name) : (iG.value = found.gid);
+                iGm.value = found.gmail || ""; if (found.goi) sG.value = found.goi; this.tínhNgàyKếtThúc();
+                NotiModule.show(`Đã tìm thấy: ${found.name}!`, "success"); setTimeout(() => this.isAutofilling = false, 100);
+            } else if (type === 'GID') { NotiModule.show(`Không thấy khách hàng: ${kw}`, "error"); }
+        }).catch(e => { console.log("Lỗi:", e); this.isAutofilling = false; });
+    },
 
-        fetch(url)
-        .then(response => response.json())
-        .then(res => {
-            if (currentSearchId !== this.searchId) return;
-            if (res.status === "success") {
 
-                this.currentGhiChu = res.data.ghiChu || ""; 
 
-                this.isAutofilling = true;
+    taiDanhSachThanhVienTheoUser: function() {
+        const container = document.getElementById('r199k-member-container'); if (!container) return;
+        const cleanUrl = this.FB_URL.replace(/\/$/, '');
+        if (this.memberEventSource) this.memberEventSource.close();
+        this.memberEventSource = new EventSource(`${cleanUrl}/r199k_members.json${this.FB_KEY ? '?auth='+this.FB_KEY : ''}`);
 
-                if (type === 'GID') {
-                    inputName.value = res.data.name;
+        const applyFilterData = (data) => {
+            const f = document.getElementById('filterStatus'); if (!f) return data;
+            return data.filter(item => { const g = (item.goi || '').trim(); return f.value === "ALL" ? true : f.value === "REGISTERED" ? (g.includes("THÁNG") || !g.includes("Hủy")) : g.includes("Hủy"); });
+        };
+
+        const renderGiaoDienSieuToc = (data) => {
+            const filteredData = applyFilterData(data), fragment = document.createDocumentFragment();
+            filteredData.forEach(item => {
+                const itemDiv = document.createElement('div'); itemDiv.className = 'member-item'; itemDiv.setAttribute('data-gid', item.gid);
+                itemDiv.innerHTML = `<div class="member-item-info" data-gid="${item.gid}"><span class="member-item-name r-click-name" style="cursor: pointer;" data-action="view-history" data-gid="${item.gid}">${item.name}</span><span class="member-item-gid" data-gid="${item.gid}">${item.gid}</span></div><span class="member-item-badge" data-gid="${item.gid}">${item.goi}</span>`;
+                fragment.appendChild(itemDiv);
+            });
+            container.innerHTML = ''; if (filteredData.length === 0) { container.innerHTML = '<div class="member-empty-state">Không có thành viên nào phù hợp bộ lọc.</div>'; return; }
+            container.appendChild(fragment);
+            container.onclick = (e) => {
+                const target = e.target, gid = target.getAttribute('data-gid'); if (!gid) return;
+                if (target.getAttribute('data-action') === 'view-history') {
+                    e.stopPropagation(); if (typeof RenewalModule !== 'undefined' && typeof RenewalModule.hienThiLichSuGiaHan === 'function') RenewalModule.hienThiLichSuGiaHan(gid);
+                } else { const inputGid = document.getElementById('r-gid'); if (inputGid) { inputGid.value = gid; this.tựĐộngTìmKiếmKháchHàng('GID'); } }
+            };
+        };
+
+        const filterElement = document.getElementById('filterStatus'); if (filterElement) filterElement.onchange = () => { if(this.cachedMembers) renderGiaoDienSieuToc(this.cachedMembers); };
+
+        this.memberEventSource.addEventListener('put', (e) => {
+            const res = JSON.parse(e.data); if (!res) return;
+            if (res.path !== "/") {
+                const parts = res.path.split('/'); const targetGid = parts[1], targetHd = parts[2];
+                if (!targetGid) return; if (!this.rawFbMembers) this.rawFbMembers = {};
+                if (res.data === null) {
+                    if (targetHd && this.rawFbMembers[targetGid]) delete this.rawFbMembers[targetGid][targetHd];
+                    if (!targetHd || Object.keys(this.rawFbMembers[targetGid] || {}).length === 0) delete this.rawFbMembers[targetGid];
                 } else {
-                    inputGid.value = res.data.gid;
+                    if (!this.rawFbMembers[targetGid]) this.rawFbMembers[targetGid] = {};
+                    targetHd ? (this.rawFbMembers[targetGid][targetHd] = res.data) : (this.rawFbMembers[targetGid] = res.data);
                 }
-                
-                inputGmail.value = res.data.gmail;
-                
-                if (res.data.goi) {
-                     selectGoi.value = res.data.goi;
-                }
-                
-                // Đồng bộ tính toán lại ngày kết thúc và ép hiển thị ngay sang cột phải
-                this.tínhNgàyKếtThúc(); 
-                
-                NotiModule.show(`Đã tìm thấy khách hàng: ${res.data.name}!`, "success");
+            } else { this.rawFbMembers = res.data || {}; }
 
-                setTimeout(() => { this.isAutofilling = false; }, 100);
-            } else if (res.status === "not_found") {
-                NotiModule.show(`Không tìm thấy khách hàng với thông tin: ${keyword}`, "error");
-            }
-        })
-        .catch(err => {
-            console.log("Lỗi tìm kiếm ngầm: ", err);
-            this.isAutofilling = false; 
+            // 🌟 ĐÃ FIX LỖI UNDEFINED: Trích xuất chính xác Object đơn lẻ [0] thay vì đẩy nguyên cả mảng lồng sâu
+            let allInvoices = [];
+            Object.keys(this.rawFbMembers).forEach(gid => {
+                if (this.rawFbMembers[gid]) {
+                    let invs = Object.values(this.rawFbMembers[gid]).filter(inv => inv && inv.gid);
+                    if (invs.length > 0) { 
+                        invs.sort((a, b) => (b.hoaDon || '').localeCompare(a.hoaDon || '')); 
+                        allInvoices.push(invs[0]); 
+                    }
+                }
+            });
+
+            this.cachedMembers = allInvoices; renderGiaoDienSieuToc(allInvoices);
         });
     },
 
-taiDanhSachThanhVienTheoUser: function() {
-    const container = document.getElementById('r199k-member-container');
-    if (!container) return;
-
-    const cacheKey = 'r199k_members_cache';
-    const cacheTimeKey = 'r199k_members_cache_time';
-    const CACHE_TIMEOUT = 5 * 60 * 1000; // 5 phút
-
-    // Hàm áp dụng logic lọc dữ liệu dựa trên giá trị của thẻ <select id="filterStatus">
-    const applyFilterData = (data) => {
-        const filterElement = document.getElementById('filterStatus');
-        if (!filterElement) return data; // Nếu không tìm thấy thẻ select bộ lọc, trả về mảng gốc ban đầu
-
-        const filterValue = filterElement.value; // Lấy giá trị đang chọn (REGISTERED, ALL, CANCELLED)
-
-        return data.filter(item => {
-            const goiText = (item.goi || '').trim();
-
-            if (filterValue === "ALL") {
-                return true; // Xem tất cả dữ liệu
-            }
-            if (filterValue === "REGISTERED") {
-                // ĐÃ ĐĂNG KÍ: Nếu chuỗi chứa chữ "THÁNG" hoặc không chứa chữ "Hủy"
-                return goiText.includes("THÁNG") || !goiText.includes("Hủy");
-            }
-            if (filterValue === "CANCELLED") {
-                // HỦY ĐĂNG KÍ: Nếu chuỗi chứa chữ "Hủy"
-                return goiText.includes("Hủy");
-            }
-            return true;
-        });
-    };
-
-    // Hàm render giao diện siêu tốc đã tích hợp bộ lọc
-    const renderGiaoDienSieuToc = (data) => {
-        // Áp dụng bộ lọc trạng thái trước khi vẽ giao diện lên màn hình
-        const filteredData = applyFilterData(data);
-
-        const fragment = document.createDocumentFragment();
-        filteredData.forEach(item => {
-            const itemDiv = document.createElement('div');
-            itemDiv.className = 'member-item';
-            itemDiv.setAttribute('data-gid', item.gid);
-            itemDiv.innerHTML = `
-                <div class="member-item-info" data-gid="${item.gid}">
-                    <span class="member-item-name r-click-name" style="cursor: pointer;" data-action="view-history" data-gid="${item.gid}">${item.name}</span>
-                    <span class="member-item-gid" data-gid="${item.gid}">${item.gid}</span>
-                </div>
-                <span class="member-item-badge" data-gid="${item.gid}">${item.goi}</span>
-            `;
-            fragment.appendChild(itemDiv);
-        });
-        
-        container.innerHTML = ''; 
-        if (filteredData.length === 0) {
-            container.innerHTML = '<div class="member-empty-state">Không có thành viên nào phù hợp bộ lọc.</div>';
-            return;
-        }
-        container.appendChild(fragment);
-
-        container.onclick = (e) => {
-            const target = e.target;
-            const gid = target.getAttribute('data-gid');
-            if (!gid) return;
-
-            if (target.getAttribute('data-action') === 'view-history') {
-                e.stopPropagation();
-                if (typeof RenewalModule !== 'undefined' && typeof RenewalModule.hienThiLichSuGiaHan === 'function') {
-                    RenewalModule.hienThiLichSuGiaHan(gid);
-                } else {
-                    NotiModule.show(`Lịch sử: ${target.innerText} (${gid})`, "success");
-                }
-            } else {
-                const inputGid = document.getElementById('r-gid');
-                if (inputGid) { inputGid.value = gid; this.tựĐộngTìmKiếmKháchHàng('GID'); }
-            }
-        };
-    };
-
-    // Gắn sự kiện onchange cho thẻ select để tự động re-render lại danh sách ngay lập tức khi chuyển tab
-    const filterElement = document.getElementById('filterStatus');
-    if (filterElement) {
-        filterElement.onchange = () => {
-            const cachedData = localStorage.getItem(cacheKey);
-            if (cachedData) {
-                // Đọc từ cache và re-render siêu tốc mà không cần gọi lại API mạng
-                renderGiaoDienSieuToc(JSON.parse(cachedData));
-            }
-        };
-    }
-
-
-    const taiDuLieuMoiTuMang = (isBackground = false) => {
-        if (this.isSubmittingMembers) return;
-        this.isSubmittingMembers = true;
-
-        if (!isBackground) container.innerHTML = '<div class="member-empty-state">Đang tải dữ liệu khách hàng...</div>';
-
-        fetch(`${this.WEB_APP_URL}?action=GET_MEMBERS`)
-        .then(response => response.ok ? response.json() : Promise.reject())
-        .then(res => {
-            if (res.status === "success" && Array.isArray(res.data) && res.data.length > 0) {
-                // Đóng dấu cục cache mới tinh vào máy
-                localStorage.setItem(cacheKey, JSON.stringify(res.data));
-                localStorage.setItem(cacheTimeKey, Date.now().toString());
-                
-                // Vẽ lại giao diện theo dữ liệu mới
-                renderGiaoDienSieuToc(res.data);
-                
-                if (isBackground && typeof NotiModule !== 'undefined') {
-                    NotiModule.show("Hệ thống đã tự động cập nhật dữ liệu mới tinh!", "success");
-                }
-            } else if (!isBackground) {
-                container.innerHTML = '<div class="member-empty-state">Chưa có thành viên nào.</div>';
-            }
-        })
-        .catch(err => {
-            console.error("Lỗi tải mạng:", err);
-            if (!isBackground) container.innerHTML = '<div class="member-empty-state">❌ Không thể tải danh sách.</div>';
-        })
-        .finally(() => {
-            this.isSubmittingMembers = false;
-        });
-    };
-
-    // ==========================================================================
-    // LOGIC XỬ LÝ CACHE THÔNG MINH CHO THIẾT BỊ MOBILE
-    // ==========================================================================
-    const cachedData = localStorage.getItem(cacheKey);
-    const cachedTime = localStorage.getItem(cacheTimeKey);
-    const now = Date.now();
-
-    if (cachedData && cachedTime) {
-        const parsedCache = JSON.parse(cachedData);
-        
-        // BƯỚC 1: Lập tức lôi dữ liệu cũ ra vẽ lên màn hình luôn (Tải tức thì 0ms cho mobile đỡ lag)
-        renderGiaoDienSieuToc(parsedCache);
-
-        // BƯỚC 2: Kiểm tra xem thời gian cache đã quá 5 phút chưa
-        if (now - cachedTime > CACHE_TIMEOUT) {
-            // Nếu quá 5 phút, tiến hành quét mới công khai
-            taiDuLieuMoiTuMang(false);
-        } else {
-            // BƯỚC 3: NÚT THẮT QUYẾT ĐỊNH: Nếu chưa quá 5 phút, âm thầm gọi API chạy ngầm để kiểm tra đơn mới
-            fetch(`${this.WEB_APP_URL}?action=GET_MEMBERS_COUNT`)
-            .then(r => r.json())
-            .then(res => {
-                // Kiểm tra xem số lượng phần tử trên Sheets trả về có khác với độ dài cục cache hiện tại không
-                if (res.status === "success" && res.count !== parsedCache.length) {
-                    console.log("🔔 Phát hiện có thành viên mới hoặc cập nhật mới trên Sheets! Tiến hành đồng bộ ngầm...");
-                    taiDuLieuMoiTuMang(true); // Gọi cập nhật ngầm đè giao diện
-                }
-            }).catch(() => {
-                // Nếu Backend không có hàm GET_MEMBERS_COUNT, ta fetch ngầm luôn link gốc để check dữ liệu
-                fetch(`${this.WEB_APP_URL}?action=GET_MEMBERS`)
-                .then(r => r.json())
-                .then(res => {
-                    if (res.status === "success" && res.data && res.data.length !== parsedCache.length) {
-                        localStorage.setItem(cacheKey, JSON.stringify(res.data));
-                        localStorage.setItem(cacheTimeKey, Date.now().toString());
-                        renderGiaoDienSieuToc(res.data);
-                    }
-                });
-            });
-        }
-    } else {
-        // Nếu trong máy hoàn toàn chưa có cache, bắt buộc tải công khai lần đầu
-        taiDuLieuMoiTuMang(false);
-    }
-},
 
 
 refreshRenewList: function () {
@@ -380,68 +246,31 @@ refreshRenewList: function () {
         const inputEnd = document.getElementById('r-end');
         const inputTien = document.getElementById('r-tien');
 
-        // 🔥 FIX ĐỒNG BỘ MOBILE 1: Nếu ở tab ĐĂNG KÝ MỚI -> Nhổ hẳn dòng Hủy ĐK ra khỏi máy
-        if (this.mode === 'NEW') {
-            const optCancel = document.getElementById('opt-cancel');
-            if (optCancel) optCancel.remove(); 
-        } 
-        // 🔥 FIX ĐỒNG BỘ MOBILE 2: Nếu ở tab GIA HẠN / HỦY -> Tự động chèn lại dòng Hủy ĐK vào menu
-        else if (this.mode === 'RENEW') {
-            const selectGoi = document.getElementById('r-goi');
-            if (selectGoi && !document.getElementById('opt-cancel')) {
-                const optNew = document.createElement('option');
-                optNew.value = 'Hủy ĐK';
-                optNew.id = 'opt-cancel';
-                optNew.innerText = 'HỦY ĐĂNG KÝ';
-                selectGoi.appendChild(optNew);
-            }
+        if (this.mode === 'NEW') { const oC = document.getElementById('opt-cancel'); if (oC) oC.remove(); } 
+        else if (this.mode === 'RENEW' && !document.getElementById('opt-cancel')) {
+            const sG = document.getElementById('r-goi'); if (sG) { const opt = new Option('HỦY ĐĂNG KÝ', 'Hủy ĐK'); opt.id = 'opt-cancel'; sG.add(opt); }
         }
 
-        // 1. Nếu chưa chọn gói (hoặc giá trị trống) -> Reset sạch thông tin hiển thị
-        if (!gói || gói === "") {
-            if (inputEnd) inputEnd.value = ""; 
-            if (inputTien) inputTien.value = "0";
-            this.capNhatKhungChamSocKhachHang();
-            return;
+        if (!gói || gói === "" || (this.mode === 'NEW' && gói === 'Hủy ĐK') || !ngàyBắtĐầuValue || ngàyBắtĐầuValue.trim() === "") {
+            if (inputEnd) inputEnd.value = ""; if (inputTien) inputTien.value = "0"; if (this.mode === 'NEW' && gói === 'Hủy ĐK') document.getElementById('r-goi').value = "";
+            this.ngayConLaiThucTe = 0; this.capNhatKhungChamSocKhachHang(); return;
         }
 
-        // 2. Chặn lỗi logic dự phòng cho hệ thống
-        if (this.mode === 'NEW' && gói === 'Hủy ĐK') {
-            if (inputEnd) inputEnd.value = "";
-            if (inputTien) inputTien.value = "0";
-            document.getElementById('r-goi').value = ""; 
-            this.capNhatKhungChamSocKhachHang();
-            return;
-        }
-
-        if (!ngàyBắtĐầuValue || ngàyBắtĐầuValue.trim() === "") {
-            if (inputEnd) inputEnd.value = "";
-            return;
-        }
-
-        let date = new Date(ngàyBắtĐầuValue);
-        if (isNaN(date.getTime())) {
-            if (inputEnd) inputEnd.value = "";
-            return;
-        }
+        let date = new Date(ngàyBắtĐầuValue); if (isNaN(date.getTime())) { if (inputEnd) inputEnd.value = ""; this.ngayConLaiThucTe = 0; return; }
+        const địnhDạngKiểuLịch = (dObj) => `ngày ${dObj.getDate()} thg ${dObj.getMonth() + 1}, ${dObj.getFullYear()}`;
         
-        const địnhDạngKiểuLịch = (dateObj) => {
-            return `ngày ${dateObj.getDate()} thg ${dateObj.getMonth() + 1}, ${dateObj.getFullYear()}`;
-        };
-        
-        // 3. Tiến hành xử lý tính toán thời hạn theo các gói hợp lệ
-        if (gói === '1 THÁNG') {
-            date.setMonth(date.getMonth() + 1);
-            if (inputEnd) inputEnd.value = địnhDạngKiểuLịch(date); 
-            if (inputTien) inputTien.value = "199000"; 
-        } else if (gói === '3 THÁNG') {
-            date.setMonth(date.getMonth() + 3);
-            if (inputEnd) inputEnd.value = địnhDạngKiểuLịch(date);
-            if (inputTien) inputTien.value = "500000";
-        } else if (gói === 'Hủy ĐK') {
-            if (inputEnd) inputEnd.value = "HỦY NGAY";
-            if (inputTien) inputTien.value = "0";
+        if (gói === '1 THÁNG') { date.setMonth(date.getMonth() + 1); if (inputEnd) inputEnd.value = địnhDạngKiểuLịch(date); if (inputTien) inputTien.value = "199000"; } 
+        else if (gói === '3 THÁNG') { date.setMonth(date.getMonth() + 3); if (inputEnd) inputEnd.value = địnhDạngKiểuLịch(date); if (inputTien) inputTien.value = "500000"; } 
+        else if (gói === 'Hủy ĐK') { if (inputEnd) inputEnd.value = "HỦY NGAY"; if (inputTien) inputTien.value = "0"; }
+
+        // 🌟 TÍNH SỐ NGÀY CÒN LẠI THỰC TẾ ĐỂ ĐẨY LÊN FIREBASE
+        let diffDays = 0;
+        if (gói !== 'Hủy ĐK') {
+            const today = new Date(); today.setHours(0, 0, 0, 0);
+            const diffTime = date - today; diffDays = Math.ceil(diffTime / 86400000);
+            if (diffDays < 0) diffDays = 0;
         }
+        this.ngayConLaiThucTe = diffDays; // Gán vào biến của module
 
         this.capNhatKhungChamSocKhachHang();
     },
@@ -564,63 +393,38 @@ refreshRenewList: function () {
         return `HD${y}${m}${d}${h}${i}${s}${rand}`;
     },
 
-guiThuChi: function(hoaDon, name, goi, tien) {
-
-    if (goi === "Hủy ĐK") {
-        return Promise.resolve();
-    }
-
-    return fetch(this.THUCHI_WEB_APP_URL, {
-        method: "POST",
-        headers: {
-            "Content-Type": "text/plain"
-        },
-        body: JSON.stringify({
-            hoaDon,
-            khachHang: name,
-            ghiChu: goi,
-            loaiGd: "R-199",
-            soTien: Number(tien),
-            mode: "THU TIỀN",
-            adminName: UserModule.uName || "ADMIN"
-        })
-    }).catch(err => {
-        console.log("Lỗi ghi Thu Chi:", err);
-    });
-},
+    guiThuChi(hD, name, goi, tien) {
+        if (goi === "Hủy ĐK") return Promise.resolve(); const cleanUrl = this.FB_URL.replace(/\/$/, ''); const bY = new Date();
+        const thoiGianTao = bY.toLocaleDateString('vi-VN') + ' ' + bY.toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'});
+        const ngayGiaoDich = bY.getFullYear() + '-' + String(bY.getMonth() + 1).padStart(2, '0') + '-' + String(bY.getDate()).padStart(2, '0');
+        
+        const payload = { hoaDon: hD, khachHang: name, ghiChu: goi, loaiGd: "R-199", soTien: Number(tien), mode: "THU TIỀN", adminName: (typeof UserModule !== 'undefined' ? UserModule.uName : "ADMIN"), thoiGian: thoiGianTao, ngayGiaoDich };
+        return fetch(`${cleanUrl}/thuchi/${hD}.json${this.FB_KEY?'?auth='+this.FB_KEY:''}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) }).catch(e => console.log("Lỗi ghi Thu Chi:", e));
+    },
 
 
-    // 🌟 HÀM MỚI BỔ SUNG: Cập nhật dữ liệu vào bộ nhớ đệm (Cache) không cần tải lại mạng
     capNhatKhachHangVaoCacheCucBo: function(newMember) {
         const cacheKey = 'r199k_members_cache';
-        let cachedData = localStorage.getItem(cacheKey);
-        let list = [];
+        let list = []; try { list = JSON.parse(localStorage.getItem(cacheKey)) || []; } catch(e) { list = []; }
 
-        if (cachedData) {
-            try { list = JSON.parse(cachedData); } catch(e) { list = []; }
-        }
-
-        // Kiểm tra xem thành viên đã có trong danh sách chưa (Tìm theo mã GID)
         const index = list.findIndex(item => item.gid === newMember.gid);
-        
         if (index !== -1) {
-            // Nếu là GIA HẠN -> Cập nhật đè thông tin mới lên dòng cũ
-            list[index] = { ...list[index], ...newMember };
+            // Gia hạn: Cập nhật đè gói mới lên bộ nhớ đệm của khách hàng cũ
+            list[index] = { ...list[index], goi: newMember.goi, name: newMember.name };
         } else {
-            // Nếu là ĐĂNG KÝ MỚI -> Đẩy lên đầu danh sách để thấy luôn đơn vừa nhập
+            // Đăng ký mới: Đẩy thực thể mới lên đầu mảng hiển thị
             list.unshift(newMember);
         }
 
-        // Lưu lại cục cache mới xuống máy
         localStorage.setItem(cacheKey, JSON.stringify(list));
         localStorage.setItem('r199k_members_cache_time', Date.now().toString());
 
-        // Ép danh sách bên phải vẽ lại giao diện ngay lập tức trong 0ms
-        if (typeof this.taiDanhSachThanhVienTheoUser === 'function') {
-            this.taiDanhSachThanhVienTheoUser(); 
-        }
+        // Ép danh sách bên phải re-render lại giao diện ngay lập tức trong 0ms
+        this.taiDanhSachThanhVienTheoUser(); 
     },
 
+
+    // 🌟 HÀM SỬA ĐỔI: Tối ưu hóa luồng xử lý khi bấm nút nhập dữ liệu
     submitR199k: function() {
         if (this.isSubmitting) return; // Chặn bấm liên tiếp gây trùng đơn
 
@@ -643,6 +447,7 @@ guiThuChi: function(hoaDon, name, goi, tien) {
             return; 
         }
 
+    // 🔥 ĐOẠN BỔ SUNG MỚI: Chặn nếu chưa chọn gói đăng ký
     if (!goi || goi === "") {
         if (typeof NotiModule !== 'undefined') {
             NotiModule.show("Bạn chưa chọn gói đăng kí!", "error");
@@ -656,63 +461,33 @@ guiThuChi: function(hoaDon, name, goi, tien) {
         const btn = document.getElementById('btn-add-r199k');
         const originalText = btn ? btn.innerText : "NHẬP DỮ LIỆU BẢNG";
         if (btn) {
-            btn.innerText = "ĐANG ĐỒNG BỘ...";
+            btn.innerText = "⏳ ĐANG ĐỒNG BỘ...";
             btn.disabled = true;
         }
         this.isSubmitting = true;
 
-        const payload = {
-            action: this.mode,
-            gid: gid,
-            name: name,
-            gmail: gmail,
-            goi: goi,
-            start: start,
-            end: end,
-            tien: tien,
-            hoaDon: hoaDon,
-            adminName: adminName
-        };
+        const payload = { action: this.mode, gid, name, gmail, goi, start, end, tien, hoaDon, adminName, ngayConLai: this.ngayConLaiThucTe || 0 };
+        const cleanUrl = this.FB_URL.replace(/\/$/, '');
+        // 🌟 CẤU TRÚC LOG MỚI: Mỗi lần gia hạn tạo 1 node hóa đơn lồng bên trong mã GID (Không bị ghi đè)
+        const targetUrl = `${cleanUrl}/r199k_members/${gid}/${hoaDon}.json${this.FB_KEY ? '?auth=' + this.FB_KEY : ''}`;
 
-        fetch(this.WEB_APP_URL, {
-            method: "POST",
-            headers: { "Content-Type": "text/plain" },
-            body: JSON.stringify(payload)
-        })
-        .then(response => response.json())
+        fetch(targetUrl, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) })
+        .then(r => r.ok ? r.json() : Promise.reject())
         .then(res => {
-            if (res.status === "success") {
-                this.guiThuChi(hoaDon, name, goi, tien)
-                .finally(() => {
-                    if (typeof ThuChiModule !== "undefined" && typeof ThuChiModule.taiHoatDongHomNay === 'function') {
-                        ThuChiModule.taiHoatDongHomNay();
-                    }
+            if (res) {
+                this.guiThuChi(hoaDon, name, goi, tien).finally(() => {
 
-                    if (typeof NotiModule !== 'undefined') {
-                        NotiModule.show("Đã đồng bộ thành viên vào bảng R-199K thành công!", "success");
-                    }
+                    this.capNhatKhachHangVaoCacheCucBo(payload);
 
-                    // 🔥 THAY THẾ LỆNH XÓA CACHE CŨ BẰNG LỆNH CẬP NHẬT TỨC THÌ NÀY:
-                    this.capNhatKhachHangVaoCacheCucBo({
-                        gid: gid,
-                        name: name,
-                        gmail: gmail,
-                        goi: goi
-                    });
-
-                    // Reset lại Form nhập liệu
                     if (document.getElementById("r-name")) document.getElementById("r-name").value = "";
-                    if (document.getElementById("r-gmail")) document.getElementById("r-gmail").value = ""; document.getElementById("r-goi").value = "";
-                    if (document.getElementById("r-start")) {
-                        document.getElementById("r-start").value = new Date().toISOString().split("T")[0];
-                    }
+                    if (document.getElementById("r-gmail")) document.getElementById("r-gmail").value = "";
+                    if (document.getElementById("r-goi")) document.getElementById("r-goi").value = "";
+                    if (document.getElementById("r-start")) document.getElementById("r-start").value = new Date().toISOString().split("T")[0];
 
-                    this.setMode("NEW");
-                    this.tựĐộngSinhGid();
-                    this.tínhNgàyKếtThúc();
+                    this.setMode("NEW"); this.tựĐộngSinhGid(); this.tínhNgàyKếtThúc();
                 });
             } else {
-                if (typeof NotiModule !== 'undefined') NotiModule.show("Có lỗi xảy ra từ máy chủ Google Sheets!", "error");
+                if (typeof NotiModule !== 'undefined') NotiModule.show("Lỗi cấu trúc phản hồi từ Firebase!", "error");
             }
         })
         .catch(err => {
@@ -720,16 +495,11 @@ guiThuChi: function(hoaDon, name, goi, tien) {
             if (typeof NotiModule !== 'undefined') NotiModule.show("Mất kết nối mạng, vui lòng kiểm tra lại!", "error");
         })
         .finally(() => {
-            this.isSubmitting = false;
-            if (btn) {
-                btn.innerText = originalText;
-                btn.disabled = false;
-            }
+            this.isSubmitting = false; if (btn) { btn.innerText = originalText; btn.disabled = false; }
         });
     }
 
 };
-
 
 document.addEventListener("DOMContentLoaded", () => {
     R199kModule.init();
