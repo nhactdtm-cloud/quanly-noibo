@@ -253,34 +253,39 @@ const R199kModule = {
                 }
             } else { this.rawFbMembers = res.data || {}; }
 
-            let allInvoices = [];
-            Object.keys(this.rawFbMembers)
-                .sort((a, b) => b.localeCompare(a)) 
-                .forEach(gid => {
-                    if (this.rawFbMembers[gid]) {
-                        let invs = Object.values(this.rawFbMembers[gid]).filter(inv => inv && inv.gid && inv.hoaDon);
-                        
-                        if (invs.length > 0) {
-                            // 🌟 GIẢI PHÁP ĐỘT PHÁ: Chuyển đổi chuỗi ngày bắt đầu sang timestamp để sắp xếp số thực tế giảm dần (Mới nhất lên đầu)
-                            invs.sort((a, b) => {
-                                const timeA = a.start ? new Date(a.start).getTime() : 0;
-                                const timeB = b.start ? new Date(b.start).getTime() : 0;
-                                
-                                // Nếu trùng ngày bắt đầu, đối chiếu tiếp theo trường số lần gia hạn (Lần lớn hơn = mới hơn)
-                                if (timeB === timeA) {
-                                    return Number(b.lanGiaHan || 0) - Number(a.lanGiaHan || 0);
-                                }
-                                return timeB - timeA;
-                            });
-                            
-                            // Nạp hóa đơn mới nhất vừa được lọc lên đầu mảng vào danh sách tổng
-                            const newestInvoice = invs[0];
-                            allInvoices.push(newestInvoice);
-                        }
+let allInvoices = [];
+Object.keys(this.rawFbMembers)
+    .sort((a, b) => b.localeCompare(a))
+    .forEach(gid => {
+        if (this.rawFbMembers[gid]) {
+            let invs = Object.values(this.rawFbMembers[gid]).filter(inv => inv && inv.gid && inv.hoaDon);
+            
+            if (invs.length > 0) {
+                // 🌟 GIẢI PHÁP ĐỘT PHÁ TRIỆT ĐỂ: Nếu có hóa đơn hủy, ưu tiên lấy hóa đơn hủy lên đầu
+                invs.sort((a, b) => {
+                    const isCancelA = (a.goi === "Hủy ĐK" || a.end === "HỦY NGAY") ? 1 : 0;
+                    const isCancelB = (b.goi === "Hủy ĐK" || b.end === "HỦY NGAY") ? 1 : 0;
+                    
+                    // Nếu một trong hai là hóa đơn hủy, đẩy hóa đơn hủy lên đầu (vị trí)
+                    if (isCancelB !== isCancelA) {
+                        return isCancelB - isCancelA;
                     }
+                    
+                    // Nếu cả hai đều không phải hủy hoặc đều là hủy, sắp xếp theo ngày bắt đầu như cũ
+                    const timeA = a.start ? new Date(a.start).getTime() : 0;
+                    const timeB = b.start ? new Date(b.start).getTime() : 0;
+                    return timeB - timeA;
                 });
 
-            this.cachedMembers = allInvoices; renderGiaoDienSieuToc(allInvoices);
+                const newestInvoice = invs[0];
+                allInvoices.push(newestInvoice);
+            }
+        }
+    });
+
+this.cachedMembers = allInvoices;
+renderGiaoDienSieuToc(allInvoices);
+
         });
     },
 
