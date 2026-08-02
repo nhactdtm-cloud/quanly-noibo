@@ -202,8 +202,9 @@ const R199kModule = {
 
         this.memberEventSource.addEventListener('put', (e) => {
             const res = JSON.parse(e.data); if (!res) return;
+            
             if (res.path !== "/") {
-                const parts = res.path.split('/'); const targetGid = parts[1], targetHd = parts[2];
+                const parts = res.path.split('/'); const targetGid = parts, targetHd = parts;
                 if (!targetGid) return; if (!this.rawFbMembers) this.rawFbMembers = {};
                 if (res.data === null) {
                     if (targetHd && this.rawFbMembers[targetGid]) delete this.rawFbMembers[targetGid][targetHd];
@@ -214,20 +215,24 @@ const R199kModule = {
                 }
             } else { this.rawFbMembers = res.data || {}; }
 
-            // 🌟 ĐÃ FIX LỖI UNDEFINED: Trích xuất chính xác Object đơn lẻ [0] thay vì đẩy nguyên cả mảng lồng sâu
             let allInvoices = [];
             Object.keys(this.rawFbMembers).forEach(gid => {
                 if (this.rawFbMembers[gid]) {
-                    let invs = Object.values(this.rawFbMembers[gid]).filter(inv => inv && inv.gid);
+                    let invs = Object.values(this.rawFbMembers[gid]).filter(inv => inv && inv.gid && inv.hoaDon);
                     if (invs.length > 0) { 
+                        // Sắp xếp các hóa đơn bên trong của 1 khách hàng lấy đơn mới nhất
                         invs.sort((a, b) => (b.hoaDon || '').localeCompare(a.hoaDon || '')); 
                         allInvoices.push(invs[0]); 
                     }
                 }
             });
 
+            // 🌟 ĐÃ FIX: Sắp xếp toàn sàn danh sách khách hàng - Khách có hóa đơn mới nhất bay lên đầu bảng lập tức
+            allInvoices.sort((a, b) => (b.hoaDon || '').localeCompare(a.hoaDon || ''));
+
             this.cachedMembers = allInvoices; renderGiaoDienSieuToc(allInvoices);
         });
+
     },
 
 
