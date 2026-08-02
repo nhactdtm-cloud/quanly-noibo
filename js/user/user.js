@@ -67,7 +67,7 @@ const UserModule = {
         
         try {
             const cleanUrl = this.FB_URL.replace(/\/$/, '');
-            const response = await fetch(`${cleanUrl}/g199k_users/${u}.json`);
+            const response = await fetch(`${cleanUrl}/noi_bo/${u}.json`);
             if (!response.ok) throw new Error("Lỗi kết nối máy chủ bảo mật!");
             
             const res = await response.json();

@@ -109,31 +109,29 @@ const R199kModule = {
 
 
     tựĐộngSinhGid: function () {
-        if (this.mode !== "NEW") return;
+    if (this.mode !== "NEW") return;
 
-        const nameInput = document.getElementById("r-name").value.trim();
-        const inputGid = document.getElementById("r-gid");
+    const nameInput = document.getElementById("r-name").value.trim();
+    const inputGid = document.getElementById("r-gid");
 
-        if (nameInput === "") {
-            inputGid.value = "TỰ ĐỘNG SINH";
-            return;
-        }
+    if (nameInput === "") {
+        inputGid.value = "TỰ ĐỘNG SINH";
+        return;
+    }
 
-        const now = new Date();
-        const yy = String(now.getFullYear()).slice(-2);
-        const mm = String(now.getMonth() + 1).padStart(2, "0");
+    // 1. Lấy toàn bộ timestamp hiện tại (gồm 13 chữ số, ví dụ: 1785647283123)
+    // Bản chất số này luôn tăng dần theo thời gian thực từng miligiây
+    const fullTimestamp = Date.now().toString();
 
-        // Lấy 6 số cuối của thời gian hiện tại
-        const seq = Date.now().toString().slice(-6);
+    // 2. Tạo thêm 3 số ngẫu nhiên để chống trùng lặp tuyệt đối (kể cả khi bấm sinh mã cùng 1 miligiây)
+    const rand = Math.floor(Math.random() * 1000)
+        .toString()
+        .padStart(3, "0");
 
-        // Tạo thêm 2 số ngẫu nhiên để chống trùng lặp dữ liệu tuyệt đối
-        const rand = Math.floor(Math.random() * 100)
-            .toString()
-            .padStart(2, "0");
+    // 3. Kết hợp lại: G + 13 số thời gian + 3 số ngẫu nhiên
+    inputGid.value = `G${fullTimestamp}${rand}`;
+},
 
-        // Gán mã GID mới vào ô nhập liệu bên trái
-        inputGid.value = `G${yy}${mm}${seq}${rand}`;
-    },
 
     tựĐộngTìmKiếmKháchHàng(type = 'GID') {
         if (this.mode !== 'RENEW' || this.isAutofilling) return;
@@ -258,26 +256,12 @@ Object.keys(this.rawFbMembers)
     .sort((a, b) => b.localeCompare(a))
     .forEach(gid => {
         if (this.rawFbMembers[gid]) {
+            // Lấy toàn bộ danh sách hóa đơn theo thứ tự gốc của Firebase
             let invs = Object.values(this.rawFbMembers[gid]).filter(inv => inv && inv.gid && inv.hoaDon);
             
             if (invs.length > 0) {
-
-                invs.sort((a, b) => {
-                    const isCancelA = (a.goi === "HẾT HẠN" || a.end === "HỦY NGAY") ? 1 : 0;
-                    const isCancelB = (b.goi === "HẾT HẠN" || b.end === "HỦY NGAY") ? 1 : 0;
-                    
-                    // Nếu một trong hai là hóa đơn hủy, đẩy hóa đơn hủy lên đầu (vị trí)
-                    if (isCancelB !== isCancelA) {
-                        return isCancelB - isCancelA;
-                    }
-                    
-                    // Nếu cả hai đều không phải hủy hoặc đều là hủy, sắp xếp theo ngày bắt đầu như cũ
-                    const timeA = a.start ? new Date(a.start).getTime() : 0;
-                    const timeB = b.start ? new Date(b.start).getTime() : 0;
-                    return timeB - timeA;
-                });
-
-                const newestInvoice = invs[0];
+                // KHÔNG SORT NỮA: Lấy luôn hóa đơn nằm ở vị trí đầu tiên (trên cùng) của Firebase
+                const newestInvoice = invs[0]; 
                 allInvoices.push(newestInvoice);
             }
         }
@@ -285,6 +269,7 @@ Object.keys(this.rawFbMembers)
 
 this.cachedMembers = allInvoices;
 renderGiaoDienSieuToc(allInvoices);
+
 
         });
     },
