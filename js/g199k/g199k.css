@@ -33,18 +33,35 @@
     box-sizing: border-box;
 }
 
-/* TAB ĐIỀU HƯỚNG (Chiếm hết 2 cột) */
+/* TAB ĐIỀU HƯỚNG (Giãn full và tăng độ lớn) */
 #p-g .card .seg {
     grid-column: span 2; 
-    display: inline-grid;
-    grid-template-columns: 1fr 1fr;
-    width: 360px;
-    max-width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr; 
+    width: 100%;                     
     background: var(--bg);
-    padding: 3px;
+    padding: 4px;                  /* Tăng nhẹ padding cho khung viền ngoài */
     border-radius: 10px;
-    margin-bottom: 2px;
+    margin-bottom: 6px;            /* Tăng khoảng cách dưới cho thoáng */
+    box-sizing: border-box;         
 }
+
+/* ĐIỀU CHỈNH CÁC NÚT TAB BÊN TRONG TO LÊN */
+#p-g .card .seg > button,
+#p-g .card .seg > div,
+#p-g .card .seg > a {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 42px;                  /* TĂNG CHIỀU CAO NÚT (Từ 36px lên 42px) */
+    font-size: var(--f-size-sm);   /* Đảm bảo dùng size chữ sm hoặc m */
+    font-weight: var(--f-weight-bold); /* Làm chữ đậm lên hẳn */
+    letter-spacing: 0.3px;         /* Giãn chữ ra một chút cho đẹp */
+    box-sizing: border-box;
+}
+
+
 
 /* ĐIỀU CHỈNH CÁC KHỐI ĐẶC BIỆT CHIẾM HẾT CHIỀU RỘNG */
 #p-g .card .gr:has(#r-gid) {

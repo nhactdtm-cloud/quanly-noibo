@@ -141,31 +141,61 @@ const R199kModule = {
         let kw = type === 'GID' ? iG.value.trim().toUpperCase() : iN.value.trim(); if ((type === 'GID' && kw.length < 5) || (type === 'NAME' && kw.length < 3)) return;
 
         const cId = ++this.searchId, cleanUrl = this.FB_URL.replace(/\/$/, '');
-        fetch(`${cleanUrl}/r199k_members.json${this.FB_KEY ? '?auth='+this.FB_KEY : ''}`)
+            fetch(`${cleanUrl}/r199k_members.json${this.FB_KEY ? '?auth='+this.FB_KEY : ''}`)
         .then(r => r.ok ? r.json() : Promise.reject()).then(res => {
             if (cId !== this.searchId || !res) return;
             
-            // 🌟 GIẢI NÉN CẤU TRÚC LỒNG: Biến đổi tất cả các hóa đơn nằm bên trong mọi GID thành mảng phẳng dạng dòng
             let allInvoices = [];
             Object.keys(res).forEach(gidKey => {
                 if (res[gidKey] && typeof res[gidKey] === 'object') {
-                    Object.values(res[gidKey]).forEach(inv => { if(inv && inv.gid) allInvoices.push(inv); });
+                    // Firebase trả về keys theo thứ tự xuất hiện trên DB (từ trên xuống dưới)
+                    Object.keys(res[gidKey]).forEach(invoiceKey => {
+                        let invData = res[gidKey][invoiceKey];
+                        if (invData && typeof invData === 'object') {
+                            allInvoices.push({
+                                ...invData,
+                                hoaDon: invoiceKey, 
+                                gid: invData.gid || gidKey
+                            });
+                        }
+                    });
                 }
             });
 
             // Tìm tất cả các dòng giao dịch của khách hàng này
             let customerRows = allInvoices.filter(i => type === 'GID' ? (i.gid || '').toUpperCase() === kw : (i.name || '').toLowerCase().includes(kw.toLowerCase()));
+            
             if (customerRows.length > 0) {
-                // Sắp xếp lấy dòng giao dịch có mã hóa đơn mới nhất (mã HD tạo theo thời gian thực nên HD lớn hơn sẽ mới hơn)
-                customerRows.sort((a, b) => (b.hoaDon || '').localeCompare(a.hoaDon || ''));
-                let found = customerRows[0];
+                // 🌟 FIX CHÍNH TẠI ĐÂY: KHÔNG DÙNG HÀM SORT THEO CHỮ NỮA
+                // Để lấy hóa đơn số 2 (hàng bên trên), ta lấy phần tử đầu tiên [0] của mảng dữ liệu gốc Firebase trả về
+                let found = customerRows[0]; 
 
-                this.currentGhiChu = found.ghiChu || ""; this.isAutofilling = true;
+                // Mẹo kiểm tra: Nếu DB của bạn bị ngược, hãy đổi [0] thành phần tử cuối cùng:
+                // let found = customerRows[customerRows.length - 1];
+
+                this.currentGhiChu = found.ghiChu || ""; 
+                this.isAutofilling = true;
+                
                 type === 'GID' ? (iN.value = found.name) : (iG.value = found.gid);
-                iGm.value = found.gmail || ""; if (found.goi) sG.value = found.goi; this.tínhNgàyKếtThúc();
-                NotiModule.show(`Đã tìm thấy: ${found.name}!`, "success"); setTimeout(() => this.isAutofilling = false, 100);
-            } else if (type === 'GID') { NotiModule.show(`Không thấy khách hàng: ${kw}`, "error"); }
+                iGm.value = found.gmail || ""; 
+                
+                // Đổ dữ liệu vào Gói đăng ký và ép giao diện cập nhật
+                if (found.goi) {
+                    sG.value = found.goi.toString().trim().toUpperCase();
+                    // Kích hoạt sự kiện đổi để giao diện (hoặc hàm tính ngày) nhận biết
+                    sG.dispatchEvent(new Event('change'));
+                }
+                
+                // Chạy hàm tính toán lại ngày kết thúc
+                this.tínhNgàyKếtThúc();
+                
+                NotiModule.show(`Đã tìm thấy: ${found.name}!`, "success"); 
+                setTimeout(() => this.isAutofilling = false, 100);
+            } else if (type === 'GID') { 
+                NotiModule.show(`Không thấy khách hàng: ${kw}`, "error"); 
+            }
         }).catch(e => { console.log("Lỗi:", e); this.isAutofilling = false; });
+
     },
 
 
@@ -419,7 +449,6 @@ const R199kModule = {
     },
 
 
-    // 🌟 HÀM SỬA ĐỔI: Tối ưu hóa luồng xử lý khi bấm nút nhập dữ liệu
     submitR199k: function() {
         if (this.isSubmitting) return; // Chặn bấm liên tiếp gây trùng đơn
 
@@ -442,16 +471,25 @@ const R199kModule = {
             return; 
         }
 
-    // 🔥 ĐOẠN BỔ SUNG MỚI: Chặn nếu chưa chọn gói đăng ký
-    if (!goi || goi === "") {
-        if (typeof NotiModule !== 'undefined') {
-            NotiModule.show("Bạn chưa chọn gói đăng kí!", "error");
-        } else {
-            alert("Bạn chưa chọn gói đăng kí!");
+        // 🔥 ĐOẠN BỔ SUNG MỚI: Chặn nếu chưa chọn gói đăng ký
+        if (!goi || goi === "") {
+            if (typeof NotiModule !== 'undefined') {
+                NotiModule.show("Bạn chưa chọn gói đăng kí!", "error");
+            } else {
+                alert("Bạn chưa chọn gói đăng kí!");
+            }
+            document.getElementById('r-goi').focus();
+            return;
         }
-        document.getElementById('r-goi').focus();
-        return;
-    }
+
+        // 🌟 XỬ LÝ FIX TRIỆT ĐỂ LỖI NGÀY BẮT ĐẦU BỊ NGƯỢC (Đổi YYYY-MM-DD thành DD/MM/YYYY)
+        let formattedStart = start;
+        if (start && start.includes("-")) {
+            const parts = start.split("-"); // Cắt chuỗi "2026-08-02" -> ["2026", "08", "02"]
+            if (parts.length === 3) {
+                formattedStart = `${parts[2]}/${parts[1]}/${parts[0]}`; // Ghép lại -> "02/08/2026"
+            }
+        }
 
         const btn = document.getElementById('btn-add-r199k');
         const originalText = btn ? btn.innerText : "NHẬP DỮ LIỆU BẢNG";
@@ -461,7 +499,8 @@ const R199kModule = {
         }
         this.isSubmitting = true;
 
-        const payload = { action: this.mode, gid, name, gmail, goi, start, end, tien, hoaDon, adminName, ngayConLai: this.ngayConLaiThucTe || 0 };
+        // 🌟 ĐÃ CẬP NHẬT: Gửi ngày bắt đầu đã định dạng chuẩn (start: formattedStart) lên Firebase
+        const payload = { action: this.mode, gid, name, gmail, goi, start: formattedStart, end, tien, hoaDon, adminName, ngayConLai: this.ngayConLaiThucTe || 0 };
         const cleanUrl = this.FB_URL.replace(/\/$/, '');
         // 🌟 CẤU TRÚC LOG MỚI: Mỗi lần gia hạn tạo 1 node hóa đơn lồng bên trong mã GID (Không bị ghi đè)
         const targetUrl = `${cleanUrl}/r199k_members/${gid}/${hoaDon}.json${this.FB_KEY ? '?auth=' + this.FB_KEY : ''}`;
@@ -470,7 +509,34 @@ const R199kModule = {
         .then(r => r.ok ? r.json() : Promise.reject())
         .then(res => {
             if (res) {
-                this.guiThuChi(hoaDon, name, goi, tien).finally(() => {
+                // Mảng chứa các tiến trình bất đồng bộ (Thu chi & Gửi email)
+                let asyncTasks = [this.guiThuChi(hoaDon, name, goi, tien)];
+
+                // 🌟 THÊM MỚI: Tự động gọi Apps Script để gửi mail nếu trường gmail có dữ liệu
+                if (gmail && gmail.includes("@")) {
+                    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwPrzosseUHUOiJX6bzVhYvD8OxCREzbE2c9jr8u2Z1F46XGL0fDBBISQjkyW4Cdzz5/exec";
+                    
+                    const mailPromise = fetch(APPS_SCRIPT_URL, {
+                        method: "POST",
+                        mode: "no-cors", // Bỏ qua phân tách CORS từ trình duyệt
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            action: "sendMailR199k",
+                            gid: gid,
+                            name: name,
+                            gmail: gmail,
+                            goi: goi,
+                            start: formattedStart, // 🌟 ĐÃ CẬP NHẬT: Gửi ngày đã sửa định dạng sang Apps Script
+                            end: end,
+                            hoaDon: hoaDon
+                        })
+                    }).catch(errMail => console.error("Lỗi gọi hàm gửi mail:", errMail));
+                    
+                    asyncTasks.push(mailPromise);
+                }
+
+                // Chờ tất cả tác vụ hoàn thành (kể cả gửi mail thành công hay lỗi) rồi mới xóa form
+                Promise.allSettled(asyncTasks).finally(() => {
                     if (typeof ThuChiModule !== "undefined" && typeof ThuChiModule.taiHoatDongHomNay === 'function')
                         ThuChiModule.taiHoatDongHomNay();
 
