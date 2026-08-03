@@ -107,7 +107,20 @@
     justify-content: center !important;
     transition: var(--transition) !important;
     box-sizing: border-box !important;
+
+    /* 🎯 TẠO KHOẢNG CÁCH GIỮA ICON MÁY IN VÀ CHỮ IN HÓA ĐƠN */
+    gap: 6px !important; 
 }
+
+/* Khử khoảng cách margin-right mặc định của hệ thống emoji khi nằm trong nút IN */
+.ui-btn-print .ui-emoji-container {
+    margin-right: 0 !important;
+    padding: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
 
 /* Hiệu ứng hover nhẹ nhàng cho nút in */
 .ui-btn-print:hover {

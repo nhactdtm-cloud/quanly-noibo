@@ -44,6 +44,7 @@ const EMOJI_LIBRARY = {
     "✅": "success.svg",
     "❌": "error.svg",
     "⚠️": "warning.svg",
+    "may-in": "may-in.svg",
     "delete": "delete.svg",
     "bat-dau": "bat-dau.svg",
     "ket-thuc": "ket-thuc.svg",
