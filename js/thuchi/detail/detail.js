@@ -2,9 +2,18 @@
 let thoiGianThongBaoXoaGanNhat = 0;
 
 function moChiTietHoaDon(maHD) {
-    khoiTaoModalHTML(); const m = document.getElementById('detailModal'), c = document.getElementById('detailRowsContainer'), b = document.getElementById('detailDeleteBtn');
+    khoiTaoModalHTML(); 
+    const m = document.getElementById('detailModal'), 
+          c = document.getElementById('detailRowsContainer'), 
+          b = document.getElementById('detailDeleteBtn');
+          
     if (m) m.classList.add('active');
-    if (b) { b.innerText = "XÓA HÓA ĐƠN"; b.disabled = false; b.style.background = "#ef4444"; b.setAttribute('onclick', `xoaHoaDon('${maHD}')`); }
+    if (b) { 
+        b.innerText = "XÓA HÓA ĐƠN"; 
+        b.disabled = false; 
+        b.style.background = "#ef4444"; 
+        b.setAttribute('onclick', `xoaHoaDon('${maHD}')`); 
+    }
 
     const item = (ThuChiModule.duLieuGiaoDichHomNay || []).find(d => d.hoaDon === maHD);
     if (item) {
@@ -15,7 +24,7 @@ function moChiTietHoaDon(maHD) {
                 <span class="detail-value" 
                       style="color:#1e40af; cursor:pointer; font-weight:bold;" 
                       title="Click để sao chép"
-                      onclick="navigator.clipboard.writeText('${item.hoaDon}'); alert('Đã sao chép: ${item.hoaDon}');">
+                      onclick="navigator.clipboard.writeText('${item.hoaDon}').then(() => NotiModule.show('Đã sao chép: ${item.hoaDon}', 'success'))">
                     ${item.hoaDon}
                 </span>
             </div>
@@ -28,8 +37,11 @@ function moChiTietHoaDon(maHD) {
             <div class="detail-row"><span class="detail-label">Trạng Thái:</span><span class="detail-value" style="color:green;"> HOÀN THÀNH</span></div>
             <div class="detail-row"><span class="detail-label">Nhân Viên:</span><span class="detail-value">${item.adminName || 'ADMIN'}</span></div>
         `;
-    } else { c.innerHTML = '<div style="text-align:center;color:red;padding:20px 0;font-size:14px;">Không tìm thấy thông tin đơn hàng!</div>'; }
+    } else { 
+        c.innerHTML = '<div style="text-align:center;color:red;padding:20px 0;font-size:14px;">Không tìm thấy thông tin đơn hàng!</div>'; 
+    }
 }
+
 
 
 function khoiTaoModalHTML() {

@@ -66,7 +66,11 @@ const RenewalModule = {
                         <div class="renewal-time-line">
                             <div class="time-line-row"><span>📅 Bắt đầu:</span> <b>${startFmt}</b></div>
                             <div class="time-line-row"><span>⌛ Kết thúc:</span> <b>${item.end || '--/--/----'}</b></div>
-                            <div class="time-line-row"><span class="renewal-days-left ${diff < 0 || item.goi === 'HẾT HẠN' ? 'expired' : 'active'}">⏱️ ${labelDays}</span></div>
+    <div class="time-line-row">
+        <span class="renewal-days-left ${diff < 0 || item.goi === 'HẾT HẠN' ? 'expired' : 'active'}">
+            <span data-emoji="⏱️"></span> ${labelDays}
+        </span>
+    </div>
                             <div class="renewal-invoice-text">Mã HD: ${item.hoaDon || 'Không có'}</div>
                         </div>
                         <div class="renewal-action-area">

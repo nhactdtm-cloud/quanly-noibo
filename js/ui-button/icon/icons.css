@@ -114,3 +114,18 @@
     width: 24px;   
     height: 24px; 
 }
+
+/* - Emoji ----------- */
+
+.ui-emoji-container {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: middle;
+}
+
+.ui-emoji-img {
+    width: 1.2em;  /* Tự động co giãn theo kích thước chữ (font-size) của thẻ cha */
+    height: 1.2em;
+    object-fit: contain;
+}
