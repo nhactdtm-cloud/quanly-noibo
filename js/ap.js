@@ -26,6 +26,25 @@ window.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btn-add-data').addEventListener('click', () => ThuChiModule.subData());
 });
 
+// ==========================================================================
+// TỰ ĐỘNG KHỞI CHẠY EMOJI CHO MỌI GIAO DIỆN ĐỘNG (DÁN VÀO CUỐI APP.JS)
+// ==========================================================================
+if (typeof renderEmojis === 'function') {
+    const emojiObserver = new MutationObserver((mutations) => {
+        // Kiểm tra xem trên trang có xuất hiện thẻ data-emoji chưa được render hay không
+        const hasNewEmoji = document.querySelector('[data-emoji]:not(.ui-emoji-container)');
+        if (hasNewEmoji) {
+            renderEmojis();
+        }
+    });
+
+    // Cấu hình camera giám sát toàn bộ sự thay đổi của các thẻ HTML trên trang web
+    emojiObserver.observe(document.body, {
+        childList: true,
+        subtree: true
+    });
+}
+
 
 const IdHoaDonModule = {
     sinhMaDuyNhat() {

@@ -64,17 +64,14 @@ const RenewalModule = {
                     </div>
                     <div class="renewal-item-body">
                         <div class="renewal-time-line">
-                            <div class="time-line-row"><span>📅 Bắt đầu:</span> <b>${startFmt}</b></div>
-                            <div class="time-line-row"><span>⌛ Kết thúc:</span> <b>${item.end || '--/--/----'}</b></div>
-    <div class="time-line-row">
-        <span class="renewal-days-left ${diff < 0 || item.goi === 'HẾT HẠN' ? 'expired' : 'active'}">
-            <span data-emoji="⏱️"></span> ${labelDays}
-        </span>
-    </div>
+                            <div class="renewal-days-left ..."><span><span data-emoji="bat-dau"></span> Bắt đầu:</span> <b>${startFmt}</b></div>
+                            <div class="renewal-days-left ..."><span><span data-emoji="ket-thuc"></span> Kết thúc:</span> <b>${item.end || '--/--/----'}</b></div>
+                            <span class="renewal-days-left ..."><span data-emoji="con-lai"></span> ${labelDays}</span>
                             <div class="renewal-invoice-text">Mã HD: ${item.hoaDon || 'Không có'}</div>
                         </div>
                         <div class="renewal-action-area">
-                            <button class="renewal-delete-item-btn" title="Xóa giao dịch lỗi">🗑️ Xóa</button>
+                            <button class="renewal-delete-item-btn" title="Xóa giao dịch lỗi"><span data-emoji="delete"></span></button>
+
                         </div>
                     </div>
                 `;

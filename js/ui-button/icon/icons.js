@@ -36,48 +36,48 @@ function renderIcons() {
     });
 }
 
-// Tự động chạy lần đầu khi tải trang
-document.addEventListener("DOMContentLoaded", () => {
-    renderIcons();
-});
-
 //---------------------------------------------------
 
-// 1. Danh sách cấu hình: Cứ gặp emoji này thì lấy link ảnh tương ứng
+// Cấu hình danh sách file ảnh tương ứng cho từng Emoji
 const EMOJI_LIBRARY = {
-    "ℹ️": "data/img/emoji/info.svg",
-    "✅": "data/img/emoji/success.svg",
-    "❌": "data/img/emoji/error.svg",
-    "⚠️": "data/img/emoji/warning.svg",
-    "⏱️": "data/img/icon/community.svg"
-    // Bạn có thể dán link ảnh dạng url web vào đây vẫn chạy tốt, ví dụ:
-    // "🍎": "https://example.com"
+    "ℹ️": "info.svg",
+    "✅": "success.svg",
+    "❌": "error.svg",
+    "⚠️": "warning.svg",
+    "delete": "delete.svg",
+    "bat-dau": "bat-dau.svg",
+    "ket-thuc": "ket-thuc.svg",
+    "con-lai": "con-lai.svg" // Tên file ảnh nằm trong thư mục emoji của bạn
 };
 
-// 2. Hàm quét và chuyển đổi link ảnh thành thẻ <img>
+// Đường dẫn thư mục gốc chung cho Emoji (Giống như ICON_BASE_PATH)
+const EMOJI_BASE_PATH = "data/img/emoji/";
+
+// Hàm quét và chuyển đổi cấu hình emoji thành thẻ <img>
 function renderEmojis() {
     const emojiElements = document.querySelectorAll("[data-emoji]");
     
     emojiElements.forEach(element => {
-        // Nếu bên trong đã có ảnh rồi thì bỏ qua không chèn lại
+        // Nếu bên trong đã có ảnh rồi thì bỏ qua không chèn lại tránh lặp cấu trúc
         if (element.querySelector('.ui-emoji-img')) return;
 
         const emojiChar = element.getAttribute("data-emoji");
         
-        // Nếu tìm thấy link ảnh cấu hình cho emoji này
+        // Nếu tìm thấy file cấu hình cho emoji này
         if (EMOJI_LIBRARY[emojiChar]) {
-            const imgUrl = EMOJI_LIBRARY[emojiChar];
+            const fileName = EMOJI_LIBRARY[emojiChar];
+            const fullPath = `${EMOJI_BASE_PATH}${fileName}`; // Ghép đường dẫn chung
             
             // Tạo thẻ img và truyền link ảnh vào thuộc tính src
-            element.innerHTML = `<img src="${imgUrl}" alt="${emojiChar}" class="ui-emoji-img">`;
+            element.innerHTML = `<img src="${fullPath}" alt="${emojiChar}" class="ui-emoji-img">`;
             element.classList.add("ui-emoji-container");
         } else {
-            console.warn(`[Emoji Error]: Chưa cấu hình link ảnh cho emoji "${emojiChar}"`);
+            console.warn(`[Emoji Error]: Chưa cấu hình file ảnh cho emoji "${emojiChar}"`);
         }
     });
 }
 
-// 3. Tự động chạy khi trang web tải xong
+// Tự động kích hoạt quét cả Icon và Emoji khi trang web tải xong lần đầu
 document.addEventListener("DOMContentLoaded", () => {
     renderIcons();
     renderEmojis();
