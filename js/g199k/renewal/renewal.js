@@ -15,7 +15,7 @@ hienThiLichSuGiaHan(gid) {
         const cfg = this.getFBConfig();
         fetch(`${cfg.url}/r199k_members/${gid}.json?_nocache=${Date.now()}${cfg.key ? '&auth='+cfg.key : ''}`)
         .then(r => r.ok ? r.json() : Promise.reject()).then(res => {
-            if (!res) { hC.innerHTML = '<div class="renewal-empty">⚠️ Không có lịch sử dữ liệu.</div>'; return; }
+            if (!res) { hC.innerHTML = '<div class="renewal-empty"><div data-emoji="warning"></div>Không có lịch sử dữ liệu.</div>'; return; }
             
             let invoiceObj = res;
             if (res.history) {
@@ -26,7 +26,7 @@ hienThiLichSuGiaHan(gid) {
             let data = Object.values(invoiceObj).filter(item => item && typeof item === 'object' && item.hoaDon);
             
             if (data.length === 0) {
-                hC.innerHTML = '<div class="renewal-empty">⚠️ Không tìm thấy bản ghi hóa đơn hợp lệ.</div>';
+                hC.innerHTML = '<div class="renewal-empty"><div data-emoji="warning"></div>Không tìm thấy bản ghi hóa đơn hợp lệ.</div>';
                 return;
             }
 
@@ -83,7 +83,7 @@ hienThiLichSuGiaHan(gid) {
                     this.xoaGiaoDichLoiByHoaDon(item.hoaDon, item.soLanGiaHanThucTe, rowDiv, item.adminName);
                 });
             });
-        }).catch(err => { console.error("Lỗi:", err); tC.innerText = `📜 Lịch Sử Gia Hạn: ${gid}`; hC.innerHTML = '<div class="renewal-empty">⚠️ Không thể kết nối dữ liệu.</div>'; });
+        }).catch(err => { console.error("Lỗi:", err); tC.innerText = `📜 Lịch Sử Gia Hạn: ${gid}`; hC.innerHTML = '<div class="renewal-empty"><div data-emoji="warning"></div>Không thể kết nối dữ liệu.</div>'; });
     },
 
 
@@ -110,7 +110,7 @@ hienThiLichSuGiaHan(gid) {
             NotiModule.show("Đã xóa giao dịch rác thành công!", "success"); elementDiv.remove();
             
             const container = document.getElementById('renewal-history-list');
-            if (container && container.children.length === 0) container.innerHTML = '<div class="renewal-empty">⚠️ Không còn lịch sử gia hạn nào.</div>';
+            if (container && container.children.length === 0) container.innerHTML = '<div class="renewal-empty"><div data-emoji="warning"></div>Không còn lịch sử gia hạn nào.</div>';
         })
         .catch(err => { elementDiv.style.opacity = "1"; elementDiv.style.pointerEvents = "auto"; alert("Lỗi mạng xóa thất bại!"); });
     },
