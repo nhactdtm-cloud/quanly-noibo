@@ -424,116 +424,154 @@ const payload = {
     },
 
 
-    submitR199k: function() {
-        if (this.isSubmitting) return; // Chặn bấm liên tiếp gây trùng đơn
+submitR199k: function() {
+    if (this.isSubmitting) return; // Chặn bấm liên tiếp gây trùng đơn
 
-        const gid = document.getElementById('r-gid').value.trim().toUpperCase();
-        const name = document.getElementById('r-name').value.trim();
-        const gmail = document.getElementById('r-gmail').value.trim();
-        const goi = document.getElementById('r-goi').value;
-        const start = document.getElementById('r-start').value;
-        const end = document.getElementById('r-end').value;
-        const tien = document.getElementById('r-tien').value;
-        const hoaDon = this.taoHoaDon();
-        const adminName = (typeof UserModule !== 'undefined' ? UserModule.uName : "ADMIN");
+    const gid = document.getElementById('r-gid').value.trim().toUpperCase();
+    const name = document.getElementById('r-name').value.trim();
+    const gmail = document.getElementById('r-gmail').value.trim();
+    const goi = document.getElementById('r-goi').value;
+    const start = document.getElementById('r-start').value;
+    const end = document.getElementById('r-end').value;
+    const tien = document.getElementById('r-tien').value;
+    const hoaDon = this.taoHoaDon();
+    const adminName = (typeof UserModule !== 'undefined' ? UserModule.uName : "ADMIN");
 
-        if (this.mode === 'RENEW' && (!gid || gid === "TỰ ĐỘNG SINH")) {
-            if (typeof NotiModule !== 'undefined') NotiModule.show("Vui lòng gõ mã GID để tìm kiếm khách hàng gia hạn!", "error");
-            return;
+    if (this.mode === 'RENEW' && (!gid || gid === "TỰ ĐỘNG SINH")) {
+        if (typeof NotiModule !== 'undefined') NotiModule.show("Vui lòng gõ mã GID để tìm kiếm khách hàng gia hạn!", "error");
+        return;
+    }
+    if (!name) { 
+        if (typeof NotiModule !== 'undefined') NotiModule.show("Vui lòng gõ tên khách hàng!", "error");  
+        return; 
+    }
+
+    if (!goi || goi === "") {
+        if (typeof NotiModule !== 'undefined') {
+            NotiModule.show("Bạn chưa chọn gói đăng kí!", "error");
+        } else {
+            alert("Bạn chưa chọn gói đăng kí!");
         }
-        if (!name) { 
-            if (typeof NotiModule !== 'undefined') NotiModule.show("Vui lòng gõ tên khách hàng!", "error");  
-            return; 
-        }
+        document.getElementById('r-goi').focus();
+        return;
+    }
 
-        // 🔥 ĐOẠN BỔ SUNG MỚI: Chặn nếu chưa chọn gói đăng ký
-        if (!goi || goi === "") {
-            if (typeof NotiModule !== 'undefined') {
-                NotiModule.show("Bạn chưa chọn gói đăng kí!", "error");
-            } else {
-                alert("Bạn chưa chọn gói đăng kí!");
+    // 🌟 HÀM ÉP ĐỊNH DẠNG NGÀY VỀ DD/MM/YYYY TUYỆT ĐỐI
+    function chuanHoaNgayVN(dateInputValue) {
+        if (!dateInputValue) return "";
+        let inputStr = String(dateInputValue).trim();
+        
+        // Trường hợp 1: Định dạng YYYY-MM-DD (Chuẩn ô input date)
+        if (inputStr.includes("-")) {
+            const parts = inputStr.split("-");
+            if (parts.length === 3 && parts[0].length === 4) {
+                return `${parts[2].padStart(2, '0')}/${parts[1].padStart(2, '0')}/${parts[0]}`;
             }
-            document.getElementById('r-goi').focus();
-            return;
         }
-
-        // 🌟 XỬ LÝ FIX TRIỆT ĐỂ LỖI NGÀY BẮT ĐẦU BỊ NGƯỢC (Đổi YYYY-MM-DD thành DD/MM/YYYY)
-        let formattedStart = start;
-        if (start && start.includes("-")) {
-            const parts = start.split("-"); // Cắt chuỗi "2026-08-02" -> ["2026", "08", "02"]
+        
+        // Trường hợp 2: Định dạng YYYY/MM/DD hoặc DD/MM/YYYY có sẵn dấu gạch chéo
+        if (inputStr.includes("/")) {
+            const parts = inputStr.split("/");
             if (parts.length === 3) {
-                formattedStart = `${parts[2]}/${parts[1]}/${parts[0]}`; // Ghép lại -> "02/08/2026"
+                if (parts[0].length === 4) { // YYYY/MM/DD
+                    return `${parts[2].padStart(2, '0')}/${parts[1].padStart(2, '0')}/${parts[0]}`;
+                }
+                return `${parts[0].padStart(2, '0')}/${parts[1].padStart(2, '0')}/${parts[2]}`; // DD/MM/YYYY
             }
         }
-
-        const btn = document.getElementById('btn-add-r199k');
-        const originalText = btn ? btn.innerText : "NHẬP DỮ LIỆU BẢNG";
-        if (btn) {
-            btn.innerText = "ĐANG ĐỒNG BỘ...";
-            btn.disabled = true;
+        
+        // Trường hợp 3: Đối tượng Date biến thể hoặc chứa chữ tự nhiên (Ví dụ: "4 thg 9, 2026")
+        try {
+            // Lọc bỏ chữ "thg" và các ký tự tiếng Việt để chuyển sang dạng số nếu cần parse Date
+            let cleanStr = inputStr.replace(/thg\s*/gi, '').replace(/,/g, '');
+            const d = new Date(cleanStr);
+            if (!isNaN(d.getTime())) {
+                const day = String(d.getDate()).padStart(2, '0');
+                const month = String(d.getMonth() + 1).padStart(2, '0');
+                const year = d.getFullYear();
+                return `${day}/${month}/${year}`;
+            }
+        } catch (e) {
+            console.error("Lỗi parse ngày:", e);
         }
-        this.isSubmitting = true;
+        
+        return inputStr; // Trả về chuỗi gốc nếu không thể bóc tách
+    }
 
-        // 🌟 ĐÃ CẬP NHẬT: Gửi ngày bắt đầu đã định dạng chuẩn (start: formattedStart) lên Firebase
-        const payload = { action: this.mode, gid, name, gmail, goi, start: formattedStart, end, tien, hoaDon, adminName, ngayConLai: this.ngayConLaiThucTe || 0 };
-        const cleanUrl = this.FB_URL.replace(/\/$/, '');
-        // 🌟 CẤU TRÚC LOG MỚI: Mỗi lần gia hạn tạo 1 node hóa đơn lồng bên trong mã GID (Không bị ghi đè)
-        const targetUrl = `${cleanUrl}/r199k_members/${gid}/${hoaDon}.json${this.FB_KEY ? '?auth=' + this.FB_KEY : ''}`;
+    // Định dạng đồng bộ cả 2 ngày sang dạng chuỗi văn bản DD/MM/YYYY sạch
+    const formattedStart = chuanHoaNgayVN(start);
+    const formattedEnd = chuanHoaNgayVN(end);
 
-        fetch(targetUrl, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) })
-        .then(r => r.ok ? r.json() : Promise.reject())
-        .then(res => {
-            if (res) {
-                // Mảng chứa các tiến trình bất đồng bộ (Thu chi & Gửi email)
-                let asyncTasks = [this.guiThuChi(gid, hoaDon, name, goi, tien)];
+    const btn = document.getElementById('btn-add-r199k');
+    const originalText = btn ? btn.innerText : "NHẬP DỮ LIỆU BẢNG";
+    if (btn) {
+        btn.innerText = "ĐANG ĐỒNG BỘ...";
+        btn.disabled = true;
+    }
+    this.isSubmitting = true;
 
-                // 🌟 THÊM MỚI: Tự động gọi Apps Script để gửi mail nếu trường gmail có dữ liệu
-                if (gmail && gmail.includes("@") && goi !== 'HẾT HẠN') {
-                    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwPrzosseUHUOiJX6bzVhYvD8OxCREzbE2c9jr8u2Z1F46XGL0fDBBISQjkyW4Cdzz5/exec";
-                    
-                    const mailPromise = fetch(APPS_SCRIPT_URL, {
-                        method: "POST",
-                        mode: "no-cors", // Bỏ qua phân tách CORS từ trình duyệt
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                            action: "sendMailR199k",
-                            gid: gid,
-                            name: name,
-                            gmail: gmail,
-                            goi: goi,
-                            start: formattedStart, // 🌟 ĐÃ CẬP NHẬT: Gửi ngày đã sửa định dạng sang Apps Script
-                            end: end,
-                            hoaDon: hoaDon
-                        })
-                    }).catch(errMail => console.error("Lỗi gọi hàm gửi mail:", errMail));
-                    
-                    asyncTasks.push(mailPromise);
+    // Gửi ngày bắt đầu và ngày kết thúc đã được làm sạch lên Firebase
+    const payload = { action: this.mode, gid, name, gmail, goi, start: formattedStart, end: formattedEnd, tien, hoaDon, adminName, ngayConLai: this.ngayConLaiThucTe || 0 };
+    const cleanUrl = this.FB_URL.replace(/\/$/, '');
+    const targetUrl = `${cleanUrl}/r199k_members/${gid}/${hoaDon}.json${this.FB_KEY ? '?auth=' + this.FB_KEY : ''}`;
+
+    fetch(targetUrl, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) })
+    .then(r => r.ok ? r.json() : Promise.reject())
+    .then(res => {
+        if (res) {
+            // Tiến trình xử lý thu chi nội bộ cần đợi
+            let asyncTasks = [this.guiThuChi(gid, hoaDon, name, goi, tien)];
+
+            // GỬI SANG GOOGLE APPS SCRIPT CHẠY NGẦM - KHÔNG BẮT TRÌNH DUYỆT ĐỢI
+            if (gmail && gmail.includes("@") && goi !== 'HẾT HẠN') {
+                const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwPrzosseUHUOiJX6bzVhYvD8OxCREzbE2c9jr8u2Z1F46XGL0fDBBISQjkyW4Cdzz5/exec";
+                
+                fetch(APPS_SCRIPT_URL, {
+                    method: "POST",
+                    mode: "no-cors", 
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        action: "sendMailR199k",
+                        gid: gid,
+                        name: name,
+                        gmail: gmail,
+                        goi: goi,
+                        start: formattedStart, // Chuỗi DD/MM/YYYY thuần túy
+                        end: formattedEnd,     // Chuỗi DD/MM/YYYY thuần túy
+                        hoaDon: hoaDon
+                    })
+                }).catch(errMail => console.error("Lỗi gọi hàm gửi mail chạy ngầm:", errMail));
+            }
+
+            // Hoàn thành form ngay lập tức mà không bị hoãn do Apps Script chậm phản hồi
+            Promise.allSettled(asyncTasks).finally(() => {
+                if (typeof ThuChiModule !== "undefined" && typeof ThuChiModule.taiHoatDongHomNay === 'function')
+                    ThuChiModule.taiHoatDongHomNay();
+
+                if (document.getElementById("r-name")) document.getElementById("r-name").value = "";
+                if (document.getElementById("r-gmail")) document.getElementById("r-gmail").value = "";
+                if (document.getElementById("r-goi")) document.getElementById("r-goi").value = "";
+                
+                // Trả ô input chọn ngày về định dạng ngày hôm nay (YYYY-MM-DD chuẩn HTML5)
+                if (document.getElementById("r-start")) {
+                    document.getElementById("r-start").value = new Date().toISOString().split("T")[0];
                 }
 
-                // Chờ tất cả tác vụ hoàn thành (kể cả gửi mail thành công hay lỗi) rồi mới xóa form
-                Promise.allSettled(asyncTasks).finally(() => {
-                    if (typeof ThuChiModule !== "undefined" && typeof ThuChiModule.taiHoatDongHomNay === 'function')
-                        ThuChiModule.taiHoatDongHomNay();
+                this.setMode("NEW"); this.tựĐộngSinhGid(); this.tínhNgàyKếtThúc();
+            });
+        } else {
+            if (typeof NotiModule !== 'undefined') NotiModule.show("Lỗi cấu trúc phản hồi!", "error");
+        }
+    })
+    .catch(err => {
+        console.error("Lỗi đồng bộ hệ thống:", err);
+        if (typeof NotiModule !== 'undefined') NotiModule.show("Mất kết nối mạng, vui lòng kiểm tra lại!", "error");
+    })
+    .finally(() => {
+        this.isSubmitting = false; if (btn) { btn.innerText = originalText; btn.disabled = false; }
+    });
+}
 
-                    if (document.getElementById("r-name")) document.getElementById("r-name").value = "";
-                    if (document.getElementById("r-gmail")) document.getElementById("r-gmail").value = "";
-                    if (document.getElementById("r-goi")) document.getElementById("r-goi").value = "";
-                    if (document.getElementById("r-start")) document.getElementById("r-start").value = new Date().toISOString().split("T")[0];
-
-                    this.setMode("NEW"); this.tựĐộngSinhGid(); this.tínhNgàyKếtThúc();
-                });
-            } else {
-                if (typeof NotiModule !== 'undefined') NotiModule.show("Lỗi cấu trúc phản hồi!", "error");
-            }
-        })
-        .catch(err => {
-            console.error("Lỗi đồng bộ hệ thống:", err);
-            if (typeof NotiModule !== 'undefined') NotiModule.show("Mất kết nối mạng, vui lòng kiểm tra lại!", "error");
-        })
-        .finally(() => {
-            this.isSubmitting = false; if (btn) { btn.innerText = originalText; btn.disabled = false; }
-        });
-    }
 
 };
 
