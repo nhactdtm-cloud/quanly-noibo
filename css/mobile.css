@@ -203,23 +203,40 @@
         padding-top: 0px; 
     }
 
-/* Ép không gian hiển thị bung rộng xuống đáy */
+/* --- SỬA LỖI VỠ CỘT: ÉP BUỘC XẾP DỌC 1 CỘT TUYỆT ĐỐI TRÊN MOBILE --- */
 .r199k-workspace {
-    min-height: calc(100vh - 80px) !important; /* Đảm bảo tổng chiều cao workspace ôm khít màn hình */
     display: flex !important;
-    flex-direction: column !important;
-    justify-content: transform;
+    flex-direction: column !important; /* 🎯 Chìa khóa: Ép buộc xếp thành 1 cột dọc, không cho phép chia đôi */
+    width: 100% !important;
+    max-width: 100% !important;
+    gap: 16px !important;
+    margin-top: 0 !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+    height: auto !important; /* Trả về chiều cao tự động để nội dung co dãn dọc mượt mà */
+    overflow: visible !important;
 }
 
-/* Thao tác trực tiếp vào khối trắng "THÔNG TIN ĐĂNG KÍ" (.r199k-sidebar) */
+/* --- XỬ LÝ KHỐI TRẮNG THÔNG TIN ĐĂNG KÝ CHẠM ĐÁY VÀ VUỐT THOẢI MÁI --- */
 .r199k-sidebar, 
 .r199k-sidebar-clean {
-    flex-grow: 1 !important; /* 🎯 CHÌA KHÓA: Tự động kéo dài hộp trắng ra điền đầy khoảng trống xuống tận cùng */
-    margin-bottom: 0 !important;
-    border-bottom-left-radius: 0 !important; /* Phẳng đáy để khít với thanh bar */
-    border-bottom-right-radius: 0 !important;
-    padding-bottom: 30px !important; /* Tạo khoảng đệm bên trong để chữ không bị che bởi menu */
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    margin-top: 10px !important;
+    margin-bottom: 0 !important; /* Bỏ lề đáy ngoài để không tạo khoảng trống xám */
+    
+    /* Đệm đáy bên trong rộng rãi giúp đẩy toàn bộ chữ "Tổng số tiền: 0đ" trồi hẳn lên trên menu khi vuốt kịch sàn */
+    padding: 16px 14px 100px 14px !important; 
+    box-sizing: border-box !important;
+    
+    background: var(--sf) !important; /* Đảm bảo đồng bộ màu nền trắng/sáng của hộp */
+    border-bottom-left-radius: 0 !important; /* Phẳng đáy góc trái */
+    border-bottom-right-radius: 0 !important; /* Phẳng đáy góc phải */
 }
+
 
 
     #p-g .card {
