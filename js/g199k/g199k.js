@@ -63,7 +63,11 @@ const R199kModule = {
                 inputGmail.value = ""; // Ép dọn dẹp trống rỗng sạch sẽ hoàn toàn
             }
         }, 200); 
+
+        // 🌟 ĐÃ THÊM VÀO ĐÂY: Ép giao diện chạy tab NEW ngay khi load trang để ẩn kính lúp lập tức
+        this.setMode('NEW');
     },
+
 
 
 
@@ -79,17 +83,25 @@ const R199kModule = {
         const cskhGroup = document.getElementById('cskh-group');
         const memberListGroup = document.getElementById('member-list-group');
 
+        // 🌟 LẤY THẺ ICON KÍNH LÚP NẰM TRONG KHỐI MÃ GID CỦA BẠN
+        const iconKinhLupR199k = inputGid?.parentElement?.querySelector('.r-gid-icon-emoji');
+
         bNew.className = bRenew.className = 'seg-btn';
         
-            if (action === 'NEW') {
+        if (action === 'NEW') {
             bNew.classList.add('active', 'thu');
             inputGid.readOnly = true;
+            inputGid.value = "TỰ ĐỘNG SINH";
+            inputGid.placeholder = ""; 
             
-            // 🌟 CHÈN DÒNG NÀY TẠI ĐÂY:
+            // 🌟 ÉP ẨN VĨNH VIỄN: Khi ở tab Đăng ký mới, khóa chặt không cho hiện kính lúp
+            if (iconKinhLupR199k) {
+                iconKinhLupR199k.style.setProperty('display', 'none', 'important');
+            }
+
             const inputGmail = document.getElementById('r-gmail');
             if (inputGmail) inputGmail.value = "";
 
-            // Hiện Chăm sóc khách hàng - Ẩn danh sách thành viên
             if (cskhGroup) cskhGroup.classList.remove('d-none');
             if (memberListGroup) memberListGroup.classList.add('d-none');
             
@@ -98,21 +110,28 @@ const R199kModule = {
                 selectGoi.value = '1 THÁNG';
             }
             this.tựĐộngSinhGid(); 
-        }
-else {
+        } else {
             bRenew.classList.add('active', 'chi');
             inputGid.value = "";
-            inputGid.placeholder = "🔍︎ Tìm kiếm bằng GID";
+            inputGid.placeholder = "Tìm kiếm bằng GID...";
             inputGid.readOnly = false;
             
-            // Ẩn Chăm sóc khách hàng - Hiện danh sách thành viên
+            // 🌟 ÉP HIỂN THỊ: Khi sang tab Gia hạn / Hủy, mở khóa hiện chiếc kính lúp SVG lên
+            if (iconKinhLupR199k) {
+                iconKinhLupR199k.style.setProperty('display', 'flex', 'important');
+            }
+
             if (cskhGroup) cskhGroup.classList.add('d-none');
             if (memberListGroup) memberListGroup.classList.remove('d-none');
             
             if (optCancel) optCancel.style.display = 'block';
 
-            // Kích hoạt gọi nạp dữ liệu danh sách thành viên của nhân viên này
             this.taiDanhSachThanhVienTheoUser();
+
+            // Gọi hàm bốc ảnh SVG kính lúp chèn vào ngay lập tức
+            if (typeof renderEmojis === 'function') {
+                renderEmojis();
+            }
         }
         this.tínhNgàyKếtThúc(); 
     },

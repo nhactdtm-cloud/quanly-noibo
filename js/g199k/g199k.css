@@ -415,3 +415,37 @@
     background-color: var(--sf) !important; /* Triệt tiêu hoàn toàn lỗi chuyển màu xám đen của trình duyệt */
 }
 
+/* ==========================================================================
+   BỘ LỌC ÉP ẨN ICON KÍNH LÚP TỰ ĐỘNG Ở TAB ĐĂNG KÝ MỚI
+   ========================================================================== */
+
+/* 1. KHI Ở TAB ĐĂNG KÝ MỚI (Ô input đang có trạng thái readOnly - Khóa chữ "TỰ ĐỘNG SINH"):
+   Tìm tất cả các thẻ icon kính lúp đứng cùng cấp hoặc nằm chung khối với ô input này và ẩn vĩnh viễn đi */
+.gr:has(input[readonly]) .r-gid-icon-emoji,
+.gr:has(input[readonly]) .ui-emoji-container,
+.gr:has(input[readonly]) .ui-emoji-img,
+.gr:has(input[readonly]) [data-emoji="tim-kiem"] {
+    display: none !important;
+}
+
+/* 2. KHI Ở TAB GIA HẠN / HỦY (Ô input mở khóa cho gõ chữ - KHÔNG có readOnly):
+   Hiển thị chiếc kính lúp sắc nét ở góc trái ô nhập liệu phục vụ tìm kiếm GID */
+.gr:has(input:not([readonly])) .r-gid-icon-emoji,
+.gr:has(input:not([readonly])) [data-emoji="tim-kiem"] {
+    display: flex !important;
+    position: absolute;
+    left: 12px;
+    bottom: 11px; /* Điều chỉnh tăng/giảm 1px nếu cần để ảnh nằm chính giữa ô input */
+    z-index: 5;
+    pointer-events: none;
+    align-items: center;
+}
+
+/* Định dạng kích thước cố định chuẩn cho hình ảnh kính lúp SVG */
+.gr .r-gid-icon-emoji .ui-emoji-img,
+.gr [data-emoji="tim-kiem"] .ui-emoji-img {
+    display: block !important;
+    width: 14px !important;
+    height: 14px !important;
+    object-fit: contain;
+}
