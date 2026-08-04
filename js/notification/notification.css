@@ -92,15 +92,20 @@
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    width: 20px;
-    height: 20px;
+    
+    /* 🌟 CHỈNH SỬA: Tăng kích thước vùng chứa từ 24px lên 28px giúp khối cân đối và bề thế hơn */
+    width: 28px;
+    height: 28px;
+    
+    /* Cân chỉnh lại vị trí để icon lớn thẳng hàng trục ngang mượt mà với dòng tiêu đề */
     margin-top: 1px;
 }
 
 /* Kích thước ảnh SVG tự động quét từ renderEmojis() */
 .toast-icon .ui-emoji-img {
-    width: 20px;
-    height: 20px;
+    /* 🌟 CHỈNH SỬA: Đồng bộ tăng kích thước ảnh SVG lên 28px sắc nét */
+    width: 28px;
+    height: 28px;
     object-fit: contain;
 }
 
