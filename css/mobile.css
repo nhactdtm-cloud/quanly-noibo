@@ -231,7 +231,7 @@
     overflow: visible !important; /* Đảm bảo cho phép nội dung chảy dọc tự do */
 }
 
-/* --- TĂNG CAO ĐỆM ĐÁY ẨN ĐỂ ĐẨY TOÀN BỘ KHỐI CHỮ TRỒI LÊN HẲN MENU --- */
+/* --- TRA LẠI BO GÓC VÀ TẠO KHOẢNG TRỐNG TRÁNH MENU ĐÈ --- */
 .r199k-sidebar, 
 .r199k-sidebar-clean {
     display: flex !important;
@@ -240,16 +240,16 @@
     max-width: 100% !important;
     height: auto !important;
     margin-top: 10px !important;
-    margin-bottom: 0 !important;
     
-    /* 🎯 GIẢI PHÁP: Tăng mạnh đệm đáy từ 100px lên 160px. 
-       Khoảng trống cực rộng này sẽ hoạt động như một bệ đỡ ẩn, kéo toàn bộ 
-       "Tổng số tiền", "Thời gian còn lại" trồi lên cao hẳn so với thanh menu đáy */
-    padding: 16px 14px 160px 14px !important; 
+    /* 🎯 CHÌA KHÓA 1: Tạo khoảng hở ngoài 80px để đẩy nguyên vẹn phần đáy bo góc lên trên menu */
+    margin-bottom: 80px !important; 
+    
+    /* 🎯 CHÌA KHÓA 2: Trả lại độ bo góc mượt mà cho 4 góc hộp (Không để bằng 0 nữa) */
+    border-radius: 12px !important; 
+    
+    /* Thu gọn padding đáy bên trong về mặc định vì đã có margin gánh vác */
+    padding: 16px 14px 20px 14px !important; 
     box-sizing: border-box !important;
-    
-    border-bottom-left-radius: 0 !important;
-    border-bottom-right-radius: 0 !important;
 }
 
 
