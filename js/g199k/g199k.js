@@ -113,7 +113,7 @@ const R199kModule = {
         } else {
             bRenew.classList.add('active', 'chi');
             inputGid.value = "";
-            inputGid.placeholder = "Tìm kiếm bằng GID...";
+            inputGid.placeholder = "Nhập mã GID để tìm...";
             inputGid.readOnly = false;
             
             // 🌟 ÉP HIỂN THỊ: Khi sang tab Gia hạn / Hủy, mở khóa hiện chiếc kính lúp SVG lên
@@ -457,12 +457,23 @@ renderGiaoDienSieuToc(allInvoices);
 
 
 
-    guiThuChi(hD, name, goi, tien) {
+    guiThuChi(gid, hD, name, goi, tien) {
         if (goi === "HẾT HẠN") return Promise.resolve(); const cleanUrl = this.FB_URL.replace(/\/$/, ''); const bY = new Date();
         const thoiGianTao = bY.toLocaleDateString('vi-VN') + ' ' + bY.toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'});
         const ngayGiaoDich = bY.getFullYear() + '-' + String(bY.getMonth() + 1).padStart(2, '0') + '-' + String(bY.getDate()).padStart(2, '0');
         
-        const payload = { hoaDon: hD, khachHang: name, ghiChu: goi, loaiGd: "R-199", soTien: Number(tien), mode: "THU TIỀN", adminName: (typeof UserModule !== 'undefined' ? UserModule.uName : "ADMIN"), thoiGian: thoiGianTao, ngayGiaoDich };
+const payload = {
+    gid: gid,
+    hoaDon: hD,
+    khachHang: name,
+    ghiChu: goi,
+    loaiGd: "R-199",
+    soTien: Number(tien),
+    mode: "THU TIỀN",
+    adminName: (typeof UserModule !== 'undefined' ? UserModule.uName : "ADMIN"),
+    thoiGian: thoiGianTao,
+    ngayGiaoDich
+};
         return fetch(`${cleanUrl}/thuchi/${hD}.json${this.FB_KEY?'?auth='+this.FB_KEY:''}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) }).catch(e => console.log("Lỗi ghi Thu Chi:", e));
     },
 
@@ -528,7 +539,7 @@ renderGiaoDienSieuToc(allInvoices);
         .then(res => {
             if (res) {
                 // Mảng chứa các tiến trình bất đồng bộ (Thu chi & Gửi email)
-                let asyncTasks = [this.guiThuChi(hoaDon, name, goi, tien)];
+                let asyncTasks = [this.guiThuChi(gid, hoaDon, name, goi, tien)];
 
                 // 🌟 THÊM MỚI: Tự động gọi Apps Script để gửi mail nếu trường gmail có dữ liệu
                 if (gmail && gmail.includes("@") && goi !== 'HẾT HẠN') {

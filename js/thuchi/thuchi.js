@@ -54,26 +54,34 @@ const ThuChiModule = {
         sel.value = '';
     },
 
-    subData() {
-        const btnAdd = document.getElementById('btn-add-data'); if (btnAdd && btnAdd.disabled) return;
-        const kh = document.getElementById('kh')?.value?.trim() || "-", gc = document.getElementById('gc')?.value?.trim() || "-", lgd = document.getElementById('lgd')?.value, st = document.getElementById('st')?.value;
-        if (!lgd || lgd === "Chọn loại giao dịch") return NotiModule.show("Vui lòng chọn Loại Giao Dịch cụ thể!", "error");
-        if (!st || isNaN(st) || Number(st) <= 0) return NotiModule.show("Vui lòng nhập số tiền hợp lệ lớn hơn 0!", "error");
-        if (btnAdd) { btnAdd.disabled = true; btnAdd.innerText = "ĐANG LƯU..."; btnAdd.style.background = "#9ca3af"; }
+subData() {
+    const btnAdd = document.getElementById('btn-add-data'); if (btnAdd && btnAdd.disabled) return;
+    const kh = document.getElementById('kh')?.value?.trim() || "-", gc = document.getElementById('gc')?.value?.trim() || "-", lgd = document.getElementById('lgd')?.value, st = document.getElementById('st')?.value;
+    
+    // 🌟 ĐÃ CẬP NHẬT: Lấy chính xác giá trị từ ô input có id="gid-thuchi"
+    const gid = document.getElementById('gid-thuchi')?.value?.trim() || "-"; 
 
-        const numSt = Number(st), hoaDon = this.taoHoaDon();
-        const admin = (localStorage.getItem('loggedUser') || (typeof UserModule !== 'undefined' && UserModule.uName) || "ADMIN").trim().toUpperCase();
-        if (typeof G199kModule !== 'undefined' && typeof G199kModule.rRow === 'function') G199kModule.rRow(hoaDon, kh, gc, lgd, numSt, this.md, admin);
-        NotiModule.show(`Đã lưu đơn ${hoaDon}! Đang đồng bộ...`, "success");
-        ['kh', 'gc', 'st'].forEach(id => { if(document.getElementById(id)) document.getElementById(id).value = ""; }); this.iId();
+    if (!lgd || lgd === "Chọn loại giao dịch") return NotiModule.show("Vui lòng chọn Loại Giao Dịch cụ thể!", "error");
+    if (!st || isNaN(st) || Number(st) <= 0) return NotiModule.show("Vui lòng nhập số tiền hợp lệ lớn hơn 0!", "error");
+    if (btnAdd) { btnAdd.disabled = true; btnAdd.innerText = "ĐANG LƯU..."; btnAdd.style.background = "#9ca3af"; }
 
-        let queue = JSON.parse(localStorage.getItem('thuchi_queue')) || []; const bY = new Date();
-        const thoiGianTao = bY.toLocaleDateString('vi-VN') + ' ' + bY.toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'});
-        const ngayGiaoDich = bY.getFullYear() + '-' + String(bY.getMonth() + 1).padStart(2, '0') + '-' + String(bY.getDate()).padStart(2, '0');
+    const numSt = Number(st), hoaDon = this.taoHoaDon();
+    const admin = (localStorage.getItem('loggedUser') || (typeof UserModule !== 'undefined' && UserModule.uName) || "ADMIN").trim().toUpperCase();
+    
+    if (typeof G199kModule !== 'undefined' && typeof G199kModule.rRow === 'function') G199kModule.rRow(hoaDon, kh, gc, lgd, numSt, this.md, admin, gid);
+    NotiModule.show(`Đã lưu đơn ${hoaDon}! Đang đồng bộ...`, "success");
+    
+    // 🌟 ĐÃ CẬP NHẬT: Tự động xóa trống ô nhập liệu GID sau khi lưu thành công đơn hàng
+    ['kh', 'gc', 'st', 'gid-thuchi'].forEach(id => { if(document.getElementById(id)) document.getElementById(id).value = ""; }); this.iId();
 
-        queue.push({ hoaDon, khachHang: kh, ghiChu: gc, loaiGd: lgd, soTien: numSt, mode: this.md === 'THU' ? 'THU TIỀN' : 'CHI TIỀN', adminName: admin, thoiGian: thoiGianTao, ngayGiaoDich });
-        localStorage.setItem('thuchi_queue', JSON.stringify(queue)); this.initLgdRong(); this.processQueue();
-    },
+    let queue = JSON.parse(localStorage.getItem('thuchi_queue')) || []; const bY = new Date();
+    const thoiGianTao = bY.toLocaleDateString('vi-VN') + ' ' + bY.toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'});
+    const ngayGiaoDich = bY.getFullYear() + '-' + String(bY.getMonth() + 1).padStart(2, '0') + '-' + String(bY.getDate()).padStart(2, '0');
+
+    queue.push({ hoaDon, khachHang: kh, ghiChu: gc, loaiGd: lgd, soTien: numSt, mode: this.md === 'THU' ? 'THU TIỀN' : 'CHI TIỀN', adminName: admin, thoiGian: thoiGianTao, ngayGiaoDich, gid: gid });
+    localStorage.setItem('thuchi_queue', JSON.stringify(queue)); this.initLgdRong(); this.processQueue();
+},
+
 
     processQueue() {
         if (this.isSyncing) return; let queue = JSON.parse(localStorage.getItem('thuchi_queue')) || []; 
