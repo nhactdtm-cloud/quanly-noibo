@@ -103,41 +103,10 @@
         row-gap: 8px; /* Thu ngắn khoảng trống giữa các dòng của form thu chi */
     }
     
-    /* --- ĐỒNG BỘ TUYỆT ĐỐI THANH TAB ĐIỀU HƯỚNG TRÊN MOBILE --- */
     #p-t .card .seg, 
-    #p-g .card .seg { 
-        grid-column: span 1 !important;
-        display: grid !important;
-        grid-template-columns: 1fr 1fr !important; /* Chia đều 50/50 diện tích màn hình */
-        width: 100% !important;
-        background: var(--bg) !important;
-        padding: 4px !important;
-        border-radius: 10px !important;
-        margin: 0 auto 4px auto !important;
-        box-sizing: border-box !important;
+    #p-t .card .btn-sm { 
+        grid-column: span 1; 
     }
-
-    /* ĐỒNG BỘ CHIỀU CAO, CỠ CHỮ ĐẬM VÀ KHOẢNG ĐỆM NÚT TAB CHUYỂN TRANG */
-    #p-t .card .seg > button,
-    #p-t .card .seg > div,
-    #p-t .card .seg > a,
-    #p-g .card .seg > button,
-    #p-g .card .seg > div,
-    #p-g .card .seg > a {
-        width: 100% !important;
-        height: 44px !important;                  /* Khóa cứng chiều cao 44px mượt mà ngón tay */
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        font-size: var(--f-size-sm) !important;   /* Đồng bộ cỡ chữ sm rõ nét */
-        font-weight: var(--f-weight-bold) !important; /* Ép chữ đậm lên hẳn chống vỡ font */
-        letter-spacing: 0.3px !important;
-        border-radius: 8px !important;
-        border: none !important;
-        box-sizing: border-box !important;
-        padding: 0 8px !important;
-    }
-
 
     #p-t .card .seg button {
         height: 44px !important; /* Đồng bộ nút tab thu chi cao 44px trên mobile */
