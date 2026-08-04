@@ -231,7 +231,7 @@
     overflow: visible !important; /* Đảm bảo cho phép nội dung chảy dọc tự do */
 }
 
-/* --- TRA LẠI BO GÓC VÀ TẠO KHOẢNG TRỐNG TRÁNH MENU ĐÈ --- */
+/* --- HẠ THẤP XUỐNG THÊM 1/3: KHÍT MỊN VÀ VỪA VẶN TUYỆT ĐỐI --- */
 .r199k-sidebar, 
 .r199k-sidebar-clean {
     display: flex !important;
@@ -241,17 +241,15 @@
     height: auto !important;
     margin-top: 10px !important;
     
-    /* 🎯 CHÌA KHÓA 1: Tạo khoảng hở ngoài 80px để đẩy nguyên vẹn phần đáy bo góc lên trên menu */
-    margin-bottom: 80px !important; 
+    /* 🎯 CHÌA KHÓA: Giảm từ 8px xuống 5px để hạ thấp khối trắng xuống thêm 1/3 */
+    margin-bottom: 5px !important; 
     
-    /* 🎯 CHÌA KHÓA 2: Trả lại độ bo góc mượt mà cho 4 góc hộp (Không để bằng 0 nữa) */
+    /* Giữ nguyên bo góc trọn vẹn cho phần đáy */
     border-radius: 12px !important; 
     
-    /* Thu gọn padding đáy bên trong về mặc định vì đã có margin gánh vác */
-    padding: 16px 14px 20px 14px !important; 
+    padding: 16px 14px 14px 14px !important; 
     box-sizing: border-box !important;
 }
-
 
 
     #p-g .card {
