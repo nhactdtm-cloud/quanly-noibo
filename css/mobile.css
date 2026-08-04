@@ -1,5 +1,5 @@
 /* ==========================================================================
-   TỐI ƯU GIAO DIỆN MOBILE (CHUNG CHO TOÀN BỘ HỆ THỐNG)
+   TỐI ƯU GIAO DIỆN MOBILE (CHUNG CHO TOÀN BỘ HỆ THỐNG - ĐÃ ĐỒNG BỘ 44PX)
    ========================================================================== */
 @media (max-width: 768px) {
 
@@ -17,7 +17,7 @@
         width: 100%;
         height: 100vh;
         padding: 16px;
-        padding-bottom: 85px;
+        padding-bottom: 95px; /* Tăng nhẹ để không bị menu đáy che mất nội dung */
         overflow-y: auto;
         box-sizing: border-box;
         z-index: 1;
@@ -53,7 +53,7 @@
         flex-direction: column !important;
         align-items: center !important;
         justify-content: center !important;
-        font-size: var(--f-size-xs-fine) !important; /* Đã đổi (10px -> quy về biến nhỏ 10.5px cho mịn) */
+        font-size: var(--f-size-xs-fine) !important; 
         padding: 12px 0 !important;
         width: 50% !important;
         border-radius: 0;
@@ -80,11 +80,11 @@
 
     .usr-bar {
         margin-bottom: 10px;
-        font-size: var(--f-size-label); /* Đã đổi (12px) */
+        font-size: var(--f-size-label); 
     }
 
 
-    /* --- [2] PHÂN HỆ THU CHI (CUỘN TỰ NHIÊN) --- */
+    /* --- [2] PHÂN HỆ THU CHI (ĐỒNG BỘ CHIỀU CAO HỆ THỐNG) --- */
     .thuchi-workspace { 
         display: flex;
         flex-direction: column; 
@@ -92,8 +92,7 @@
         height: auto !important; 
         overflow-y: visible !important; 
         gap: 16px;
-        padding: 12px;
-        padding-bottom: 80px; 
+        padding: 4px 0; /* Thu gọn lề trên dưới */
         box-sizing: border-box;
     }
 
@@ -101,16 +100,21 @@
         grid-template-columns: 1fr; 
         height: auto; 
         padding: 16px; 
-        row-gap: 12px; 
+        row-gap: 8px; /* Thu ngắn khoảng trống giữa các dòng của form thu chi */
     }
     
-    #p-t .card .seg, #p-t .card .btn-sm { 
+    #p-t .card .seg, 
+    #p-t .card .btn-sm { 
         grid-column: span 1; 
+    }
+
+    #p-t .card .seg button {
+        height: 44px !important; /* Đồng bộ nút tab thu chi cao 44px trên mobile */
     }
     
     #p-t .card .btn-sm { 
         width: 100%; 
-        height: 44px; 
+        height: 44px !important; /* Đồng bộ nút bấm 44px */
         margin-top: 4px; 
     }
 
@@ -125,7 +129,7 @@
     .stat-sidebar { 
         order: 1; 
         height: auto;
-        padding: 16px;
+        padding: 12px 16px;
     }
 
     .quick-history { 
@@ -139,14 +143,14 @@
     }
 
 
-    /* --- [3] PHÂN HỆ R199K (CHỐNG VỠ GIAO DIỆN) --- */
+    /* --- [3] PHÂN HỆ R199K (ĐỒNG BỘ KÍCH THƯỚC CHUẨN ĐẸP) --- */
     .r199k-workspace {
         display: flex !important;
         flex-direction: column !important;
         width: 100% !important;
         max-width: 100% !important;
         gap: 16px;
-        padding: 0 4px; 
+        padding: 4px 0; /* Thu gọn lề trên dưới thống nhất hệ thống */
         box-sizing: border-box !important;
         overflow-x: hidden;
     }
@@ -155,16 +159,14 @@
         display: flex !important;
         flex-direction: column !important;
         width: 100% !important;
-        padding: 16px 14px !important;
-        row-gap: 12px !important; 
+        padding: 10px 14px !important; /* Thu gọn padding trên dưới giống bản PC vừa fix */
+        row-gap: 8px !important;       /* THU NGẮN DÒNG: Giảm từ 12px xuống 8px cực gọn */
         height: auto !important;
         box-sizing: border-box !important;
     }
 
     #p-g .card .gr,
     #p-g .card .seg,
-    #p-g .card .gr:has(#r-gid),
-    #p-g .card .gr:has(#btn-add-r199k),
     .gr {
         grid-column: unset !important; 
         width: 100% !important;
@@ -173,10 +175,22 @@
         box-sizing: border-box !important;
     }
 
+    /* ĐẨY RIÊNG HÀNG ĐẦU TIÊN THOÁNG MẮT NHƯ THUCHI */
+    #p-g .card .gr:has(#r-gid) {
+        margin-top: 10px !important; /* Tạo khoảng trống đệm nhẹ với thanh tab trên mobile */
+    }
+
     #p-g .card .seg {
         margin: 0 auto 4px auto !important;
     }
 
+    #p-g .card .seg button,
+    #p-g .card .seg div,
+    #p-g .card .seg a {
+        height: 44px !important; /* ĐỒNG BỘ: Tăng từ 42px lên 44px chuẩn chỉnh */
+    }
+
+    /* ĐỒNG BỘ TOÀN BỘ Ô NHẬP LIỆU LÊN CHUẨN 44PX VÀ CĂN GIỮA */
     .gr input, 
     .gr select,
     .gr input[readonly] {
@@ -184,16 +198,33 @@
         max-width: 100% !important;
         display: block !important;         
         text-align: center !important;     
-        font-size: var(--f-size-sm);    /* Đã đổi (13px) */        
+        font-size: var(--f-size-md) !important; /* Đổi sang MD (15px) cho rõ nét, không bị zoom trình duyệt */        
         -webkit-text-fill-color: var(--t) !important; 
         opacity: 1 !important;             
         box-sizing: border-box !important; 
-        height: 34px !important;
-        line-height: 24px !important; 
-        padding: 4px 10px !important;
+        height: 44px !important;        /* ĐỒNG BỘ: Nâng từ 34px lên cứng 44px bằng thuchi.css */
+        line-height: 44px !important; 
+        padding: 4px 12px !important;
         background: var(--input-bg) !important;
         border: 1px solid var(--b) !important;
-        border-radius: 6px !important;
+        border-radius: 10px !important; /* Tăng bo góc lên 10px đồng bộ hệ thống */
+    }
+
+    /* Điều chỉnh lề label trên mobile cho sát input */
+    .gr label {
+        margin-bottom: 4px !important;
+        padding-left: 2px;
+    }
+
+    /* FIX LỖI KÍNH LÚP TRÊN MOBILE KHI Ô INPUT LÊN 44PX */
+    .gr:has(input:not([readonly])) .r-gid-icon-emoji,
+    .gr:has(input:not([readonly])) [data-emoji="tim-kiem"] {
+        bottom: 15px !important; /* Căn giữa trục dọc hoàn hảo theo ô cao 44px */
+    }
+
+    .gr:has(input:not([readonly])) input {
+        padding-left: 36px !important; /* Giữ khoảng thụt lề an toàn chống đè chữ */
+        text-align: left !important;   /* Khi có kính lúp, ép căn trái để text thẳng hàng sau kính lúp */
     }
 
     #r-start {
@@ -203,7 +234,7 @@
         text-align: center !important;
         -webkit-appearance: none !important; 
         appearance: none !important;
-        min-height: 34px !important;         
+        min-height: 44px !important; /* Đồng bộ 44px */        
     }
 
     #r-start::-webkit-date-and-time-value {
@@ -226,9 +257,13 @@
         padding: 0 !important;
     }
 
+    /* NÚT BẤM DƯỚI ĐÁY FORM TRANG G_199K */
     #p-g .card .btn-sm {
-        height: 40px !important;              
+        height: 44px !important; /* ĐỒNG BỘ: Tăng từ 40px lên đúng 44px thẳng hàng */             
         width: 100% !important;
+        font-size: var(--f-size-base) !important;
+        border-radius: 10px !important;
+        margin-top: 4px !important;
         box-sizing: border-box !important;
     }
 
@@ -236,7 +271,14 @@
         width: 100% !important;
         height: auto !important;
         margin-bottom: 30px;
+        padding: 16px 14px !important; /* Thu gọn padding dọc của sidebar phải */
+        gap: 12px !important;          /* Thu ngắn khoảng cách giữa các block con bên phải */
         box-sizing: border-box !important;
+    }
+
+    /* Đồng bộ ô chọn trạng thái trên mobile */
+    #filterStatus {
+        height: 34px !important; /* Giữ nguyên chiều cao mỏng gọn của bộ lọc select trên sidebar */
     }
 
 
@@ -250,7 +292,7 @@
     }
 
     .toast-item {
-        font-size: var(--f-size-sm);    /* Đang dùng biến (13px) */
+        font-size: var(--f-size-sm);    
         padding: 14px 16px;
         border-radius: var(--r);
         animation: mobileSlideIn .4s cubic-bezier(.16,1,.3,1) forwards;
@@ -272,30 +314,5 @@
     #gc {
         -webkit-appearance: none !important;
         appearance: none !important;
-    }
-}
-
-/* ==========================================================================
-   ANIMATION KEYFRAMES MOBILE (Đặt ngoài @media để trình duyệt biên dịch chuẩn)
-   ========================================================================== */
-@keyframes mobileSlideIn {
-    from {
-        opacity: 0;
-        transform: translateY(-30px) scale(.95);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
-}
-
-@keyframes mobileSlideOut {
-    from {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
-    to {
-        opacity: 0;
-        transform: translateY(-30px) scale(.95);
     }
 }
