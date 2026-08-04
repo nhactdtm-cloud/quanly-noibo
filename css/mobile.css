@@ -11,18 +11,19 @@
         overflow: hidden;
     }
 
-    .main {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100vh;
-        padding: 16px;
-        padding-bottom: 95px; /* Tăng nhẹ để không bị menu đáy che mất nội dung */
-        overflow-y: auto;
-        box-sizing: border-box;
-        z-index: 1;
-    }
+.main {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    padding: 16px;
+    padding-bottom: 60px !important; /* 🎯 Thu hẹp lại bằng đúng chiều cao của thanh menu bar để nội dung chạm sát viền menu */
+    overflow-y: auto;
+    box-sizing: border-box;
+    z-index: 1;
+}
+
 
     .sb {
         width: 100%;
@@ -202,18 +203,24 @@
         padding-top: 0px; 
     }
 
-/* --- PHÂN HỆ R199K (SIÊU ÉP DÒNG - ĐÃ SỬA LỖI DÍNH CHỮ TIÊU ĐỀ) --- */
-    .r199k-workspace {
-        display: flex !important;
-        flex-direction: column !important;
-        width: 100% !important;
-        max-width: 100% !important;
-        gap: 10px;
-        margin-top: 0 !important;      /* ĐƯA VỀ 0: Tháo bỏ hoàn toàn lệnh kéo âm gây dính chữ, lấp chữ lên đỉnh đầu */
-        padding: 0 !important;
-        box-sizing: border-box !important;
-        overflow-x: hidden;
-    }
+/* Ép không gian hiển thị bung rộng xuống đáy */
+.r199k-workspace {
+    min-height: calc(100vh - 80px) !important; /* Đảm bảo tổng chiều cao workspace ôm khít màn hình */
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: transform;
+}
+
+/* Thao tác trực tiếp vào khối trắng "THÔNG TIN ĐĂNG KÍ" (.r199k-sidebar) */
+.r199k-sidebar, 
+.r199k-sidebar-clean {
+    flex-grow: 1 !important; /* 🎯 CHÌA KHÓA: Tự động kéo dài hộp trắng ra điền đầy khoảng trống xuống tận cùng */
+    margin-bottom: 0 !important;
+    border-bottom-left-radius: 0 !important; /* Phẳng đáy để khít với thanh bar */
+    border-bottom-right-radius: 0 !important;
+    padding-bottom: 30px !important; /* Tạo khoảng đệm bên trong để chữ không bị che bởi menu */
+}
+
 
     #p-g .card {
         display: flex !important;
@@ -373,3 +380,4 @@
         appearance: none !important;
     }
 }
+
