@@ -524,7 +524,13 @@ submitR199k: function() {
     .then(r => r.ok ? r.json() : Promise.reject())
     .then(res => {
         if (res) {
-            // Tiến trình xử lý thu chi nội bộ cần đợi
+
+        if (typeof NotiModule !== 'undefined') {
+            NotiModule.show(`Bạn đã tạo thành công khách hàng ${name}!`, "success");
+        } else if (typeof NotificationModule !== 'undefined') {
+            NotificationModule.show(`Bạn đã tạo thành công khách hàng ${name}!`, "success");
+        }
+
             let asyncTasks = [this.guiThuChi(gid, hoaDon, name, goi, tien)];
 
             // GỬI SANG GOOGLE APPS SCRIPT CHẠY NGẦM - KHÔNG BẮT TRÌNH DUYỆT ĐỢI
