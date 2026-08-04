@@ -52,39 +52,22 @@
 }
 
 /* ==========================================================================
-   VÙNG CHỨA NÚT BẤM (HÀNG NGANG CĂN GIỮA - ĐÃ KHỬ LỖI CHỮ NHẬT)
+   VÙNG CHỨA NÚT BẤM (HÀNG NGANG CĂN GIỮA - ĐÃ TINH GỌN GỘP MÃ)
    ========================================================================== */
 
-/* Khung bọc 2 nút bấm ở đáy modal (ID detailDeleteBtn gốc của bạn) */
+/* Khung bọc 2 nút bấm xếp hàng ngang dưới đáy (Đã gộp hoàn chỉnh, cách nhau 16px thoáng đãng) */
 #detailDeleteBtn,
 .detail-actions-area {
     display: flex !important;
     align-items: center !important;
-    justify-content: center !important; /* Căn giữa 2 nút ra chính giữa như ảnh */
-    gap: 12px !important;                 /* Khoảng cách an toàn giữa 2 nút */
+    justify-content: center !important; /* Căn toàn bộ cụm nút ra chính giữa */
+    gap: 16px !important;                 /* Tạo khoảng cách thông thoáng giữa nút in và nút xóa */
     width: 100% !important;
-    background: transparent !important; /* Xóa bỏ màu nền đỏ cũ của thẻ bọc */
+    background: transparent !important; /* Triệt tiêu màu nền đỏ của khối cũ */
     padding: 0 !important;
     border: none !important;
     box-sizing: border-box !important;
-}
-
-/* Khung bọc 2 nút bấm xếp hàng ngang dưới đáy */
-#detailDeleteBtn,
-.detail-actions-area {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important; /* Căn toàn bộ cụm ra chính giữa */
-    
-    /* 🎯 TĂNG GAP ĐỂ TÁCH RỜI HAI NÚT RA XA NHAU */
-    gap: 16px !important;                 /* Tăng từ 10px lên 16px để tạo khoảng cách thoáng, đẹp mắt */
-    
-    width: 100% !important;
-    background: transparent !important;
-    padding: 0 !important;
-    border: none !important;
-    box-sizing: border-box !important;
-    margin-top: 20px !important;        /* Tăng thêm khoảng cách với dòng Nhân Viên phía trên */
+    margin-top: 20px !important;        /* Khoảng cách an toàn với dòng nội dung phía trên */
 }
 
 /* NÚT IN HÓA ĐƠN CHỮ NHẬT */
@@ -92,13 +75,10 @@
     background-color: transparent !important; 
     color: var(--t) !important;               
     border: 1px solid var(--b) !important;    
-    padding: 0 32px !important;               /* Tăng nhẹ padding cho nút dài rộng rãi hơn */
+    padding: 0 32px !important;               /* Padding rộng rãi sang hai bên */
     min-width: 150px !important;              
     height: 34px !important;                  
-    
-    /* 🎯 BO TRÒN LẠI NÚT IN CHO ĐỒNG BỘ THEME VỚI NÚT XÓA TRÒN */
-    border-radius: 20px !important;           /* Sử dụng góc bo lớn (hoặc var(--r-xl)) giúp nút thuôn tròn rất sang */
-    
+    border-radius: 20px !important;           /* Thiết kế bo tròn dạng viên thuốc sang trọng */
     font-size: var(--f-size-base) !important;
     font-weight: var(--f-weight-bold) !important;
     cursor: pointer !important;
@@ -107,9 +87,7 @@
     justify-content: center !important;
     transition: var(--transition) !important;
     box-sizing: border-box !important;
-
-    /* 🎯 TẠO KHOẢNG CÁCH GIỮA ICON MÁY IN VÀ CHỮ IN HÓA ĐƠN */
-    gap: 6px !important; 
+    gap: 6px !important;                      /* Khoảng cách 6px đồng bộ giữa ảnh máy in và chữ */
 }
 
 /* Khử khoảng cách margin-right mặc định của hệ thống emoji khi nằm trong nút IN */
@@ -121,61 +99,8 @@
     justify-content: center !important;
 }
 
-
 /* Hiệu ứng hover nhẹ nhàng cho nút in */
 .ui-btn-print:hover {
     background-color: var(--hover-bg) !important;
     border-color: var(--border-hover) !important;
-}
-
-
-
-/* 🎯 CLASS NÚT XÓA TRÒN CHUNG TOÀN HỆ THỐNG (ĐÃ ÉP ĐÈ HOÀN TOÀN DETAIL-DELETE-BTN CŨ) */
-.detail-delete-btn,
-.ui-btn-delete-circle {
-    width: 34px !important;
-    height: 34px !important;
-    padding: 0 !important; 
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    border-radius: 50% !important; /* Biến thành hình tròn tuyệt đối */
-    background: transparent !important; 
-    border: 1px solid var(--b) !important; 
-    color: var(--ts) !important;
-    cursor: pointer !important; 
-    transition: var(--transition) !important;
-    box-sizing: border-box !important;
-}
-
-.detail-delete-btn:hover,
-.ui-btn-delete-circle:hover {
-    background-color: var(--danger-light) !important; 
-    color: var(--d) !important; 
-    border-color: var(--d) !important;
-    transform: translateY(-1px) !important; 
-    box-shadow: var(--shadow-sm) !important;
-}
-.detail-delete-btn:active,
-.ui-btn-delete-circle:active { 
-    transform: translateY(0) scale(0.96) !important; 
-}
-
-/* Khử khoảng cách lệch tâm của icon emoji bên trong nút tròn chung */
-.detail-delete-btn .ui-emoji-container,
-.ui-btn-delete-circle .ui-emoji-container {
-    margin: 0 !important;
-    padding: 0 !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    width: auto !important;
-    height: auto !important;
-}
-
-.detail-delete-btn .ui-emoji-img,
-.ui-btn-delete-circle .ui-emoji-img {
-    width: 16px !important;
-    height: 16px !important;
-    display: block !important;
 }

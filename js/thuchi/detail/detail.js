@@ -12,13 +12,15 @@ if (b) {
     b.removeAttribute('style'); 
     b.innerHTML = `
         <div class="detail-actions-area">
-            <!-- Đã thêm thẻ emoji máy in dính liền trước văn bản -->
             <button class="ui-btn-print" onclick="inHoaDon('${maHD}')"><span data-emoji="may-in"></span> IN HÓA ĐƠN</button>
-            <button class="ui-btn-delete-circle" title="Xóa hóa đơn" onclick="xoaHoaDon('${maHD}')"><span data-emoji="delete"></span></button>
+            <!-- 🎯 Gọi hàm tạo nút xóa chung từ UIButton: -->
+            ${UIButton.deleteCircle(`btn-del-hd-${maHD}`, 'Xóa hóa đơn')}
         </div>
     `;
-}
 
+    // 🎯 Gán chức năng xóa ngay phía dưới:
+    UIButton.setupDeleteEvent(`btn-del-hd-${maHD}`, () => xoaHoaDon(maHD));
+}
 
 
     const item = (ThuChiModule.duLieuGiaoDichHomNay || []).find(d => d.hoaDon === maHD);

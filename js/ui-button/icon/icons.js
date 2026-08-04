@@ -44,6 +44,7 @@ const EMOJI_LIBRARY = {
     "✅": "success.svg",
     "❌": "error.svg",
     "⚠️": "warning.svg",
+    "tim-kiem": "tim-kiem.svg",
     "may-in": "may-in.svg",
     "delete": "delete.svg",
     "bat-dau": "bat-dau.svg",
@@ -54,24 +55,29 @@ const EMOJI_LIBRARY = {
 // Đường dẫn thư mục gốc chung cho Emoji (Giống như ICON_BASE_PATH)
 const EMOJI_BASE_PATH = "data/img/emoji/";
 
-// Hàm quét và chuyển đổi cấu hình emoji thành thẻ <img>
+// ==========================================================================
+// HÀM QUÉT EMOJI TỰ ĐỘNG CHUẨN HÓA (ĐẶT TẠI FILE APP.JS)
+// ==========================================================================
 function renderEmojis() {
-    const emojiElements = document.querySelectorAll("[data-emoji]");
+    // 🌟 SỬA TẠI ĐÂY: Chỉ quét các phần tử CHƯA TỪNG được xử lý vẽ ảnh
+    const emojiElements = document.querySelectorAll("[data-emoji]:not(.ui-emoji-container)");
     
     emojiElements.forEach(element => {
-        // Nếu bên trong đã có ảnh rồi thì bỏ qua không chèn lại tránh lặp cấu trúc
+        // 🌟 ÉP KHÓA BẢO VỆ NGAY LẬP TỨC: Ngăn MutationObserver tạo vòng lặp vô hạn gây đơ DOM
+        element.classList.add("ui-emoji-container");
+
+        // Nếu bên trong đã có cấu trúc ảnh rồi thì bỏ qua không chèn lại tránh lặp cấu trúc
         if (element.querySelector('.ui-emoji-img')) return;
 
         const emojiChar = element.getAttribute("data-emoji");
         
-        // Nếu tìm thấy file cấu hình cho emoji này
+        // Đối chiếu danh sách cấu hình file ảnh từ EMOJI_LIBRARY của bạn
         if (EMOJI_LIBRARY[emojiChar]) {
             const fileName = EMOJI_LIBRARY[emojiChar];
-            const fullPath = `${EMOJI_BASE_PATH}${fileName}`; // Ghép đường dẫn chung
+            const fullPath = `${EMOJI_BASE_PATH}${fileName}`; // Ghép đường dẫn chung thư mục
             
-            // Tạo thẻ img và truyền link ảnh vào thuộc tính src
+            // Tiến hành thay thế văn bản bằng thẻ <img> chứa ảnh SVG của bạn
             element.innerHTML = `<img src="${fullPath}" alt="${emojiChar}" class="ui-emoji-img">`;
-            element.classList.add("ui-emoji-container");
         } else {
             console.warn(`[Emoji Error]: Chưa cấu hình file ảnh cho emoji "${emojiChar}"`);
         }
@@ -80,6 +86,6 @@ function renderEmojis() {
 
 // Tự động kích hoạt quét cả Icon và Emoji khi trang web tải xong lần đầu
 document.addEventListener("DOMContentLoaded", () => {
-    renderIcons();
+    if (typeof renderIcons === 'function') renderIcons();
     renderEmojis();
 });

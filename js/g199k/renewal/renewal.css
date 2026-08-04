@@ -104,34 +104,7 @@
 /* Vùng nút bấm bên phải */
 .renewal-action-area { display: flex; align-items: flex-end; justify-content: flex-end; }
 
-.renewal-delete-item-btn {
-    width: 34px !important;
-    height: 34px !important;
-    padding: 0 !important; 
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
 
-    /* 🔴 ĐÂY LÀ DÒNG THAY ĐỔI: Biến nút thành hình tròn */
-    border-radius: 50% !important; 
-
-    /* Các thuộc tính viền và màu sắc cũ giữ nguyên */
-    background-color: transparent; border: 1px solid var(--b); color: var(--ts);
-    cursor: pointer; transition: var(--transition);
-}
-
-/* Giữ nguyên đoạn khử khoảng cách này để icon không bị lệch tâm */
-.renewal-delete-item-btn .ui-emoji-container {
-    margin: 0 !important;
-    padding: 0 !important;
-}
-
-
-.renewal-delete-item-btn:hover {
-    background-color: var(--danger-light); color: var(--d); border-color: var(--d);
-    transform: translateY(-1px); box-shadow: var(--shadow-sm);
-}
-.renewal-delete-item-btn:active { transform: translateY(0) scale(0.96); }
 
 /* Trạng thái chờ */
 .renewal-loading, .renewal-empty { text-align: center; padding: 30px 10px; color: var(--ts); font-size: var(--f-size-sm); }

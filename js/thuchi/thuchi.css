@@ -342,3 +342,25 @@
 }
 
 
+/* Thiết lập khung bọc relative */
+.gr {
+    position: relative;
+}
+
+/* Định vị khung chứa icon kính lúp SVG nằm đè lên góc trái ô input */
+.input-icon-emoji {
+    position: absolute;
+    left: 12px;
+    bottom: 9px; /* Căn chỉnh tăng/giảm 1-2px để ảnh nằm chính giữa ô input của bạn */
+    z-index: 5;
+    pointer-events: none; /* Bấm xuyên qua ảnh kính lúp để gõ chữ bình thường */
+    display: flex;
+    align-items: center;
+}
+
+/* Định dạng kích thước hiển thị cho ảnh tim-kiem.svg */
+.input-icon-emoji .ui-emoji-img {
+    width: 14px;
+    height: 14px;
+    object-fit: contain;
+}

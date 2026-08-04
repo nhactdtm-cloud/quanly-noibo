@@ -61,7 +61,19 @@
                             <button class="seg-btn active thu" id="s-thu">THU TIỀN</button>
                             <button class="seg-btn" id="s-chi">CHI TIỀN</button>
                         </div>
-                        <div class="gr"><label>ID Lệnh</label><input type="text" id="id" readonly></div>
+<!-- Bọc relative để định vị ảnh SVG nằm gọn bên trong ô nhập liệu -->
+<div class="gr" style="position: relative;">
+    <label>Tìm kiếm bằng GID</label>
+    
+    <!-- 🌟 THẺ NHẬN DIỆN EMOJI: Hàm renderEmojis() sẽ tự động quét và chèn ảnh tim-kiem.svg vào đây -->
+    <span class="input-icon-emoji" data-emoji="tim-kiem"></span>
+    
+    <!-- Đổi id thành gid-thuchi và đẩy chữ sang phải 35px để không bị đè lên hình kính lúp -->
+    <input type="text" id="gid-thuchi" style="padding-left: 35px !important;">
+</div>
+
+
+
                         <div class="gr"><label>Khách Hàng</label><input type="text" id="kh" placeholder="Vd : Huyền Aerobic"></div>
 <div class="gr">
     <label>Ghi Chú</label>

@@ -1,27 +1,90 @@
+/* ==========================================================================
+   THÀNH PHẦN: NÚT ĐÓNG MODAL (.ui-close-btn)
+   ========================================================================== */
 .ui-close-btn {
-
     position: absolute;
-
     top: 10px;
     right: 15px;
 
+    /* Đồng bộ Hệ Font chữ & Độ đậm tiêu chuẩn (700) */
+    font-family: var(--f-family);
     font-size: 30px;
-    font-weight: bold;
-
-    color: #666;
-
-    cursor: pointer;
-
+    font-weight: var(--f-weight-bold);
     line-height: 1;
 
+    /* Đồng bộ hệ màu chữ phụ của hệ thống */
+    color: var(--ts);
+
+    cursor: pointer;
     user-select: none;
 
-    transition: 0.2s;
+    /* Đồng bộ hiệu ứng chuyển động mượt toàn hệ thống */
+    transition: var(--transition);
 }
 
-
+/* Hiệu ứng khi di chuột vào nút đóng */
 .ui-close-btn:hover {
-    color: red;
+    /* Đồng bộ sang màu đỏ trạng thái nguy hiểm/xóa */
+    color: var(--d);
     transform: scale(1.15);
 }
 
+
+/* ==========================================================================
+   THÀNH PHẦN: NÚT XÓA TRÒN CHUNG TOÀN HỆ THỐNG (.ui-btn-delete-circle)
+   ========================================================================== */
+.ui-btn-delete-circle {
+    width: 34px !important;
+    height: 34px !important;
+    padding: 0 !important; 
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    
+    /* Biến nút thành hình tròn hoàn hảo */
+    border-radius: 50% !important; 
+    
+    /* Đồng bộ màu nền trong suốt và màu viền, màu chữ hệ thống */
+    background-color: transparent !important; 
+    border: 1px solid var(--b) !important; 
+    color: var(--ts) !important;
+    
+    cursor: pointer !important; 
+    transition: var(--transition) !important;
+    box-sizing: border-box !important;
+}
+
+/* Hiệu ứng khi di chuột vào nút xóa tròn */
+.ui-btn-delete-circle:hover {
+    /* Đồng bộ sang nền đỏ nhạt, viền đỏ đậm và chữ đỏ hệ thống */
+    background-color: var(--danger-light) !important; 
+    color: var(--d) !important; 
+    border-color: var(--d) !important;
+    
+    transform: translateY(-1px) !important; 
+    box-shadow: var(--shadow-sm) !important; /* Đồng bộ bóng đổ nhỏ */
+}
+
+/* Hiệu ứng khi ấn chuột vào */
+.ui-btn-delete-circle:active { 
+    transform: translateY(0) scale(0.96) !important; 
+}
+
+/* Khử hoàn toàn khoảng trống lệch tâm của icon emoji bên trong nút tròn */
+.ui-btn-delete-circle .ui-emoji-container {
+    margin: 0 !important;
+    padding: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: auto !important;
+    height: auto !important;
+}
+
+/* Điều chỉnh kích thước ảnh icon thùng rác bên trong nút vuông vắn */
+.ui-btn-delete-circle .ui-emoji-img {
+    width: 16px !important;
+    height: 16px !important;
+    display: block !important;
+    object-fit: contain !important;
+}

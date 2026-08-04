@@ -15,18 +15,13 @@ const R199kModule = {
         this.tínhNgàyKếtThúc();
 
         // 1. Khi gõ tên khách hàng -> Sinh mã GID và đẩy ngay lập tức sang cột phải
-
-
-        // [SỬA LỖI ĐỒNG BỘ MÃ GID LIÊN TỤC]
-        
-        // 1. Khi gõ tên khách hàng -> Sinh mã GID và đẩy ngay lập tức sang cột phải
         document.getElementById('r-name').addEventListener('input', () => {
             if (this.mode === 'NEW') {
                 this.tựĐộngSinhGid(); 
             } else {
-                this.tựĐộngTìmKiếmKháchHàng('NAME'); 
+                // Đã sửa gọi hàm toàn cục từ app.js
+                tựĐộngTìmKiếmKháchHàng(this, 'NAME'); 
             }
-            // Ép buộc cột phải cập nhật lại Mã GID vừa sinh
             this.capNhatKhungChamSocKhachHang(); 
         });
 
@@ -45,7 +40,8 @@ const R199kModule = {
         
         // 4.5. Khi gõ hoặc sửa mã GID ở tab Gia Hạn -> Tự động truy vấn và đồng bộ sang cột phải
         document.getElementById('r-gid').addEventListener('input', () => {
-            this.tựĐộngTìmKiếmKháchHàng();
+            // Đã sửa gọi hàm toàn cục từ app.js
+            tựĐộngTìmKiếmKháchHàng(this, 'GID');
             this.capNhatKhungChamSocKhachHang(); 
         });
 
@@ -59,7 +55,16 @@ const R199kModule = {
         if (document.getElementById('opt-cancel')) {
             document.getElementById('opt-cancel').style.display = 'none';
         }
+
+        // 🌟 ĐÃ THÊM: Chặn đứng hành vi tự động điền chữ admin của trình duyệt khi vừa load trang
+        setTimeout(() => {
+            const inputGmail = document.getElementById('r-gmail');
+            if (inputGmail) {
+                inputGmail.value = ""; // Ép dọn dẹp trống rỗng sạch sẽ hoàn toàn
+            }
+        }, 200); 
     },
+
 
 
     setMode: function(action) {
@@ -76,10 +81,14 @@ const R199kModule = {
 
         bNew.className = bRenew.className = 'seg-btn';
         
-        if (action === 'NEW') {
+            if (action === 'NEW') {
             bNew.classList.add('active', 'thu');
             inputGid.readOnly = true;
             
+            // 🌟 CHÈN DÒNG NÀY TẠI ĐÂY:
+            const inputGmail = document.getElementById('r-gmail');
+            if (inputGmail) inputGmail.value = "";
+
             // Hiện Chăm sóc khách hàng - Ẩn danh sách thành viên
             if (cskhGroup) cskhGroup.classList.remove('d-none');
             if (memberListGroup) memberListGroup.classList.add('d-none');
@@ -89,7 +98,8 @@ const R199kModule = {
                 selectGoi.value = '1 THÁNG';
             }
             this.tựĐộngSinhGid(); 
-        } else {
+        }
+else {
             bRenew.classList.add('active', 'chi');
             inputGid.value = "";
             inputGid.placeholder = "🔍︎ Tìm kiếm bằng GID";
@@ -502,7 +512,7 @@ renderGiaoDienSieuToc(allInvoices);
                 let asyncTasks = [this.guiThuChi(hoaDon, name, goi, tien)];
 
                 // 🌟 THÊM MỚI: Tự động gọi Apps Script để gửi mail nếu trường gmail có dữ liệu
-                if (gmail && gmail.includes("@")) {
+                if (gmail && gmail.includes("@") && goi !== 'HẾT HẠN') {
                     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwPrzosseUHUOiJX6bzVhYvD8OxCREzbE2c9jr8u2Z1F46XGL0fDBBISQjkyW4Cdzz5/exec";
                     
                     const mailPromise = fetch(APPS_SCRIPT_URL, {

@@ -7,7 +7,7 @@ const RenewalModule = {
         };
     },
 
-    hienThiLichSuGiaHan(gid) {
+hienThiLichSuGiaHan(gid) {
         if (!gid) return; this.khoiTaoKhungGiaoDien();
         const hC = document.getElementById('renewal-history-list'), tC = document.getElementById('renewal-history-title');
         tC.innerText = `Đang tải lịch sử: ${gid}...`; hC.innerHTML = '<div class="renewal-loading">Đang tải lịch sử...</div>';
@@ -56,6 +56,7 @@ const RenewalModule = {
                     labelDays = `Còn lại: ${diff} ngày`;
                 }
 
+                // 🛠️ ĐÃ SỬA: Chuẩn hóa class hệ thống dòng timeline và sử dụng UIButton tạo nút xóa chung dùng class .ui-btn-delete-circle
                 rowDiv.innerHTML = `
                     <div class="renewal-item-header">
                         <!-- Hiển thị số lần thực tế đã băm ngược: Mới nhất = Lần 1 -->
@@ -70,21 +71,21 @@ const RenewalModule = {
                             <div class="renewal-invoice-text">Mã HD: ${item.hoaDon || 'Không có'}</div>
                         </div>
                         <div class="renewal-action-area">
-                            <button class="renewal-delete-item-btn" title="Xóa giao dịch lỗi"><span data-emoji="delete"></span></button>
-
+                            ${UIButton.deleteCircle(`btn-del-ls-${item.hoaDon}`, 'Xóa giao dịch lỗi')}
                         </div>
                     </div>
                 `;
-                const btnDel = rowDiv.querySelector('.renewal-delete-item-btn');
-                if (btnDel) {
-                    btnDel.addEventListener('click', () => {
-                        this.xoaGiaoDichLoiByHoaDon(item.hoaDon, item.soLanGiaHanThucTe, rowDiv, item.adminName);
-                    });
-                }
+
+                // 🛠️ ĐÃ SỬA: Đẩy khối append vào DOM trước, sau đó dùng UIButton gán chức năng click xóa cực kỳ an toàn
                 hC.appendChild(rowDiv);
+
+                UIButton.setupDeleteEvent(`btn-del-ls-${item.hoaDon}`, () => {
+                    this.xoaGiaoDichLoiByHoaDon(item.hoaDon, item.soLanGiaHanThucTe, rowDiv, item.adminName);
+                });
             });
         }).catch(err => { console.error("Lỗi:", err); tC.innerText = `📜 Lịch Sử Gia Hạn: ${gid}`; hC.innerHTML = '<div class="renewal-empty">⚠️ Không thể kết nối dữ liệu.</div>'; });
     },
+
 
 
 

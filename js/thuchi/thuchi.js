@@ -1,11 +1,39 @@
 // js/thuchi/thuchi.js - FULL MODULE FIREBASE COMPLETE (SIÊU TIẾT KIỆM DÒNG)
 const ThuChiModule = {
     FB_URL: "https://noibo-nhactdtm-default-rtdb.asia-southeast1.firebasedatabase.app/", FB_KEY: "", 
-    md: 'THU', totalOrders: 0, totalRevenue: 0, totalExpense: 0, isSyncing: false, isLoadingData: false, duLieuGiaoDichHomNay: [],
+    md: 'THU',
+    mode: 'RENEW', 
+    searchId: 0,
+    isAutofilling: false,
+     totalOrders: 0, totalRevenue: 0, totalExpense: 0, isSyncing: false, isLoadingData: false, duLieuGiaoDichHomNay: [],
     oT: ['NHẠC LẺ', 'PHÍ ĐÀO TẠO', 'DOANH THU KHÁC'], oC: ['ADS', 'CHI PHÍ VẬN HÀNH'],
 
-    init() { this.iId(); this.initLgdRong(); this.taiHoatDongHomNay(); setInterval(() => this.processQueue(), 5000); },
-    iId() { const el = document.getElementById('id'); if (el) el.value = "CHỜ TỰ ĐỘNG"; },
+    init() { 
+        this.iId(); 
+        this.initLgdRong(); 
+        this.taiHoatDongHomNay(); 
+
+        // 🌟 SỬA TẠI ĐÂY: Đổi 'id' thành 'gid-thuchi'
+        const inputIdBox = document.getElementById('gid-thuchi');
+        if (inputIdBox) {
+            inputIdBox.addEventListener('change', () => {
+                tựĐộngTìmKiếmKháchHàng(this, 'GID'); 
+            });
+        }
+
+        setInterval(() => this.processQueue(), 5000); 
+    },
+
+
+    iId() { 
+        // Thay đổi sang ID mới bảo mật chống lỗi admin
+        const el = document.getElementById('gid-thuchi'); 
+        if (el) {
+            el.value = ""; // Xóa sạch chữ admin cứng đầu
+            el.placeholder = "Nhập mã GID để tìm..."; // 🌟 Nạp chữ gợi ý thuần tại đây bằng JS
+        }
+    },
+
     thayDoiBoLocThoiGian() { this.taiHoatDongHomNay(); },
     taoHoaDon() { 
     return IdHoaDonModule.sinhMaDuyNhat(); 

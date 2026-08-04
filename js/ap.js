@@ -62,3 +62,102 @@ const IdHoaDonModule = {
         return `HD${chuoiFirebase}${randomShort}`;
     }
 };
+
+// ==========================================================================
+// HÀM DÙNG CHUNG TOÀN CỤC: ĐẶT TẠI CUỐI FILE APP.JS (FIX CHÍNH XÁC 100%)
+// ==========================================================================
+function tựĐộngTìmKiếmKháchHàng(context, type = 'GID') {
+    // 1. Nhận diện môi trường dựa trên chính Object truyền vào (Bảo đảm không bao giờ nhầm lẫn)
+    // Nếu trong Object truyền vào có chứa mảng 'oT' (Loại giao dịch thu) -> Chắc chắn là ThuChiModule
+    const isThuChiPage = context.oT !== undefined;
+    
+    if (context.mode !== 'RENEW' || context.isAutofilling) return;
+    
+    let iG, iN;
+    if (isThuChiPage) {
+        // Môi trường 1: Giao diện Thu Chi
+        iG = document.getElementById('gid-thuchi'); // 🌟 ĐÃ CẬP NHẬT THEO ID MỚI
+        iN = document.getElementById('kh') || document.querySelector('input[placeholder*="Huyền Aerobic"]');
+    } else {
+        // Môi trường 2: Giao diện R199k
+        iG = document.getElementById('r-gid');
+        iN = document.getElementById('r-name');
+    }
+
+    // Các phần tử bổ sung của form R199k (Bên Thu Chi không có sẽ tự là null)
+    const iGm = document.getElementById('r-gmail'), 
+          sG = document.getElementById('r-goi');
+          
+    if (!iG || !iN) return; // Chặn lỗi crash nếu giao diện thiếu thẻ HTML cốt lõi
+
+    let kw = type === 'GID' ? iG.value.trim().toUpperCase() : iN.value.trim(); 
+    
+    // BỘ LỌC CHẶN LỖI: Không tìm kiếm nếu từ khóa là chữ "ADMIN", "CHỜ TỰ ĐỘNG" hoặc trống rỗng
+    if (kw === "ADMIN" || kw === "CHỜ TỰ ĐỘNG" || kw === "") return;
+    if ((type === 'GID' && kw.length < 5) || (type === 'NAME' && kw.length < 3)) return;
+
+    const cId = ++context.searchId, cleanUrl = context.FB_URL.replace(/\/$/, '');
+    
+    fetch(`${cleanUrl}/r199k_members.json${context.FB_KEY ? '?auth='+context.FB_KEY : ''}`)
+    .then(r => r.ok ? r.json() : Promise.reject())
+    .then(res => {
+        if (cId !== context.searchId || !res) return;
+        
+        let allInvoices = [];
+        Object.keys(res).forEach(gidKey => {
+            if (res[gidKey] && typeof res[gidKey] === 'object') {
+                Object.keys(res[gidKey]).forEach(invoiceKey => {
+                    let invData = res[gidKey][invoiceKey];
+                    if (invData && typeof invData === 'object') {
+                        allInvoices.push({
+                            ...invData,
+                            hoaDon: invoiceKey, 
+                            gid: invData.gid || gidKey
+                        });
+                    }
+                });
+            }
+        });
+
+        let customerRows = allInvoices.filter(i => type === 'GID' ? (i.gid || '').toUpperCase() === kw : (i.name || '').toLowerCase().includes(kw.toLowerCase()));
+        
+        if (customerRows.length > 0) {
+            let found = customerRows[0]; 
+
+            context.currentGhiChu = found.ghiChu || ""; 
+            context.isAutofilling = true;
+            
+            // Đổ dữ liệu tên khách hàng chính xác theo từng giao diện cụ thể
+            if (isThuChiPage) {
+                iN.value = found.name;
+                iN.dispatchEvent(new Event('input')); // Kích hoạt sự kiện để giao diện nhận biết dữ liệu thay đổi
+            } else {
+                type === 'GID' ? (iN.value = found.name) : (iG.value = found.gid);
+            }
+            
+            // Các trường phụ trợ điền dữ liệu của riêng trang R199k
+            if (iGm) iGm.value = found.gmail || ""; 
+            if (sG && found.goi) {
+                sG.value = found.goi.toString().trim().toUpperCase();
+                sG.dispatchEvent(new Event('change'));
+            }
+            
+            // Kích hoạt hàm xử lý ngày kết thúc (chỉ chạy nếu bên file gọi có khai báo hàm này)
+            if (typeof context.tínhNgàyKếtThúc === 'function') {
+                context.tínhNgàyKếtThúc();
+            }
+            
+            if (typeof NotiModule !== 'undefined') {
+                NotiModule.show(`Đã tìm thấy: ${found.name}!`, "success"); 
+            }
+            setTimeout(() => context.isAutofilling = false, 100);
+        } else if (type === 'GID') { 
+            if (typeof NotiModule !== 'undefined' && kw !== "ADMIN") { 
+                NotiModule.show(`Không thấy khách hàng: ${kw}`, "error"); 
+            }
+        }
+    }).catch(e => { 
+        console.log("Lỗi hệ thống truy vấn:", e); 
+        context.isAutofilling = false; 
+    });
+}
