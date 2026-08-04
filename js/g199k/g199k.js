@@ -14,16 +14,15 @@ const R199kModule = {
         this.tựĐộngSinhGid(); 
         this.tínhNgàyKếtThúc();
 
-        // 1. Khi gõ tên khách hàng -> Sinh mã GID và đẩy ngay lập tức sang cột phải
-        document.getElementById('r-name').addEventListener('input', () => {
-            if (this.mode === 'NEW') {
-                this.tựĐộngSinhGid(); 
-            } else {
-                // Đã sửa gọi hàm toàn cục từ app.js
-                tựĐộngTìmKiếmKháchHàng(this, 'NAME'); 
-            }
-            this.capNhatKhungChamSocKhachHang(); 
-        });
+document.getElementById('r-name').addEventListener('input', () => {
+    if (this.mode === 'NEW') {
+        this.tựĐộngSinhGid(); 
+    } else {
+        // Gọi hàm từ app.js và ném chính 'this' (R199kModule) vào làm ngữ cảnh
+        tựĐộngTìmKiếmKháchHàng(this, 'NAME'); 
+    }
+    this.capNhatKhungChamSocKhachHang(); 
+});
 
         // 2. Khi chọn lại gói -> Cập nhật tiền, ngày kết thúc và đồng bộ cột phải
         document.getElementById('r-goi').addEventListener('change', () => {
@@ -38,12 +37,12 @@ const R199kModule = {
         document.getElementById('r-s-new').addEventListener('click', () => this.setMode('NEW'));
         document.getElementById('r-s-renew').addEventListener('click', () => this.setMode('RENEW'));
         
-        // 4.5. Khi gõ hoặc sửa mã GID ở tab Gia Hạn -> Tự động truy vấn và đồng bộ sang cột phải
-        document.getElementById('r-gid').addEventListener('input', () => {
-            // Đã sửa gọi hàm toàn cục từ app.js
-            tựĐộngTìmKiếmKháchHàng(this, 'GID');
-            this.capNhatKhungChamSocKhachHang(); 
-        });
+document.getElementById('r-gid').addEventListener('input', () => {
+    // Gọi hàm từ app.js và ném 'this' vào
+    tựĐộngTìmKiếmKháchHàng(this, 'GID');
+    this.capNhatKhungChamSocKhachHang(); 
+});
+
 
         // 5. Gắn sự kiện cho nút Submit dữ liệu
         document.getElementById('btn-add-r199k').addEventListener('click', () => this.submitR199k());
@@ -162,68 +161,6 @@ const R199kModule = {
 },
 
 
-    tựĐộngTìmKiếmKháchHàng(type = 'GID') {
-        if (this.mode !== 'RENEW' || this.isAutofilling) return;
-        const iG = document.getElementById('r-gid'), iN = document.getElementById('r-name'), iGm = document.getElementById('r-gmail'), sG = document.getElementById('r-goi');
-        let kw = type === 'GID' ? iG.value.trim().toUpperCase() : iN.value.trim(); if ((type === 'GID' && kw.length < 5) || (type === 'NAME' && kw.length < 3)) return;
-
-        const cId = ++this.searchId, cleanUrl = this.FB_URL.replace(/\/$/, '');
-            fetch(`${cleanUrl}/r199k_members.json${this.FB_KEY ? '?auth='+this.FB_KEY : ''}`)
-        .then(r => r.ok ? r.json() : Promise.reject()).then(res => {
-            if (cId !== this.searchId || !res) return;
-            
-            let allInvoices = [];
-            Object.keys(res).forEach(gidKey => {
-                if (res[gidKey] && typeof res[gidKey] === 'object') {
-                    // Firebase trả về keys theo thứ tự xuất hiện trên DB (từ trên xuống dưới)
-                    Object.keys(res[gidKey]).forEach(invoiceKey => {
-                        let invData = res[gidKey][invoiceKey];
-                        if (invData && typeof invData === 'object') {
-                            allInvoices.push({
-                                ...invData,
-                                hoaDon: invoiceKey, 
-                                gid: invData.gid || gidKey
-                            });
-                        }
-                    });
-                }
-            });
-
-            // Tìm tất cả các dòng giao dịch của khách hàng này
-            let customerRows = allInvoices.filter(i => type === 'GID' ? (i.gid || '').toUpperCase() === kw : (i.name || '').toLowerCase().includes(kw.toLowerCase()));
-            
-            if (customerRows.length > 0) {
-                // 🌟 FIX CHÍNH TẠI ĐÂY: KHÔNG DÙNG HÀM SORT THEO CHỮ NỮA
-                // Để lấy hóa đơn số 2 (hàng bên trên), ta lấy phần tử đầu tiên [0] của mảng dữ liệu gốc Firebase trả về
-                let found = customerRows[0]; 
-
-                // Mẹo kiểm tra: Nếu DB của bạn bị ngược, hãy đổi [0] thành phần tử cuối cùng:
-                // let found = customerRows[customerRows.length - 1];
-
-                this.currentGhiChu = found.ghiChu || ""; 
-                this.isAutofilling = true;
-                
-                type === 'GID' ? (iN.value = found.name) : (iG.value = found.gid);
-                iGm.value = found.gmail || ""; 
-                
-                // Đổ dữ liệu vào Gói đăng ký và ép giao diện cập nhật
-                if (found.goi) {
-                    sG.value = found.goi.toString().trim().toUpperCase();
-                    // Kích hoạt sự kiện đổi để giao diện (hoặc hàm tính ngày) nhận biết
-                    sG.dispatchEvent(new Event('change'));
-                }
-                
-                // Chạy hàm tính toán lại ngày kết thúc
-                this.tínhNgàyKếtThúc();
-                
-                NotiModule.show(`Đã tìm thấy: ${found.name}!`, "success"); 
-                setTimeout(() => this.isAutofilling = false, 100);
-            } else if (type === 'GID') { 
-                NotiModule.show(`Không thấy khách hàng: ${kw}`, "error"); 
-            }
-        }).catch(e => { console.log("Lỗi:", e); this.isAutofilling = false; });
-
-    },
 
 
 
@@ -247,12 +184,22 @@ const R199kModule = {
             });
             container.innerHTML = ''; if (filteredData.length === 0) { container.innerHTML = '<div class="member-empty-state">Không có thành viên nào phù hợp bộ lọc.</div>'; return; }
             container.appendChild(fragment);
-            container.onclick = (e) => {
-                const target = e.target, gid = target.getAttribute('data-gid'); if (!gid) return;
-                if (target.getAttribute('data-action') === 'view-history') {
-                    e.stopPropagation(); if (typeof RenewalModule !== 'undefined' && typeof RenewalModule.hienThiLichSuGiaHan === 'function') RenewalModule.hienThiLichSuGiaHan(gid);
-                } else { const inputGid = document.getElementById('r-gid'); if (inputGid) { inputGid.value = gid; this.tựĐộngTìmKiếmKháchHàng('GID'); } }
-            };
+container.onclick = (e) => {
+    const target = e.target, gid = target.getAttribute('data-gid'); if (!gid) return;
+    if (target.getAttribute('data-action') === 'view-history') {
+        e.stopPropagation(); 
+        if (typeof RenewalModule !== 'undefined' && typeof RenewalModule.hienThiLichSuGiaHan === 'function') 
+            RenewalModule.hienThiLichSuGiaHan(gid);
+    } else { 
+        const inputGid = document.getElementById('r-gid'); 
+        if (inputGid) { 
+            inputGid.value = gid; 
+            // Gọi hàm từ app.js chạy cho module này
+            tựĐộngTìmKiếmKháchHàng(this, 'GID'); 
+        } 
+    }
+};
+
         };
 
         const filterElement = document.getElementById('filterStatus'); if (filterElement) filterElement.onchange = () => { if(this.cachedMembers) renderGiaoDienSieuToc(this.cachedMembers); };
@@ -355,7 +302,6 @@ renderGiaoDienSieuToc(allInvoices);
         const endVal = document.getElementById('r-end').value;     
         const tienVal = document.getElementById('r-tien').value || 0;
 
-        // Cập nhật Dòng 1: Mã GID ( Tên Khách Hàng )
         document.getElementById('display-customer-info').innerText = `${gid} ( ${name} )`;
 
         // 1. Định dạng Ngày bắt đầu (Luôn đảm bảo ra DD/MM/YYYY)
