@@ -143,15 +143,15 @@
         padding-top: 0px; 
     }
 
-
-    /* --- [3] PHÂN HỆ R199K (ĐỒNG BỘ KÍCH THƯỚC CHUẨN ĐẸP) --- */
+/* --- PHÂN HỆ R199K (SIÊU ÉP DÒNG - ĐÃ SỬA LỖI DÍNH CHỮ TIÊU ĐỀ) --- */
     .r199k-workspace {
         display: flex !important;
         flex-direction: column !important;
         width: 100% !important;
         max-width: 100% !important;
-        gap: 16px;
-        padding: 4px 0; /* Thu gọn lề trên dưới thống nhất hệ thống */
+        gap: 10px;
+        margin-top: 0 !important;      /* ĐƯA VỀ 0: Tháo bỏ hoàn toàn lệnh kéo âm gây dính chữ, lấp chữ lên đỉnh đầu */
+        padding: 0 !important;
         box-sizing: border-box !important;
         overflow-x: hidden;
     }
@@ -160,14 +160,21 @@
         display: flex !important;
         flex-direction: column !important;
         width: 100% !important;
-        padding: 10px 14px !important; /* Thu gọn padding trên dưới giống bản PC vừa fix */
-        row-gap: 8px !important;       /* THU NGẮN DÒNG: Giảm từ 12px xuống 8px cực gọn */
+        padding: 14px 14px 10px 14px !important; /* ĐỒNG BỘ CÂN ĐỐI: Đặt padding-top là 14px để giữ khoảng cách lề card mượt mà */
+        row-gap: 4px !important;       
         height: auto !important;
         box-sizing: border-box !important;
+        margin-top: 2px !important;    /* Khoảng hở nhỏ tinh tế từ chữ tiêu đề xuống mép card trắng */
+    }
+
+    /* ĐỒNG BỘ NÚT TAB (.SEG) */
+    #p-g .card .seg {
+        grid-column: span 1 !important;
+        margin-top: 11px !important;   /* Tạo khoảng hở I đồng bộ ô input với Thu Chi */
+        margin-bottom: 4px !important;  
     }
 
     #p-g .card .gr,
-    #p-g .card .seg,
     .gr {
         grid-column: unset !important; 
         width: 100% !important;
@@ -176,22 +183,12 @@
         box-sizing: border-box !important;
     }
 
-    /* ĐẨY RIÊNG HÀNG ĐẦU TIÊN THOÁNG MẮT NHƯ THUCHI */
+    /* Đẩy nhẹ dòng đầu tiên (Mã GID) cách một khoảng đệm cực nhỏ để không dính tab */
     #p-g .card .gr:has(#r-gid) {
-        margin-top: 10px !important; /* Tạo khoảng trống đệm nhẹ với thanh tab trên mobile */
+        margin-top: 4px !important;
     }
 
-    #p-g .card .seg {
-        margin: 0 auto 4px auto !important;
-    }
-
-    #p-g .card .seg button,
-    #p-g .card .seg div,
-    #p-g .card .seg a {
-        height: 44px !important; /* ĐỒNG BỘ: Tăng từ 42px lên 44px chuẩn chỉnh */
-    }
-
-    /* ĐỒNG BỘ TOÀN BỘ Ô NHẬP LIỆU LÊN CHUẨN 44PX VÀ CĂN GIỮA */
+    /* ĐỒNG BỘ TOÀN BỘ CÁC Ô NHẬP FIELD GỌN GÀNG 40PX */
     .gr input, 
     .gr select,
     .gr input[readonly] {
@@ -199,33 +196,32 @@
         max-width: 100% !important;
         display: block !important;         
         text-align: center !important;     
-        font-size: var(--f-size-md) !important; /* Đổi sang MD (15px) cho rõ nét, không bị zoom trình duyệt */        
+        font-size: var(--f-size-sm) !important;         
         -webkit-text-fill-color: var(--t) !important; 
         opacity: 1 !important;             
         box-sizing: border-box !important; 
-        height: 44px !important;        /* ĐỒNG BỘ: Nâng từ 34px lên cứng 44px bằng thuchi.css */
-        line-height: 44px !important; 
-        padding: 4px 12px !important;
+        height: 40px !important;        
+        line-height: 40px !important; 
+        padding: 4px 10px !important;
         background: var(--input-bg) !important;
         border: 1px solid var(--b) !important;
-        border-radius: 10px !important; /* Tăng bo góc lên 10px đồng bộ hệ thống */
+        border-radius: 8px !important; 
     }
 
-    /* Điều chỉnh lề label trên mobile cho sát input */
     .gr label {
-        margin-bottom: 4px !important;
+        margin-bottom: 2px !important; 
         padding-left: 2px;
+        font-size: var(--f-size-xs) !important;
     }
 
-    /* FIX LỖI KÍNH LÚP TRÊN MOBILE KHI Ô INPUT LÊN 44PX */
     .gr:has(input:not([readonly])) .r-gid-icon-emoji,
     .gr:has(input:not([readonly])) [data-emoji="tim-kiem"] {
-        bottom: 15px !important; /* Căn giữa trục dọc hoàn hảo theo ô cao 44px */
+        bottom: 13px !important; 
     }
 
     .gr:has(input:not([readonly])) input {
-        padding-left: 36px !important; /* Giữ khoảng thụt lề an toàn chống đè chữ */
-        text-align: left !important;   /* Khi có kính lúp, ép căn trái để text thẳng hàng sau kính lúp */
+        padding-left: 32px !important; 
+        text-align: left !important;   
     }
 
     #r-start {
@@ -235,7 +231,7 @@
         text-align: center !important;
         -webkit-appearance: none !important; 
         appearance: none !important;
-        min-height: 44px !important; /* Đồng bộ 44px */        
+        min-height: 40px !important;         
     }
 
     #r-start::-webkit-date-and-time-value {
@@ -258,15 +254,16 @@
         padding: 0 !important;
     }
 
-    /* NÚT BẤM DƯỚI ĐÁY FORM TRANG G_199K */
+    /* NÚT BẤM CHÂN FORM */
     #p-g .card .btn-sm {
-        height: 44px !important; /* ĐỒNG BỘ: Tăng từ 40px lên đúng 44px thẳng hàng */             
+        height: 40px !important;              
         width: 100% !important;
-        font-size: var(--f-size-base) !important;
-        border-radius: 10px !important;
+        font-size: var(--f-size-sm) !important;
+        border-radius: 8px !important;
         margin-top: 4px !important;
         box-sizing: border-box !important;
     }
+
 
     .r199k-sidebar {
         width: 100% !important;
