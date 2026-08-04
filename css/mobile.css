@@ -217,7 +217,21 @@
     overflow: visible !important;
 }
 
-/* --- XỬ LÝ KHỐI TRẮNG THÔNG TIN ĐĂNG KÝ CHẠM ĐÁY VÀ VUỐT THOẢI MÁI --- */
+/* --- ÉP DỌC TUYỆT ĐỐI KHÔNG CHO PHÉP BIẾN DẠNG --- */
+.r199k-workspace {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    gap: 16px !important;
+    margin-top: 0 !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+    height: auto !important;
+    overflow: visible !important; /* Đảm bảo cho phép nội dung chảy dọc tự do */
+}
+
+/* --- TĂNG CAO ĐỆM ĐÁY ẨN ĐỂ ĐẨY TOÀN BỘ KHỐI CHỮ TRỒI LÊN HẲN MENU --- */
 .r199k-sidebar, 
 .r199k-sidebar-clean {
     display: flex !important;
@@ -226,15 +240,16 @@
     max-width: 100% !important;
     height: auto !important;
     margin-top: 10px !important;
-    margin-bottom: 0 !important; /* Bỏ lề đáy ngoài để không tạo khoảng trống xám */
+    margin-bottom: 0 !important;
     
-    /* Đệm đáy bên trong rộng rãi giúp đẩy toàn bộ chữ "Tổng số tiền: 0đ" trồi hẳn lên trên menu khi vuốt kịch sàn */
-    padding: 16px 14px 100px 14px !important; 
+    /* 🎯 GIẢI PHÁP: Tăng mạnh đệm đáy từ 100px lên 160px. 
+       Khoảng trống cực rộng này sẽ hoạt động như một bệ đỡ ẩn, kéo toàn bộ 
+       "Tổng số tiền", "Thời gian còn lại" trồi lên cao hẳn so với thanh menu đáy */
+    padding: 16px 14px 160px 14px !important; 
     box-sizing: border-box !important;
     
-    background: var(--sf) !important; /* Đảm bảo đồng bộ màu nền trắng/sáng của hộp */
-    border-bottom-left-radius: 0 !important; /* Phẳng đáy góc trái */
-    border-bottom-right-radius: 0 !important; /* Phẳng đáy góc phải */
+    border-bottom-left-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
 }
 
 
