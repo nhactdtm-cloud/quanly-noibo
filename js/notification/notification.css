@@ -19,10 +19,10 @@
 .toast-item {
     pointer-events: auto;
     
-    /* 🌟 FIX TẠI ĐÂY: Tăng độ đục nền trắng lên 0.9 và giảm độ nhòe nhiễu xuống 6px cho trong trẻo */
-    background: rgba(255, 255, 255, 0.90); 
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
+    /* 🌟 FIX TẠI ĐÂY: Hạ blur xuống mức tối thiểu 3px và giảm độ đục nền xuống 0.75 giúp trong suốt như pha lê */
+    background: rgba(255, 255, 255, 0.75); 
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
 
     color: var(--t);
     padding: 16px;
@@ -60,24 +60,24 @@
 
 /* Trạng thái Thành Công (Success) */
 .toast-item.success {
-    /* 🌟 FIX TẠI ĐÂY: Tối ưu lại độ mờ gradient hòa trộn với nền mới */
-    background: linear-gradient(to right, rgba(22, 163, 74, 0.06), rgba(255, 255, 255, 0.92) 40%);
+    /* 🌟 FIX TẠI ĐÂY: Đồng bộ dải màu gradient mỏng theo độ trong suốt mới */
+    background: linear-gradient(to right, rgba(22, 163, 74, 0.05), rgba(255, 255, 255, 0.78) 40%);
 }
 .toast-item.success .toast-icon { color: var(--s); }
 .toast-item.success::after { background: var(--s); }
 
 /* Trạng thái Thất Bại (Error) */
 .toast-item.error {
-    /* 🌟 FIX TẠI ĐÂY: Tối ưu lại độ mờ gradient hòa trộn với nền mới */
-    background: linear-gradient(to right, rgba(220, 38, 38, 0.06), rgba(255, 255, 255, 0.92) 40%);
+    /* 🌟 FIX TẠI ĐÂY: Đồng bộ dải màu gradient mỏng theo độ trong suốt mới */
+    background: linear-gradient(to right, rgba(220, 38, 38, 0.05), rgba(255, 255, 255, 0.78) 40%);
 }
 .toast-item.error .toast-icon { color: var(--d); }
 .toast-item.error::after { background: var(--d); }
 
 /* Trạng thái Thông Tin (Info) */
 .toast-item.info {
-    /* 🌟 FIX TẠI ĐÂY: Tối ưu lại độ mờ gradient hòa trộn với nền mới */
-    background: linear-gradient(to right, rgba(37, 99, 235, 0.06), rgba(255, 255, 255, 0.92) 40%);
+    /* 🌟 FIX TẠI ĐÂY: Đồng bộ dải màu gradient mỏng theo độ trong suốt mới */
+    background: linear-gradient(to right, rgba(37, 99, 235, 0.05), rgba(255, 255, 255, 0.78) 40%);
 }
 .toast-item.info .toast-icon { color: var(--info); }
 .toast-item.info::after { background: var(--info); }
@@ -123,7 +123,7 @@
 .toast-message {
     font-size: var(--f-size-sm); /* Chuẩn chữ mô tả nhỏ hơn 13px */
     font-weight: var(--f-weight-medium); /* Chuẩn weight 500 */
-    color: var(--ts); /* Màu chữ phụ hệ thống hệ thống (Màu xám) */
+    color: var(--ts); /* Màu chữ phụ hệ thống (Màu xám) */
     line-height: 1.45;
     word-break: break-word;
 }
