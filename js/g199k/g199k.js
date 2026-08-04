@@ -275,7 +275,12 @@ renderGiaoDienSieuToc(allInvoices);
         }
 
         let date = new Date(ngàyBắtĐầuValue); if (isNaN(date.getTime())) { if (inputEnd) inputEnd.value = ""; this.ngayConLaiThucTe = 0; return; }
-        const địnhDạngKiểuLịch = (dObj) => `ngày ${dObj.getDate()} thg ${dObj.getMonth() + 1}, ${dObj.getFullYear()}`;
+        const địnhDạngKiểuLịch = (dObj) => {
+    const day = String(dObj.getDate()).padStart(2, '0');
+    const month = String(dObj.getMonth() + 1).padStart(2, '0');
+    return `${day}/${month}/${dObj.getFullYear()}`;
+};
+
         
         if (gói === '1 THÁNG') { date.setMonth(date.getMonth() + 1); if (inputEnd) inputEnd.value = địnhDạngKiểuLịch(date); if (inputTien) inputTien.value = "199000"; } 
         else if (gói === '3 THÁNG') { date.setMonth(date.getMonth() + 3); if (inputEnd) inputEnd.value = địnhDạngKiểuLịch(date); if (inputTien) inputTien.value = "500000"; } 
