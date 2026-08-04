@@ -1,5 +1,5 @@
 /* ==========================================================================
-   TOAST NOTIFICATION - USE GLOBAL THEME (PC & GENERAL)
+   TOAST NOTIFICATION - MODERN GLOBAL THEME (PC & GENERAL)
    ========================================================================== */
 
 #toast-container {
@@ -11,86 +11,156 @@
     flex-direction: column;
     gap: 12px;
     max-width: 380px;
-    width: 100%;
+    width: calc(100% - 48px);
     pointer-events: none;
+    font-family: var(--f-family);
 }
 
 .toast-item {
     pointer-events: auto;
     background: var(--sf);
     color: var(--t);
-    padding: 16px 20px;
-    border-radius: var(--r);
+    padding: 16px;
+    border-radius: var(--r); /* Bo góc 16px theo chuẩn hệ thống */
     border: 1px solid var(--b);
-
-    /* Đã đồng bộ sang biến bóng đổ toast chuyên dụng */
     box-shadow: var(--shadow-toast);
-
-    font-size: var(--f-size-base);       /* Đã đổi (14px) */
-    font-weight: var(--f-weight-semibold); /* Đã đổi (600) */
-    line-height: 1.5;
-
+    
     display: flex;
     align-items: flex-start;
     gap: 14px;
     box-sizing: border-box;
+    position: relative;
+    overflow: hidden;
+    transition: var(--transition);
 
-    animation: euroSlideIn .4s cubic-bezier(.16,1,.3,1) forwards;
+    /* Hiệu ứng mượt mà */
+    animation: euroSlideIn .45s cubic-bezier(.25, 1, .5, 1) forwards;
 }
 
-/* ==========================
-   STATUS
-========================== */
-
-.toast-item.success {
-    border-left: 4px solid var(--s);
-}
-
-.toast-item.success span {
-    color: var(--s);
-}
-
-.toast-item.error {
-    border-left: 4px solid var(--d);
-}
-
-.toast-item.error span {
-    color: var(--d);
-}
-
-/* nếu đã thêm --info vào theme.css */
-.toast-item.info {
-    border-left: 4px solid var(--info);
-}
-
-.toast-item.info span {
-    color: var(--info);
-}
-
-.toast-item span {
-    font-size: var(--f-size-md);        /* Đã đổi (16px -> quy về md cho cỡ chữ icon cân đối) */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-top: 2px;
+/* Thanh chạy ngầm hiển thị thời gian ở đáy */
+.toast-item::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    width: 100%;
+    transform-origin: left;
+    animation: toastProgress 3s linear forwards;
 }
 
 /* ==========================================================================
-   ANIMATION PC
+   STATUS & MODERN GLOW EFFECTS (KHÔNG VIỀN ĐẦU)
+   ========================================================================== */
+
+/* Trạng thái Thành Công (Success) */
+.toast-item.success {
+    background: linear-gradient(to right, rgba(22, 163, 74, 0.06), var(--sf) 40%);
+}
+.toast-item.success .toast-icon { color: var(--s); }
+.toast-item.success::after { background: var(--s); }
+
+/* Trạng thái Thất Bại (Error) */
+.toast-item.error {
+    background: linear-gradient(to right, rgba(220, 38, 38, 0.06), var(--sf) 40%);
+}
+.toast-item.error .toast-icon { color: var(--d); }
+.toast-item.error::after { background: var(--d); }
+
+/* Trạng thái Thông Tin (Info) */
+.toast-item.info {
+    background: linear-gradient(to right, rgba(37, 99, 235, 0.06), var(--sf) 40%);
+}
+.toast-item.info .toast-icon { color: var(--info); }
+.toast-item.info::after { background: var(--info); }
+
+
+/* ==========================================================================
+   INNER COMPONENTS (Icon, Body, Text, Close Button)
+   ========================================================================== */
+
+.toast-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    margin-top: 1px;
+}
+
+/* Kích thước ảnh SVG tự động quét từ renderEmojis() */
+.toast-icon .ui-emoji-img {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+}
+
+.toast-body {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding-right: 20px;
+}
+
+.toast-title {
+    font-size: var(--f-size-base); /* Chuẩn 14px cho Toast PC */
+    font-weight: var(--f-weight-semibold); /* Chuẩn weight 600 */
+    color: var(--t);
+    margin: 0;
+    line-height: 1.4;
+}
+
+.toast-message {
+    font-size: var(--f-size-sm); /* Chuẩn chữ mô tả nhỏ hơn 13px */
+    font-weight: var(--f-weight-medium); /* Chuẩn weight 500 */
+    color: var(--ts); /* Màu chữ phụ hệ thống hệ thống (Màu xám) */
+    line-height: 1.45;
+    word-break: break-word;
+}
+
+/* Nút đóng nhanh (X) */
+.toast-close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    background: none;
+    border: none;
+    color: var(--ts); /* Dùng màu chữ phụ */
+    opacity: 0.6;
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--r-sm); /* Bo góc nút đóng 6px */
+    transition: var(--transition);
+}
+
+.toast-close:hover {
+    opacity: 1;
+    color: var(--t);
+    background: var(--hover-bg); /* Dùng nền hover hệ thống */
+}
+
+
+/* ==========================================================================
+   ANIMATIONS
    ========================================================================== */
 
 .toast-item.fade-out {
-    animation: euroSlideOut .35s cubic-bezier(.16,1,.3,1) forwards !important;
+    animation: euroSlideOut .35s cubic-bezier(.25, 1, .5, 1) forwards !important;
 }
 
 @keyframes euroSlideIn {
     from {
         opacity: 0;
-        transform: translateX(60px) scale(.95);
+        transform: translateY(-12px) scale(0.97);
     }
     to {
         opacity: 1;
-        transform: translateX(0) scale(1);
+        transform: translateY(0) scale(1);
     }
 }
 
@@ -101,6 +171,11 @@
     }
     to {
         opacity: 0;
-        transform: translateX(80px) scale(.95);
+        transform: translateX(80px);
     }
+}
+
+@keyframes toastProgress {
+    from { transform: scaleX(1); }
+    to { transform: scaleX(0); }
 }

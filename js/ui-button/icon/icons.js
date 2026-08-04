@@ -40,9 +40,9 @@ function renderIcons() {
 
 // Cấu hình danh sách file ảnh tương ứng cho từng Emoji
 const EMOJI_LIBRARY = {
-    "ℹ️": "info.svg",
-    "✅": "success.svg",
-    "❌": "error.svg",
+    "info": "info.svg",
+    "success": "success.svg",
+    "error": "error.svg",
     "⚠️": "warning.svg",
     "tim-kiem": "tim-kiem.svg",
     "may-in": "may-in.svg",
