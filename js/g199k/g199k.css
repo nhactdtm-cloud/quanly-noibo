@@ -153,6 +153,46 @@
 }
 
 
+    /* ==========================================================================
+       ÉP CHỐT HẠ: KHÓA BẰNG KHÍT TỪNG PX CHO CÁC NÚT BẤM TAB (.SEG)
+       ========================================================================== */
+    #p-t .card .seg, 
+    #p-g .card .seg { 
+        grid-column: span 1 !important;
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important; /* Chia đôi diện tích màn hình 50/50 */
+        width: 100% !important;
+        background: var(--bg) !important;
+        padding: 3px !important; 
+        border-radius: 8px !important;
+        box-sizing: border-box !important;
+    }
+
+    /* ĐÈ TOÀN BỘ THUỘC TÍNH: BẤT KỂ LÀ THỦY THỂ BUTTON, DIV HAY A ĐỀU PHẢI CAO 40PX */
+    #p-t .card .seg > button,
+    #p-t .card .seg > div,
+    #p-t .card .seg > a,
+    #p-g .card .seg > button,
+    #p-g .card .seg > div,
+    #p-g .card .seg > a {
+        display: flex !important;                  /* Cưỡng ép cơ chế flexbox */
+        align-items: center !important;            /* Căn giữa chữ trục dọc */
+        justify-content: center !important;         /* Căn giữa chữ trục ngang */
+        width: 100% !important;
+        height: 40px !important;                  /* Cố định chiều cao tuyệt đối 40px */
+        line-height: 40px !important;             /* Đồng bộ chiều cao dòng text */
+        box-sizing: border-box !important;        /* BẮT BUỘC: Ép tính chiều cao bao gồm cả viền và padding */
+        
+        font-size: var(--f-size-sm) !important;   
+        font-weight: var(--f-weight-bold) !important; /* Ép chữ đậm chống lệch phông trực quan */
+        letter-spacing: 0.3px !important;
+        border-radius: 6px !important;
+        border: none !important;                  /* Triệt tiêu viền mặc định của button */
+        padding: 0 8px !important;
+        margin: 0 !important;
+    }
+
+
 /* ==========================================================================
    TỐI ƯU CỰC HẠN TRANG G_199K: ĐẨY HÀNG ĐẦU THOÁNG - ÉP SÁT CÁC HÀNG DƯỚI
    ========================================================================== */
