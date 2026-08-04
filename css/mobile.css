@@ -97,37 +97,27 @@
         box-sizing: border-box;
     }
 
-#p-t .card {
-    grid-template-columns: 1fr;
-    height: auto;
-    padding: 10px 14px !important; /* Đồng bộ với G199K */
-    row-gap: 8px;
-}
+    #p-t .card { 
+        grid-template-columns: 1fr; 
+        height: auto; 
+        padding: 16px; 
+        row-gap: 8px; /* Thu ngắn khoảng trống giữa các dòng của form thu chi */
+    }
+    
+    #p-t .card .seg, 
+    #p-t .card .btn-sm { 
+        grid-column: span 1; 
+    }
 
-#p-t .card .seg,
-#p-t .card .btn-sm {
-    grid-column: span 1;
-    width: 100% !important;
-    max-width: 100% !important;
-    box-sizing: border-box !important;
-}
-
-#p-t .card .seg {
-    margin: 0 auto 4px auto !important;
-}
-
-#p-t .card .seg button {
-    flex: 1;
-    height: 44px !important; /* Đồng bộ chiều cao */
-}
-
-#p-t .card .btn-sm {
-    width: 100% !important;
-    height: 44px !important;
-    margin-top: 4px;
-    border-radius: 10px !important;
-    box-sizing: border-box !important;
-}
+    #p-t .card .seg button {
+        height: 44px !important; /* Đồng bộ nút tab thu chi cao 44px trên mobile */
+    }
+    
+    #p-t .card .btn-sm { 
+        width: 100%; 
+        height: 44px !important; /* Đồng bộ nút bấm 44px */
+        margin-top: 4px; 
+    }
 
     .thuchi-workspace-right { 
         display: flex;
