@@ -155,15 +155,18 @@
         overflow-x: hidden;
     }
 
-    #p-g .card {
-        display: flex !important;
-        flex-direction: column !important;
-        width: 100% !important;
-        padding: 10px 14px !important; /* Thu gọn padding trên dưới giống bản PC vừa fix */
-        row-gap: 8px !important;       /* THU NGẮN DÒNG: Giảm từ 12px xuống 8px cực gọn */
-        height: auto !important;
-        box-sizing: border-box !important;
-    }
+#p-g .card {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    padding: 10px 14px !important;
+    row-gap: 4px !important;       
+    height: auto !important;
+    box-sizing: border-box !important;
+
+    /* 🎯 LỆNH ĐẨY KHỐI CARD LÙI XUỐNG BẰNG KHÍT THUCHI: */
+    margin-top: 14px !important; /* Đẩy khối card trắng lùi xuống đúng bằng khoảng hở I của trang Thu Chi */
+}
 
     #p-g .card .gr,
     #p-g .card .seg,
@@ -180,9 +183,13 @@
         margin-top: 10px !important; /* Tạo khoảng trống đệm nhẹ với thanh tab trên mobile */
     }
 
+        /* 🎯 CHÈN THÊM ĐOẠN NÀY ĐỂ ĐẨY RIÊNG THANH NÚT BẤM G_199K THỤT XUỐNG TẠO KHOẢNG TRỐNG I */
     #p-g .card .seg {
-        margin: 0 auto 4px auto !important;
+        grid-column: span 1 !important;
+        margin-top: 14px !important;    /* TẠO KHOẢNG HỞ I: Đẩy riêng thanh nút ĐĂNG KÝ lùi xuống */
+        margin-bottom: 4px !important;  /* Khoảng hở gọn gàng với ô nhập liệu bên dưới */
     }
+
 
     #p-g .card .seg button,
     #p-g .card .seg div,

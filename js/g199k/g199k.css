@@ -2,33 +2,37 @@
    CẤU TRÚC KHUNG CHUẨN TRANG G_199K (ĐÃ THU NGẮN CÁC DÒNG PHÍA DƯỚI)
    ========================================================================== */
 
-/* Khung chứa chính: Bằng khít bề ngang trang thu chi */
-.r199k-workspace {
-    display: grid;
-    grid-template-columns: 2fr 1fr; 
-    gap: 24px; 
-    width: 100%;
-    max-width: 1200px;
-    margin: auto;
-    height: calc(100vh - 160px); 
-    box-sizing: border-box;
+    /* --- PHÂN HỆ R199K (TĂNG LỰC KÉO ÂM ĐỂ DÂNG CAO KHÍT VẠCH XANH) --- */
+    .r199k-workspace {
+        display: flex !important;
+        flex-direction: column !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        gap: 10px;
+        
+        /* 🎯 SỬA SỐ NÀY: Tăng từ -6px lên -14px để nhấc bổng toàn bộ khối lên đúng vạch thước */
+        margin-top: -14px !important;  
+        
+        padding: 0 !important;         
+        box-sizing: border-box !important;
+        overflow-x: hidden;
+    }
+
+
+
+#p-g .card {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    padding: 10px 14px !important;
+    row-gap: 4px !important;       
+    height: auto !important;
+    box-sizing: border-box !important;
+
+    /* ĐỒNG BỘ: Đưa margin-top về 0 để không bóp lùi khối card xuống dưới */
+    margin-top: 0 !important; 
 }
 
-/* Khối Form bên trái: Ép các dòng sát rạt nhau */
-#p-g .card {
-    background: var(--sf);
-    border: 1px solid var(--b);
-    border-radius: var(--r);
-    padding: 10px 24px;             
-    display: grid;
-    grid-template-columns: 1fr 1fr; 
-    column-gap: 20px;               
-    row-gap: 4px !important;        /* Giúp các dòng nhập liệu phía dưới ôm sát nhau */
-    align-content: start;
-    align-items: end;               /* Giữ chân nút và input thẳng hàng tuyệt đối */
-    height: 100%;                   
-    box-sizing: border-box;
-}
 
 /* Thanh tab điều hướng */
 #p-g .card .seg {
