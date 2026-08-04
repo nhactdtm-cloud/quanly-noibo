@@ -97,27 +97,44 @@
         box-sizing: border-box;
     }
 
+    /* ==========================================================================
+       [2] PHÂN HỆ THU CHI (ĐÃ ĐỒNG BỘ KHÍT KÍCH THƯỚC CÂN XỨNG VỚI G199K)
+       ========================================================================== */
     #p-t .card { 
-        grid-template-columns: 1fr; 
-        height: auto; 
-        padding: 16px; 
-        row-gap: 8px; /* Thu ngắn khoảng trống giữa các dòng của form thu chi */
+        display: grid !important;
+        grid-template-columns: 1fr !important; /* Cấu trúc 1 cột bung rộng */
+        height: auto !important; 
+        padding: 10px 14px !important;         /* ĐỒNG BỘ: Hạ từ 16px xuống 10px 14px cho bằng khít lề của G199K */
+        row-gap: 4px !important;               /* ĐỒNG BỘ: Hạ từ 8px xuống đúng 4px để khoảng giãn dòng khít rạt như G199K */
+        box-sizing: border-box !important;
+        margin-top: 0 !important;
     }
     
-    #p-t .card .seg, 
-    #p-t .card .btn-sm { 
-        grid-column: span 1; 
+    /* ĐỒNG BỘ THANH NÚT TAB (.SEG) THU CHI CHO BẰNG G199K */
+    #p-t .card .seg { 
+        grid-column: span 1 !important; 
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        background: var(--bg) !important;
+        padding: 3px !important;
+        border-radius: 8px !important;
+        box-sizing: border-box !important;
+        margin: 11px 0 4px 0 !important;      /* ĐỒNG BỘ: Thêm khoảng hở dọc 11px và khóa lề ngang bằng 0 như G199K */
     }
 
-    #p-t .card .seg button {
-        height: 44px !important; /* Đồng bộ nút tab thu chi cao 44px trên mobile */
-    }
-    
+    /* ĐỒNG BỘ NÚT BẤM CHÂN FORM THU CHI */
     #p-t .card .btn-sm { 
-        width: 100%; 
-        height: 44px !important; /* Đồng bộ nút bấm 44px */
-        margin-top: 4px; 
+        grid-column: span 1 !important;
+        width: 100% !important; 
+        height: 40px !important;               /* ĐỒNG BỘ: Hạ từ 44px xuống đúng 40px siêu tiết kiệm dòng bằng G199K */
+        font-size: var(--f-size-sm) !important;
+        border-radius: 8px !important;         /* ĐỒNG BỘ: Hạ bo góc về 8px */
+        margin-top: 4px !important; 
+        box-sizing: border-box !important;
     }
+
 
     .thuchi-workspace-right { 
         display: flex;
