@@ -154,3 +154,38 @@ h2 {
   display: none !important;
   -webkit-appearance: none;
 }
+
+/* ==========================================================================
+   ĐỒNG BỘ KHOẢNG CÁCH DÒNG VÀ ĐỘ ĐẨY TAB BẰNG KHÍT TUYỆT ĐỐI TRANG THU CHI
+   ========================================================================== */
+
+/* 1. ĐỒNG BỘ THANH CHUYỂN TAB (CẢ HAI TRANG ĐỀU DÙNG CHUNG KHOẢNG CÁCH NÀY) */
+#p-t .card .seg,
+#p-g .card .seg {
+    grid-column: span 2; 
+    display: grid;
+    grid-template-columns: 1fr 1fr; 
+    width: 100%;                     
+    background: var(--bg);
+    padding: 4px;                  
+    border-radius: 10px;
+    margin-bottom: 4px !important;  /* Trả về 4px chuẩn như trang thuchi */
+    box-sizing: border-box;         
+}
+
+/* 2. ĐỒNG BỘ KHỐI GRID FORM TRÁI: DÙNG ROW-GAP LỚN ĐỂ TỰ ĐỘNG ĐẨY HÀNG ĐẦU */
+#p-t .card, 
+#p-g .card {
+    background: var(--sf);
+    padding: 24px !important;       /* Đồng bộ padding phủ lòng 24px */
+    border-radius: var(--r);
+    border: 1px solid var(--b);
+    display: grid;
+    grid-template-columns: 1fr 1fr; 
+    column-gap: 20px !important;                
+    row-gap: 16px !important;       /* CHUỐT LẠI CHUẨN: Dùng đúng 16px để độ giãn hàng đầu và các hàng dưới bằng khít trang thuchi */
+    align-content: start !important;
+    align-items: end !important;    
+    height: 100% !important;                    
+    box-sizing: border-box !important;
+}
