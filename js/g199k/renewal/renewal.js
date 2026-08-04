@@ -30,7 +30,7 @@ hienThiLichSuGiaHan(gid) {
                 return;
             }
 
-            tC.innerText = `KHÁCH HÀNG: ${res.name || data[0]?.name || "Thành viên"} (${gid})`; hC.innerHTML = '';
+            tC.innerText = `KH: ${res.name || data[0]?.name || "Thành viên"} (${gid})`; hC.innerHTML = '';
             
             // 🌟 1. THUẬT TOÁN MỚI: Sắp xếp GIẢM DẦN theo mã Hóa Đơn (Hóa đơn mới nhất, sinh sau cùng sẽ lên ĐẦU mảng)
             data.sort((a, b) => (b.hoaDon || '').localeCompare(a.hoaDon || ''));
