@@ -98,19 +98,26 @@
     }
 
     /* ==========================================================================
-       [2] PHÂN HỆ THU CHI (ĐÃ ĐỒNG BỘ KHÍT KÍCH THƯỚC CÂN XỨNG VỚI G199K)
+       PHÂN HỆ THU CHI (ĐỒNG BỘ CÂN BẰNG & ÉP CHỮ CĂN GIỮA TUYỆT ĐỐI)
        ========================================================================== */
     #p-t .card { 
         display: grid !important;
         grid-template-columns: 1fr !important; /* Cấu trúc 1 cột bung rộng */
         height: auto !important; 
-        padding: 10px 14px !important;         /* ĐỒNG BỘ: Hạ từ 16px xuống 10px 14px cho bằng khít lề của G199K */
-        row-gap: 4px !important;               /* ĐỒNG BỘ: Hạ từ 8px xuống đúng 4px để khoảng giãn dòng khít rạt như G199K */
+        padding: 10px 14px !important;         /* Giữ nguyên lề 10px 14px bằng khít G-199K */
+        row-gap: 4px !important;               /* Ép khít rạt dòng 4px như G-199K */
         box-sizing: border-box !important;
         margin-top: 0 !important;
     }
     
-    /* ĐỒNG BỘ THANH NÚT TAB (.SEG) THU CHI CHO BẰNG G199K */
+    /* ÉP TOÀN BỘ VĂN BẢN TRONG Ô INPUT/SELECT CỦA THU CHI RA GIỮA KHUNG */
+    #p-t .card input,
+    #p-t .card select {
+        text-align: center !important;         /* 🎯 CHÌA KHÓA: Đưa toàn bộ chữ nhập và placeholder ra chính giữa */
+        text-align-last: center !important;    /* Giúp căn giữa chuẩn xác cho cả ô select thả xuống */
+    }
+
+    /* ĐỒNG BỘ THANH NÚT TAB (.SEG) THU CHI */
     #p-t .card .seg { 
         grid-column: span 1 !important; 
         display: grid !important;
@@ -121,21 +128,56 @@
         padding: 3px !important;
         border-radius: 8px !important;
         box-sizing: border-box !important;
-        margin: 11px 0 4px 0 !important;      /* ĐỒNG BỘ: Thêm khoảng hở dọc 11px và khóa lề ngang bằng 0 như G199K */
+        margin: 11px 0 4px 0 !important;      /* Khối nút bung full lề ngang, hở dọc I */
     }
 
-    /* ĐỒNG BỘ NÚT BẤM CHÂN FORM THU CHI */
+    /* ĐỒNG BỘ NÚT BẤM NHẬP DỮ LIỆU CHÂN FORM THU CHI */
     #p-t .card .btn-sm { 
         grid-column: span 1 !important;
         width: 100% !important; 
-        height: 40px !important;               /* ĐỒNG BỘ: Hạ từ 44px xuống đúng 40px siêu tiết kiệm dòng bằng G199K */
+        height: 40px !important;               /* Cố định chiều cao 40px tinh gọn bằng G-199K */
         font-size: var(--f-size-sm) !important;
-        border-radius: 8px !important;         /* ĐỒNG BỘ: Hạ bo góc về 8px */
+        border-radius: 8px !important;         
         margin-top: 4px !important; 
         box-sizing: border-box !important;
     }
 
 
+    /* ==========================================================================
+       ÉP SÂN DIỆN RỘNG: BUỘC CHỮ TRONG Ô NHẬP CỦA CẢ 2 TRANG PHẢI RA GIỮA 
+       ========================================================================== */
+    #p-t .card input,
+    #p-t .card select,
+    #p-g .card input,
+    #p-g .card select,
+    .gr input,
+    .gr select {
+        text-align: center !important;        /* Ép chữ người dùng gõ phải ra chính giữa */
+        text-align-last: center !important;   /* Ép chữ hiển thị của ô select lựa chọn phải ra giữa */
+        padding-left: 10px !important;        /* Khóa cứng khoảng đệm đều 2 bên để chữ không bị đẩy lệch trái */
+        padding-right: 10px !important;
+    }
+
+    /* Ép tất cả các chữ gợi ý mờ (Placeholder) của cả 2 trang cũng phải ra giữa */
+    #p-t .card input::placeholder,
+    #p-g .card input::placeholder,
+    .gr input::placeholder {
+        text-align: center !important;        /* Ép chữ gợi ý "Vd: Huyền Aerobic", "Nhập họ và tên..." ra giữa */
+    }
+
+    /* 🎯 NGOẠI LỆ DUY NHẤT: Ô tra cứu GID nếu có icon kính lúp thì trả về căn trái để chống đè chữ */
+    .gr:has(input:not([readonly])) input,
+    #p-t .card .gr:first-of-type input {
+        text-align: left !important;
+        text-align-last: left !important;
+        padding-left: 32px !important;        /* Chừa khoảng trống 32px cho kính lúp đứng */
+    }
+    .gr:has(input:not([readonly])) input::placeholder,
+    #p-t .card .gr:first-of-type input::placeholder {
+        text-align: left !important;
+    }
+
+    
     .thuchi-workspace-right { 
         display: flex;
         flex-direction: column;
