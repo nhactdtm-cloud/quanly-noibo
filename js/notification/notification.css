@@ -128,31 +128,6 @@
     word-break: break-word;
 }
 
-/* Nút đóng nhanh (X) */
-.toast-close {
-    position: absolute;
-    top: 14px;
-    right: 14px;
-    background: none;
-    border: none;
-    color: var(--ts); /* Dùng màu chữ phụ */
-    opacity: 0.6;
-    cursor: pointer;
-    padding: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: var(--r-sm); /* Bo góc nút đóng 6px */
-    transition: var(--transition);
-}
-
-.toast-close:hover {
-    opacity: 1;
-    color: var(--t);
-    background: var(--hover-bg); /* Dùng nền hover hệ thống */
-}
-
-
 /* ==========================================================================
    ANIMATIONS
    ========================================================================== */

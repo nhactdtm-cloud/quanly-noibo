@@ -88,3 +88,50 @@
     display: block !important;
     object-fit: contain !important;
 }
+
+/* ==========================================================================
+   UI COMPONENT - TOAST CLOSE BUTTON (ĐÃ TÁCH RIÊNG)
+   ========================================================================== */
+
+.toast-close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    background: none;
+    border: none;
+    
+    /* Sử dụng màu chữ phụ hệ thống từ theme.css */
+    color: var(--ts); 
+    opacity: 0.6;
+    cursor: pointer;
+    
+    /* Tạo vùng bấm cân đối */
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    /* Bo góc nút đóng 6px theo biến sm hệ thống */
+    border-radius: var(--r-sm); 
+    
+    /* Hiệu ứng mượt mà khi hover */
+    transition: var(--transition);
+}
+
+.toast-close:hover {
+    opacity: 1;
+    
+    /* Chuyển sang màu chữ chính khi tương tác */
+    color: var(--t); 
+    
+    /* Sử dụng màu nền hover hệ thống */
+    background: var(--hover-bg); 
+}
+
+/* Tối ưu kích thước icon SVG bên trong nút đóng */
+.toast-close svg {
+    display: block;
+    width: 14px;
+    height: 14px;
+    pointer-events: none; /* Tránh click lệch vào thẻ svg */
+}
