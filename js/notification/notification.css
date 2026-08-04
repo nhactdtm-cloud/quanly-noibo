@@ -18,10 +18,15 @@
 
 .toast-item {
     pointer-events: auto;
-    background: var(--sf);
+    
+    /* 🌟 CẢI TIẾN: Giảm nhẹ opacity nền trắng và thêm hiệu ứng nhòe Gaussian Blur */
+    background: rgba(255, 255, 255, 0.82); 
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px); /* Hỗ trợ trình duyệt Safari */
+
     color: var(--t);
     padding: 16px;
-    border-radius: var(--r); /* Bo góc 16px theo chuẩn hệ thống */
+    border-radius: var(--r);
     border: 1px solid var(--b);
     box-shadow: var(--shadow-toast);
     
@@ -33,43 +38,28 @@
     overflow: hidden;
     transition: var(--transition);
 
-    /* Hiệu ứng mượt mà */
     animation: euroSlideIn .45s cubic-bezier(.25, 1, .5, 1) forwards;
 }
 
-/* Thanh chạy ngầm hiển thị thời gian ở đáy */
-.toast-item::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    height: 3px;
-    width: 100%;
-    transform-origin: left;
-    animation: toastProgress 3s linear forwards;
-}
-
 /* ==========================================================================
-   STATUS & MODERN GLOW EFFECTS (KHÔNG VIỀN ĐẦU)
+   TỐI ƯU LẠI GRADIENT GLOW ĐỂ KHÔNG LÀM MẤT HIỆU ỨNG BLUR
    ========================================================================== */
 
-/* Trạng thái Thành Công (Success) */
 .toast-item.success {
-    background: linear-gradient(to right, rgba(22, 163, 74, 0.06), var(--sf) 40%);
+    /* Đổi sang dùng rgba để vừa giữ được màu nhận diện vừa xuyên thấu kính */
+    background: linear-gradient(to right, rgba(22, 163, 74, 0.08), rgba(255, 255, 255, 0.85) 40%);
 }
 .toast-item.success .toast-icon { color: var(--s); }
 .toast-item.success::after { background: var(--s); }
 
-/* Trạng thái Thất Bại (Error) */
 .toast-item.error {
-    background: linear-gradient(to right, rgba(220, 38, 38, 0.06), var(--sf) 40%);
+    background: linear-gradient(to right, rgba(220, 25, 25, 0.08), rgba(255, 255, 255, 0.85) 40%);
 }
 .toast-item.error .toast-icon { color: var(--d); }
 .toast-item.error::after { background: var(--d); }
 
-/* Trạng thái Thông Tin (Info) */
 .toast-item.info {
-    background: linear-gradient(to right, rgba(37, 99, 235, 0.06), var(--sf) 40%);
+    background: linear-gradient(to right, rgba(37, 99, 235, 0.08), rgba(255, 255, 255, 0.85) 40%);
 }
 .toast-item.info .toast-icon { color: var(--info); }
 .toast-item.info::after { background: var(--info); }
