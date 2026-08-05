@@ -235,7 +235,14 @@
         margin-bottom: 4px !important;  
     }
 
-
+#p-g .card .gr,
+.gr {
+    grid-column: unset !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+}
 
     /* Đẩy nhẹ dòng đầu tiên (Mã GID) cách một khoảng đệm cực nhỏ để không dính tab */
     #p-g .card .gr:has(#r-gid) {
