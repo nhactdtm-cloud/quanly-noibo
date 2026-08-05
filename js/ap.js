@@ -63,6 +63,21 @@ const IdHoaDonModule = {
     }
 };
 
+document.addEventListener("DOMContentLoaded", function() {
+    // 1. Lấy chuỗi mã Base64 từ biến CSS ra
+    let iconUrl = getComputedStyle(document.documentElement).getPropertyValue('--app-icon').trim();
+    
+    // 2. Loại bỏ chữ url("...") ở hai đầu chuỗi để lấy nguyên bản đoạn data:image
+    iconUrl = iconUrl.replace(/^url\(["']?/, '').replace(/["']?\)$/, '');
+    
+    // 3. Tìm thẻ icon thông qua ID và gán giá trị vào thuộc tính href
+    let iosIconElement = document.getElementById('ios-icon');
+    if (iosIconElement) {
+        iosIconElement.setAttribute('href', iconUrl);
+    }
+});
+
+
 // ==========================================================================
 // HÀM DÙNG CHUNG TOÀN CỤC: ĐẶT TẠI CUỐI FILE APP.JS (FIX CHÍNH XÁC 100%)
 // ==========================================================================
