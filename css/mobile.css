@@ -17,12 +17,24 @@
     left: 0;
     width: 100%;
     height: 100vh;
-    padding: 16px;
-    padding-bottom: 60px !important; /* 🎯 Thu hẹp lại bằng đúng chiều cao của thanh menu bar để nội dung chạm sát viền menu */
+    padding: 16px 16px 75px 16px !important; /* 🎯 Cố định khoảng đệm trần 16px cho cả hệ thống */
     overflow-y: auto;
     box-sizing: border-box;
     z-index: 1;
 }
+
+
+/* Khóa cứng đỉnh đầu của chữ tiêu đề h2 để khi chuyển tab không bị giật trồi sụt */
+.main h2,
+#p-t h2, 
+#p-g h2,
+.main > h2:first-of-type {
+    margin-top: 0 !important;        /* Khóa cứng đỉnh chữ sát vạch padding 16px */
+    margin-bottom: 14px !important;  /* Khoảng hở từ chữ tiêu đề xuống mép Card trắng */
+    padding: 0 !important;
+    line-height: 1.2 !important;
+}
+
 
 
     .sb {
@@ -85,18 +97,21 @@
         font-size: var(--f-size-label); 
     }
 
+    /* Ép đồng bộ lề trên của cả 2 trang về 0 để ăn khớp tuyệt đối theo tiêu đề h2 */
+.thuchi-workspace,
+.r199k-workspace { 
+    display: flex !important;
+    flex-direction: column !important; 
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important; 
+    overflow: visible !important; 
+    gap: 16px !important;
+    padding: 0 !important;       
+    margin-top: 0 !important;    
+    box-sizing: border-box;
+}
 
-    /* --- [2] PHÂN HỆ THU CHI (ĐỒNG BỘ CHIỀU CAO HỆ THỐNG) --- */
-    .thuchi-workspace { 
-        display: flex;
-        flex-direction: column; 
-        width: 100%;
-        height: auto !important; 
-        overflow-y: visible !important; 
-        gap: 16px;
-        padding: 4px 0; /* Thu gọn lề trên dưới */
-        box-sizing: border-box;
-    }
 
     /* ==========================================================================
        PHÂN HỆ THU CHI (ĐỒNG BỘ CÂN BẰNG & ÉP CHỮ CĂN GIỮA TUYỆT ĐỐI)
@@ -184,19 +199,7 @@
         padding-top: 0px; 
     }
 
-/* --- R199K WORKSPACE MOBILE --- */
-.r199k-workspace {
-    display: flex !important;
-    flex-direction: column !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    gap: 16px !important;
-    margin-top: 0 !important;
-    padding: 0 !important;
-    box-sizing: border-box !important;
-    height: auto !important;
-    overflow: visible !important;
-}
+
 
 .r199k-sidebar,
 .r199k-sidebar-clean {
