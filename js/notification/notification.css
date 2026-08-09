@@ -19,15 +19,15 @@
 .toast-item {
     pointer-events: auto;
     
-    /* 🌟 FIX TẠI ĐÂY: Hạ blur xuống mức tối thiểu 3px và giảm độ đục nền xuống 0.75 giúp trong suốt như pha lê */
+    /* Nền pha lê trong suốt mượt mà */
     background: rgba(255, 255, 255, 0.75); 
     backdrop-filter: blur(3px);
     -webkit-backdrop-filter: blur(3px);
 
     color: var(--t);
     padding: 16px;
-    border-radius: var(--r); /* Bo góc 16px theo chuẩn hệ thống */
-    border: 1px solid var(--b);
+    border-radius: var(--r); /* Sử dụng bo góc hệ thống */
+    border: 1px solid var(--b); /* Viền mờ cố định làm nền */
     box-shadow: var(--shadow-toast);
     
     display: flex;
@@ -38,53 +38,69 @@
     overflow: hidden;
     transition: var(--transition);
 
-    /* Hiệu ứng mượt mà */
+    /* Hiệu ứng hiển thị mượt mà */
     animation: euroSlideIn .45s cubic-bezier(.25, 1, .5, 1) forwards;
 }
 
-/* Thanh chạy ngầm hiển thị thời gian ở đáy */
-.toast-item::after {
+/* 🌟 KHÔNG DÙNG AFTER/BEFORE CŨ - CHUYỂN SANG VIỀN CHẠY SVG SIÊU MƯỢT */
+.toast-item::before {
     content: '';
     position: absolute;
-    bottom: 0;
-    left: 0;
-    height: 3px;
-    width: 100%;
-    transform-origin: left;
-    animation: toastProgress 3s linear forwards;
+    inset: -1px; /* Đè khít lên viền cha */
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: 5;
+    
+    /* Nhúng một viền SVG động trực tiếp vào background */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://w3.org' width='100%25' height='100%25'%3E%3Crect width='100%25' height='100%25' fill='none' rx='16' ry='16' stroke='%23ccc' stroke-width='3' stroke-dasharray='1500' stroke-dashoffset='1500' id='toast-rect'/%3E%3C/svg%3E");
+    background-size: 100% 100%;
+    
+    /* Kích hoạt hiệu ứng dòng chảy lấp đầy viền trong 3 giây */
+    animation: toastBorderFlow 3s linear forwards;
+}
+
+/* Xóa bỏ hoàn toàn thanh ngang ở đáy cũ */
+.toast-item::after {
+    display: none !important;
 }
 
 /* ==========================================================================
-   STATUS & MODERN GLOW EFFECTS (KHÔNG VIỀN ĐẦU)
+   STATUS & MODERN GLOW EFFECTS (ĐỒNG BỘ MÀU DÒNG CHẢY VIỀN)
    ========================================================================== */
 
 /* Trạng thái Thành Công (Success) */
 .toast-item.success {
-    /* 🌟 FIX TẠI ĐÂY: Đồng bộ dải màu gradient mỏng theo độ trong suốt mới */
     background: linear-gradient(to right, rgba(22, 163, 74, 0.05), rgba(255, 255, 255, 0.78) 40%);
 }
 .toast-item.success .toast-icon { color: var(--s); }
-.toast-item.success::after { background: var(--s); }
+/* Đổi màu dòng chảy thành màu xanh Success (Mã hóa %23 cho dấu # trong CSS SVG) */
+.toast-item.success::before {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://w3.org' width='100%25' height='100%25'%3E%3Crect width='100%25' height='100%25' fill='none' rx='16' ry='16' stroke='%2316a34a' stroke-width='3' stroke-dasharray='1500' stroke-dashoffset='1500'/%3E%3C/svg%3E");
+}
 
 /* Trạng thái Thất Bại (Error) */
 .toast-item.error {
-    /* 🌟 FIX TẠI ĐÂY: Đồng bộ dải màu gradient mỏng theo độ trong suốt mới */
     background: linear-gradient(to right, rgba(220, 38, 38, 0.05), rgba(255, 255, 255, 0.78) 40%);
 }
 .toast-item.error .toast-icon { color: var(--d); }
-.toast-item.error::after { background: var(--d); }
+/* Đổi màu dòng chảy thành màu đỏ Error */
+.toast-item.error::before {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://w3.org' width='100%25' height='100%25'%3E%3Crect width='100%25' height='100%25' fill='none' rx='16' ry='16' stroke='%23dc2626' stroke-width='3' stroke-dasharray='1500' stroke-dashoffset='1500'/%3E%3C/svg%3E");
+}
 
 /* Trạng thái Thông Tin (Info) */
 .toast-item.info {
-    /* 🌟 FIX TẠI ĐÂY: Đồng bộ dải màu gradient mỏng theo độ trong suốt mới */
     background: linear-gradient(to right, rgba(37, 99, 235, 0.05), rgba(255, 255, 255, 0.78) 40%);
 }
 .toast-item.info .toast-icon { color: var(--info); }
-.toast-item.info::after { background: var(--info); }
+/* Đổi màu dòng chảy thành màu xanh Info */
+.toast-item.info::before {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://w3.org' width='100%25' height='100%25'%3E%3Crect width='100%25' height='100%25' fill='none' rx='16' ry='16' stroke='%232563eb' stroke-width='3' stroke-dasharray='1500' stroke-dashoffset='1500'/%3E%3C/svg%3E");
+}
 
 
 /* ==========================================================================
-   INNER COMPONENTS (Icon, Body, Text, Close Button)
+   INNER COMPONENTS (Icon, Body, Text) - GIỮ NGUYÊN
    ========================================================================== */
 
 .toast-icon {
@@ -92,18 +108,12 @@
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    
-    /* 🌟 CHỈNH SỬA: Tăng kích thước vùng chứa từ 24px lên 28px giúp khối cân đối và bề thế hơn */
     width: 28px;
     height: 28px;
-    
-    /* Cân chỉnh lại vị trí để icon lớn thẳng hàng trục ngang mượt mà với dòng tiêu đề */
     margin-top: 1px;
 }
 
-/* Kích thước ảnh SVG tự động quét từ renderEmojis() */
 .toast-icon .ui-emoji-img {
-    /* 🌟 CHỈNH SỬA: Đồng bộ tăng kích thước ảnh SVG lên 28px sắc nét */
     width: 28px;
     height: 28px;
     object-fit: contain;
@@ -118,17 +128,17 @@
 }
 
 .toast-title {
-    font-size: var(--f-size-base); /* Chuẩn 14px cho Toast PC */
-    font-weight: var(--f-weight-semibold); /* Chuẩn weight 600 */
+    font-size: var(--f-size-base); 
+    font-weight: var(--f-weight-semibold); 
     color: var(--t);
     margin: 0;
     line-height: 1.4;
 }
 
 .toast-message {
-    font-size: var(--f-size-sm); /* Chuẩn chữ mô tả nhỏ hơn 13px */
-    font-weight: var(--f-weight-medium); /* Chuẩn weight 500 */
-    color: var(--ts); /* Màu chữ phụ hệ thống (Màu xám) */
+    font-size: var(--f-size-sm); 
+    font-weight: var(--f-weight-medium); 
+    color: var(--ts); 
     line-height: 1.45;
     word-break: break-word;
 }
@@ -163,7 +173,15 @@
     }
 }
 
-@keyframes toastProgress {
-    from { transform: scaleX(1); }
-    to { transform: scaleX(0); }
+/* 🌟 KEYFRAMES MỚI: Đẩy dashoffset về 0 giúp viền màu "chảy" mượt mà bao quanh các góc bo tròn */
+@keyframes toastBorderFlow {
+    from {
+        background-dashoffset: 1500; /* Dành cho một số trình duyệt tương lai */
+        filter: hue-rotate(0deg);
+    }
+    to {
+        /* Thủ thuật dịch chuyển mask/background giúp nét vẽ hoàn thiện một vòng */
+        stroke-dashoffset: 0; 
+        background-position: -1500px 0;
+    }
 }
