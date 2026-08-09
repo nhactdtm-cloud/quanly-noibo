@@ -26,8 +26,8 @@
 
     color: var(--t);
     padding: 16px;
-    border-radius: var(--r); /* Sử dụng bo góc hệ thống */
-    border: 1px solid var(--b); /* Viền mờ cố định làm nền */
+    border-radius: var(--r); /* Bo góc theo hệ thống */
+    border: 1px solid var(--b); /* Viền mờ cố định ban đầu */
     box-shadow: var(--shadow-toast);
     
     display: flex;
@@ -42,65 +42,68 @@
     animation: euroSlideIn .45s cubic-bezier(.25, 1, .5, 1) forwards;
 }
 
-/* 🌟 KHÔNG DÙNG AFTER/BEFORE CŨ - CHUYỂN SANG VIỀN CHẠY SVG SIÊU MƯỢT */
+/* 🌟 FIX TẠI ĐÂY: Tạo thẻ giả lập viền chạy bao quanh bằng SVG */
 .toast-item::before {
     content: '';
     position: absolute;
-    inset: -1px; /* Đè khít lên viền cha */
+    inset: 0;
     border-radius: inherit;
+    padding: 1px;
+    background: var(--border-color, var(--b));
+    
+    /* Tạo hiệu ứng vẽ viền bằng cơ chế gạch nét (dash) của SVG */
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://w3.org' width='100%25' height='100%25'%3E%3Crect width='100%25' height='100%25' fill='none' stroke='black' stroke-width='4'/%3E%3C/svg%3E");
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://w3.org' width='100%25' height='100%25'%3E%3Crect width='100%25' height='100%25' fill='none' stroke='black' stroke-width='4'/%3E%3C/svg%3E");
+    
     pointer-events: none;
-    z-index: 5;
-    
-    /* Nhúng một viền SVG động trực tiếp vào background */
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://w3.org' width='100%25' height='100%25'%3E%3Crect width='100%25' height='100%25' fill='none' rx='16' ry='16' stroke='%23ccc' stroke-width='3' stroke-dasharray='1500' stroke-dashoffset='1500' id='toast-rect'/%3E%3C/svg%3E");
-    background-size: 100% 100%;
-    
-    /* Kích hoạt hiệu ứng dòng chảy lấp đầy viền trong 3 giây */
-    animation: toastBorderFlow 3s linear forwards;
+    z-index: 2;
 }
 
-/* Xóa bỏ hoàn toàn thanh ngang ở đáy cũ */
+/* 🌟 FIX TẠI ĐÂY: Thanh đếm ngược chạy bao quanh hộp thông báo thông qua clip-path hình học */
 .toast-item::after {
-    display: none !important;
+    content: '';
+    position: absolute;
+    /* Giãn khít đè lên viền 1px */
+    top: -1px;
+    left: -1px;
+    right: -1px;
+    bottom: -1px;
+    border-radius: inherit;
+    border: 2px solid var(--progress-color, #ccc);
+    pointer-events: none;
+    z-index: 3;
+    /* Animation đếm ngược xoay vòng quanh 4 cạnh vuông */
+    animation: toastBorderProgress 3s linear forwards;
 }
 
 /* ==========================================================================
-   STATUS & MODERN GLOW EFFECTS (ĐỒNG BỘ MÀU DÒNG CHẢY VIỀN)
+   STATUS & MODERN GLOW EFFECTS (ĐỒNG BỘ MÀU VIỀN XOAY)
    ========================================================================== */
 
 /* Trạng thái Thành Công (Success) */
 .toast-item.success {
     background: linear-gradient(to right, rgba(22, 163, 74, 0.05), rgba(255, 255, 255, 0.78) 40%);
+    --progress-color: var(--s); /* Gán màu viền chạy thành màu Success */
 }
 .toast-item.success .toast-icon { color: var(--s); }
-/* Đổi màu dòng chảy thành màu xanh Success (Mã hóa %23 cho dấu # trong CSS SVG) */
-.toast-item.success::before {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://w3.org' width='100%25' height='100%25'%3E%3Crect width='100%25' height='100%25' fill='none' rx='16' ry='16' stroke='%2316a34a' stroke-width='3' stroke-dasharray='1500' stroke-dashoffset='1500'/%3E%3C/svg%3E");
-}
 
 /* Trạng thái Thất Bại (Error) */
 .toast-item.error {
     background: linear-gradient(to right, rgba(220, 38, 38, 0.05), rgba(255, 255, 255, 0.78) 40%);
+    --progress-color: var(--d); /* Gán màu viền chạy thành màu Error */
 }
 .toast-item.error .toast-icon { color: var(--d); }
-/* Đổi màu dòng chảy thành màu đỏ Error */
-.toast-item.error::before {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://w3.org' width='100%25' height='100%25'%3E%3Crect width='100%25' height='100%25' fill='none' rx='16' ry='16' stroke='%23dc2626' stroke-width='3' stroke-dasharray='1500' stroke-dashoffset='1500'/%3E%3C/svg%3E");
-}
 
 /* Trạng thái Thông Tin (Info) */
 .toast-item.info {
     background: linear-gradient(to right, rgba(37, 99, 235, 0.05), rgba(255, 255, 255, 0.78) 40%);
+    --progress-color: var(--info); /* Gán màu viền chạy thành màu Info */
 }
 .toast-item.info .toast-icon { color: var(--info); }
-/* Đổi màu dòng chảy thành màu xanh Info */
-.toast-item.info::before {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://w3.org' width='100%25' height='100%25'%3E%3Crect width='100%25' height='100%25' fill='none' rx='16' ry='16' stroke='%232563eb' stroke-width='3' stroke-dasharray='1500' stroke-dashoffset='1500'/%3E%3C/svg%3E");
-}
 
 
 /* ==========================================================================
-   INNER COMPONENTS (Icon, Body, Text) - GIỮ NGUYÊN
+   INNER COMPONENTS (Icon, Body, Text, Close Button)
    ========================================================================== */
 
 .toast-icon {
@@ -173,15 +176,21 @@
     }
 }
 
-/* 🌟 KEYFRAMES MỚI: Đẩy dashoffset về 0 giúp viền màu "chảy" mượt mà bao quanh các góc bo tròn */
-@keyframes toastBorderFlow {
-    from {
-        background-dashoffset: 1500; /* Dành cho một số trình duyệt tương lai */
-        filter: hue-rotate(0deg);
+/* 🌟 KEYFRAMES XOAY QUANH: Cắt đa giác giúp viền thu nhỏ dần theo chiều kim đồng hồ từ góc trên bên trái */
+@keyframes toastBorderProgress {
+    0% {
+        clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, 0 0);
     }
-    to {
-        /* Thủ thuật dịch chuyển mask/background giúp nét vẽ hoàn thiện một vòng */
-        stroke-dashoffset: 0; 
-        background-position: -1500px 0;
+    25% {
+        clip-path: polygon(100% 0, 100% 0, 100% 100%, 0 100%, 0 0);
+    }
+    50% {
+        clip-path: polygon(100% 100%, 100% 100%, 100% 100%, 0 100%, 0 0);
+    }
+    75% {
+        clip-path: polygon(0 100%, 0 100%, 0 100%, 0 100%, 0 0);
+    }
+    100% {
+        clip-path: polygon(0 0, 0 0, 0 0, 0 0, 0 0);
     }
 }
