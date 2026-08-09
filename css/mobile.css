@@ -1,5 +1,5 @@
 /* ==========================================================================
-   TỐI ƯU GIAO DIỆN MOBILE - ĐÃ ĐỒNG BỘ TOÀN BỘ KHOẢNG CÁCH (1 ĐẾN 6)
+   TỐI ƯU GIAO DIỆN MOBILE - ĐỒNG BỘ ĐỐI XỨNG TUYỆT ĐỐI (DÒNG 1 ĐẾN 6)
    ========================================================================== */
 @media (max-width: 768px) {
     /* --- CẤU TRÚC KHUNG TRANG CHÍNH & MENU ĐÁY --- */
@@ -14,18 +14,20 @@
     .usr-bar { margin-bottom: 10px; font-size: var(--f-size-label); }
     .thuchi-workspace, .r199k-workspace { display: flex !important; flex-direction: column !important; width: 100% !important; max-width: 100% !important; height: auto !important; overflow: visible !important; gap: 16px !important; padding: 0 !important; margin-top: 0 !important; box-sizing: border-box; }
 
-    /* --- [FIX ĐƯỜNG KÈ LỆCH 1 ĐẾN 6]: ĐỒNG BỘ TOÀN BỘ CARD & KHOẢNG CÁCH Ô NHẬP --- */
-    #p-t .card, #p-g .card { display: flex !important; flex-direction: column !important; row-gap: 12px !important; padding: 14px 14px 10px 14px !important; box-sizing: border-box !important; margin-top: 0 !important; }
-    #p-t .card .seg, #p-g .card .seg { display: grid !important; grid-template-columns: 1fr 1fr !important; width: 100% !important; max-width: 100% !important; background: var(--bg) !important; padding: 3px !important; border-radius: 8px !important; box-sizing: border-box !important; margin: 11px 0 4px 0 !important; }
-    #p-t .card .gr, #p-g .card .gr, .gr { display: flex !important; flex-direction: column !important; gap: 2px !important; width: 100% !important; max-width: 100% !important; margin: 0 !important; box-sizing: border-box !important; }
+    /* --- 🎯 THIẾT LẬP CÂN BẰNG LÕI: FIX TRÙNG KHỚP DÒNG 1 ĐẾN DÒNG 6 --- */
+    #p-t .card, #p-g .card { display: flex !important; flex-direction: column !important; row-gap: 12px !important; padding: 14px 14px 10px 14px !important; box-sizing: border-box !important; margin: 0 !important; }
+    #p-t .card .seg, #p-g .card .seg { display: grid !important; grid-template-columns: 1fr 1fr !important; width: 100% !important; max-width: 100% !important; background: var(--bg) !important; padding: 3px !important; border-radius: 8px !important; box-sizing: border-box !important; margin: 11px 0 2px 0 !important; }
+    
+    /* Ép tất cả các khối .gr về một quy chuẩn dòng chảy thống nhất */
+    #p-t .card .gr, #p-g .card .gr, .gr { display: flex !important; flex-direction: column !important; gap: 2px !important; width: 100% !important; max-width: 100% !important; margin: 0 !important; padding: 0 !important; box-sizing: border-box !important; }
 
-    /* --- CẤU TRÚC ĐỒNG BỘ CHỮ & CHIỀU CAO Ô NHẬP LIỆU --- */
+    /* Khóa cứng chiều cao của label chữ để triệt tiêu việc chữ dài ngắn đẩy dòng lệch nhau */
+    .gr label { display: block !important; width: 100% !important; max-width: 100% !important; margin: 0 0 2px 0 !important; padding-left: 2px !important; font-size: var(--f-size-xs) !important; height: 15px !important; line-height: 15px !important; overflow: hidden !important; text-overflow: ellipsis !important; white-space: nowrap !important; box-sizing: border-box !important; }
+
+    /* --- CẤU TRÚC ĐỒNG BỘ CÁC Ô NHẬP LIỆU INPUT / SELECT --- */
     #p-t .card input, #p-t .card select, #p-g .card input, #p-g .card select, .gr input, .gr select { text-align: center !important; text-align-last: center !important; padding: 4px 10px !important; }
     #p-t .card input::placeholder, #p-g .card input::placeholder, .gr input::placeholder { text-align: center !important; }
     .gr input, .gr select, .gr input[readonly] { width: 100% !important; max-width: 100% !important; display: block !important; font-size: var(--f-size-sm) !important; -webkit-text-fill-color: var(--t) !important; opacity: 1 !important; box-sizing: border-box !important; height: 40px !important; line-height: 40px !important; background: var(--input-bg) !important; border: 1px solid var(--b) !important; border-radius: 8px !important; }
-    
-    /* Ép chết chiều cao label chữ để không bị lệch dấu tiếng Việt */
-    .gr label { display: block !important; margin: 0 0 2px 0 !important; padding-left: 2px; font-size: var(--f-size-xs) !important; height: 14px !important; line-height: 14px !important; }
     .gr:has(input:not([readonly])) .r-gid-icon-emoji, .gr:has(input:not([readonly])) [data-emoji="tim-kiem"] { bottom: 13px !important; }
 
     /* Ngoại lệ: ô tìm kiếm canh trái */
