@@ -104,7 +104,7 @@ function inHoaDon(maHD) {
     const soTienDinhDang = (item.soTien || 0).toLocaleString('vi-VN') + 'đ';
 
     // 2. Mở một cửa sổ mới hoàn toàn ẩn ở nền để phục vụ lệnh in lệnh
-    const printWindow = window.open('hoadon.html?ma=' + maHD, '_blank', 'width=800,height=600');
+    const printWindow = window.open('', '_blank', 'width=800,height=600');
     
     // 3. Thiết kế phôi hóa đơn chuẩn hóa ngay trong mã HTML xuất bản
     printWindow.document.write(`
