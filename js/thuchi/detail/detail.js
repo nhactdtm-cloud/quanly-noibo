@@ -103,11 +103,14 @@ function inHoaDon(maHD) {
     const isThu = ['THU TIỀN', 'THU'].includes(item.mode);
     const soTienDinhDang = (item.soTien || 0).toLocaleString('vi-VN') + 'đ';
 
-    // 2. Nội dung HTML của hóa đơn (Đặt tên tiêu đề KHÔNG DẤU để Safari nhận diện)
-    const htmlContent = `
+    // 2. Mở một cửa sổ mới hoàn toàn ẩn ở nền để phục vụ lệnh in lệnh
+    const printWindow = window.open('', '_blank', 'width=800,height=600');
+    
+    // 3. Thiết kế phôi hóa đơn chuẩn hóa ngay trong mã HTML xuất bản
+    printWindow.document.write(`
         <html>
         <head>
-            <title>hoadon_${item.hoaDon}</title>
+            <title>Hóa Đơn - ${item.hoaDon}</title>
             <style>
                 body { font-family: Arial, sans-serif; padding: 30px; color: #333; line-height: 1.5; }
                 .invoice-box { max-width: 500px; margin: auto; padding: 20px; border: 1px solid #eee; border-radius: 8px; }
@@ -134,25 +137,16 @@ function inHoaDon(maHD) {
                 <div class="footer">Cảm ơn quý khách đã sử dụng dịch vụ!</div>
             </div>
             <script>
+                // Tự động kích hoạt lệnh gọi máy in của máy tính ngay khi trang vừa dựng xong
                 window.onload = function() {
-                    document.title = "hoadon_${item.hoaDon}";
                     window.print();
+                    // Sau khi người dùng bấm xác nhận in hoặc hủy, tự động đóng tab ẩn này lại
                     setTimeout(function() { window.close(); }, 500);
                 };
             <\/script>
         </body>
         </html>
-    `;
+    `);
 
-    // 3. MẸO CHO SAFARI MOBILE: Biến HTML thành một File Object tạm thời
-    const blob = new Blob([htmlContent], { type: 'text/html' });
-    const blobURL = URL.createObjectURL(blob);
-
-    // 4. Mở file tạm thời này trên tab mới
-    const printWindow = window.open(blobURL, '_blank');
-
-    // Giải phóng bộ nhớ sau khi mở
-    if (printWindow) {
-        URL.revokeObjectURL(blobURL);
-    }
+    printWindow.document.close();
 }
