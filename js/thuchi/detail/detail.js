@@ -104,13 +104,13 @@ function inHoaDon(maHD) {
     const soTienDinhDang = (item.soTien || 0).toLocaleString('vi-VN') + 'đ';
 
     // 2. Mở một cửa sổ mới hoàn toàn ẩn ở nền để phục vụ lệnh in lệnh
-    const printWindow = window.open('', '_blank', 'width=800,height=600');
+    const printWindow = window.open('hoadon.html?ma=' + maHD, '_blank', 'width=800,height=600');
     
     // 3. Thiết kế phôi hóa đơn chuẩn hóa ngay trong mã HTML xuất bản
     printWindow.document.write(`
         <html>
         <head>
-            <title>Hoa_Don_${item.hoaDon}</title>
+            <title>Hóa Đơn - ${item.hoaDon}</title>
             <style>
                 body { font-family: Arial, sans-serif; padding: 30px; color: #333; line-height: 1.5; }
                 .invoice-box { max-width: 500px; margin: auto; padding: 20px; border: 1px solid #eee; border-radius: 8px; }
@@ -139,7 +139,6 @@ function inHoaDon(maHD) {
             <script>
                 // Tự động kích hoạt lệnh gọi máy in của máy tính ngay khi trang vừa dựng xong
                 window.onload = function() {
-                    document.title = "Hoa_Don_${item.hoaDon}"; 
                     window.print();
                     // Sau khi người dùng bấm xác nhận in hoặc hủy, tự động đóng tab ẩn này lại
                     setTimeout(function() { window.close(); }, 500);
