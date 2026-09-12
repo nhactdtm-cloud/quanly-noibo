@@ -418,7 +418,7 @@ const payload = {
     hoaDon: hD,
     khachHang: name,
     ghiChu: goi,
-    loaiGd: "R-199",
+    loaiGd: "R199",
     soTien: Number(tien),
     mode: "THU TIỀN",
     adminName: (typeof UserModule !== 'undefined' ? UserModule.uName : "ADMIN"),
