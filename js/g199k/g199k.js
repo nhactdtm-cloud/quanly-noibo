@@ -161,10 +161,7 @@ document.getElementById('r-gid').addEventListener('input', () => {
 },
 
 
-
-
-
-    taiDanhSachThanhVienTheoUser: function() {
+taiDanhSachThanhVienTheoUser: function() {
         const container = document.getElementById('r199k-member-container'); if (!container) return;
         const cleanUrl = this.FB_URL.replace(/\/$/, '');
         if (this.memberEventSource) this.memberEventSource.close();
@@ -177,6 +174,23 @@ document.getElementById('r-gid').addEventListener('input', () => {
 
         const renderGiaoDienSieuToc = (data) => {
             const filteredData = applyFilterData(data), fragment = document.createDocumentFragment();
+            
+            // --- TỰ ĐỘNG ĐẾM VÀ CẬP NHẬT CHỮ HIỂN THỊ THÀNH VIÊN ---
+            const countSpan = document.getElementById('customerCount');
+            const filterElement = document.getElementById('filterStatus');
+            if (countSpan && filterElement) {
+                let textStatus = "";
+                if (filterElement.value === "REGISTERED") {
+                    textStatus = "Khách hàng"; // "23 Khách hàng" khi chọn Đang hoạt động
+                } else if (filterElement.value === "CANCELLED") {
+                    textStatus = "Khách hàng"; // "12 Khách hàng Ngừng hoạt động" khi chọn Ngừng hoạt động
+                } else {
+                    textStatus = "Tổng số khách hàng"; // "35 Tổng số khách hàng" khi chọn Xem tất cả
+                }
+                countSpan.textContent = `${filteredData.length} ${textStatus}`;
+            }
+            // -----------------------------------------------------
+
             filteredData.forEach(item => {
                 const itemDiv = document.createElement('div'); itemDiv.className = 'member-item'; itemDiv.setAttribute('data-gid', item.gid);
                 itemDiv.innerHTML = `<div class="member-item-info" data-gid="${item.gid}"><span class="member-item-name r-click-name" style="cursor: pointer;" data-action="view-history" data-gid="${item.gid}">${item.name}</span><span class="member-item-gid" data-gid="${item.gid}">${item.gid}</span></div><span class="member-item-badge" data-gid="${item.gid}">${item.goi}</span>`;
@@ -248,13 +262,6 @@ renderGiaoDienSieuToc(allInvoices);
 
 
         });
-    },
-
-    refreshRenewList: function () {
-        localStorage.removeItem('r199k_members_cache');
-        localStorage.removeItem('r199k_members_cache_time');
-
-        this.taiDanhSachThanhVienTheoUser();
     },
 
 
