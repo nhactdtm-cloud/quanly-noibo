@@ -181,11 +181,11 @@ taiDanhSachThanhVienTheoUser: function() {
             if (countSpan && filterElement) {
                 let textStatus = "";
                 if (filterElement.value === "REGISTERED") {
-                    textStatus = "Khách hàng"; // "23 Khách hàng" khi chọn Đang hoạt động
+                    textStatus = "Thành viên";
                 } else if (filterElement.value === "CANCELLED") {
-                    textStatus = "Khách hàng"; // "12 Khách hàng Ngừng hoạt động" khi chọn Ngừng hoạt động
+                    textStatus = "Thành viên";
                 } else {
-                    textStatus = "Tổng số khách hàng"; // "35 Tổng số khách hàng" khi chọn Xem tất cả
+                    textStatus = "Thành viên";
                 }
                 countSpan.textContent = `${filteredData.length} ${textStatus}`;
             }
