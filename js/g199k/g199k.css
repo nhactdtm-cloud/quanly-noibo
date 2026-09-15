@@ -14,21 +14,7 @@
     box-sizing: border-box;
 }
 
-/* Khối Form bên trái: Ép các dòng sát rạt nhau */
-#p-g .card {
-    background: var(--sf);
-    border: 1px solid var(--b);
-    border-radius: var(--r);
-    padding: 10px 24px;             
-    display: grid;
-    grid-template-columns: 1fr 1fr; 
-    column-gap: 20px;               
-    row-gap: 4px !important;        /* Giúp các dòng nhập liệu phía dưới ôm sát nhau */
-    align-content: start;
-    align-items: end;               /* Giữ chân nút và input thẳng hàng tuyệt đối */
-    height: 100%;                   
-    box-sizing: border-box;
-}
+
 
 /* Thanh tab điều hướng */
 #p-g .card .seg {
@@ -55,18 +41,34 @@
 }
 
 
+/* Khối Form bên trái: Giữ chiều cao cố định */
+#p-g .card {
+    background: var(--sf);
+    border: 1px solid var(--b);
+    border-radius: var(--r);
+    padding: 16px 24px;             
+    display: grid;
+    grid-template-columns: 1fr 1fr; 
+    column-gap: 20px;               
+    row-gap: 4px !important;        
+    align-content: start;
+    align-items: end;               
+    height: 100% !important; /* Đảm bảo luôn lấp đầy chiều cao khung cha */
+    box-sizing: border-box;
+}
 
-/* KHỐI SIDEBAR BÊN PHẢI */
+/* KHỐI SIDEBAR BÊN PHẢI: Giữ chiều cao cố định bằng form trái */
 .r199k-sidebar {
     background: var(--sf);
     border: 1px solid var(--b);
     border-radius: var(--r);
-    padding: 10px 20px;             /* ÉP CHẶT: Giảm padding trên/dưới xuống còn 10px */
+    padding: 10px 20px;             
     display: flex;
     flex-direction: column;
-    gap: 6px;                       /* ÉP CHẶT: Hạ gap từ 12px xuống còn 6px để các block dính sát nhau */
-    height: 100%;                   
+    gap: 6px;                       
+    height: 100% !important; /* Đảm bảo luôn lấp đầy chiều cao khung cha */
     box-sizing: border-box;
+    overflow: hidden; /* Ngăn chặn nội dung bên trong tràn ra làm hỏng form */
 }
 
 
@@ -105,21 +107,7 @@
     box-sizing: border-box;         
 }
 
-/* Khối Form trái: Ép các dòng sát rạt nhau tối đa */
-#p-g .card {
-    background: var(--sf);
-    border: 1px solid var(--b);
-    border-radius: var(--r);
-    padding: 16px 24px;             
-    display: grid;
-    grid-template-columns: 1fr 1fr; 
-    column-gap: 20px;               
-    row-gap: 4px !important;        /* ÉP SÁT: Thu ngắn tối đa khoảng cách tất cả các dòng phía dưới */
-    align-content: start;
-    align-items: end;               
-    height: 100%;                   
-    box-sizing: border-box;
-}
+
 
 
 
@@ -322,9 +310,9 @@
     margin-bottom: 8px;
 }
 
-/* KHU VỰC CUỘN (Giữ cố định không gian thanh cuộn chống giật lệch lề) */
+/* KHU VỰC CUỘN */
 .member-container-scroll {
-    max-height: 280px;
+    max-height: 200px !important; /* Hạ từ 280px xuống 200px để không kích chiều cao sidebar */
     overflow-y: auto;
     scrollbar-gutter: stable; 
     display: flex;
@@ -334,6 +322,7 @@
     width: 100%;
     box-sizing: border-box;
 }
+
 
 /* THANH CUỘN SIÊU MẢNH */
 .member-container-scroll::-webkit-scrollbar {
@@ -492,4 +481,13 @@
     width: 14px !important;
     height: 14px !important;
     object-fit: contain;
+}
+/* Thêm vào cuối file CSS của bạn */
+.gr {
+    position: relative; /* Tạo điểm neo cho icon tuyệt đối */
+}
+
+/* Khi input KHÔNG có readonly (đang ở tab gia hạn) thì đẩy chữ sang phải 30px */
+.gr:has(input:not([readonly])) input {
+    padding-left: 32px !important;
 }
