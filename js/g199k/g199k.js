@@ -314,7 +314,7 @@ renderGiaoDienSieuToc(allInvoices);
         const endVal = document.getElementById('r-end').value;     
         const tienVal = document.getElementById('r-tien').value || 0;
 
-        document.getElementById('display-customer-info').innerText = `${gid} ( ${name} )`;
+        document.getElementById('display-customer-info').innerText = `${name} ( ${gid} )`;
 
         // 1. Định dạng Ngày bắt đầu (Luôn đảm bảo ra DD/MM/YYYY)
         let startFormatted = '--/--/----';
@@ -368,10 +368,8 @@ renderGiaoDienSieuToc(allInvoices);
     },
 
 
-
-    // HÀM MỚI: Đăng ký sự kiện Click là tự động sao chép văn bản
     dangKySuKienCopy: function() {
-        // 1. Copy nhanh dữ liệu dòng Mã GID (Tên Khách Hàng)
+
         const copyGidBox = document.getElementById('copy-gid-box');
         if (copyGidBox) {
             copyGidBox.addEventListener('click', () => {
@@ -380,7 +378,7 @@ renderGiaoDienSieuToc(allInvoices);
             });
         }
 
-        // 2. Copy nhanh toàn bộ khối văn bản "GIA HẠN THANH TOÁN NHÓM" gửi khách hàng
+
         const copyTextBox = document.getElementById('copy-text-box');
         if (copyTextBox) {
             copyTextBox.addEventListener('click', () => {
