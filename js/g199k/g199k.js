@@ -314,7 +314,7 @@ renderGiaoDienSieuToc(allInvoices);
         const endVal = document.getElementById('r-end').value;     
         const tienVal = document.getElementById('r-tien').value || 0;
 
-        document.getElementById('display-customer-info').innerText = `${name} ( ${gid} )`;
+        document.getElementById('display-customer-info').innerText = `${gid} ( ${name} )`;
 
         // 1. Định dạng Ngày bắt đầu (Luôn đảm bảo ra DD/MM/YYYY)
         let startFormatted = '--/--/----';
