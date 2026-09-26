@@ -6,7 +6,7 @@ const ThuChiModule = {
     searchId: 0,
     isAutofilling: false,
      totalOrders: 0, totalRevenue: 0, totalExpense: 0, isSyncing: false, isLoadingData: false, duLieuGiaoDichHomNay: [],
-    oT: ['NHẠC LẺ', 'PHÍ ĐÀO TẠO', 'DOANH THU KHÁC'], oC: ['Quảng Cáo', 'CHI PHÍ VẬN HÀNH'],
+    oT: ['NHẠC LẺ', 'PHÍ ĐÀO TẠO', 'DOANH THU KHÁC'], oC: ['QUẢNG CÁO', 'CHI PHÍ VẬN HÀNH'],
 
     init() { 
         this.iId(); 
