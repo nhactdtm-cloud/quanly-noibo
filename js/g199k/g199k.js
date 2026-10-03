@@ -281,7 +281,19 @@ renderGiaoDienSieuToc(allInvoices);
             this.ngayConLaiThucTe = 0; this.capNhatKhungChamSocKhachHang(); return;
         }
 
-        let date = new Date(ngàyBắtĐầuValue); if (isNaN(date.getTime())) { if (inputEnd) inputEnd.value = ""; this.ngayConLaiThucTe = 0; return; }
+        // Thay thế dấu '-' thành '/' để ép JavaScript parse theo giờ Local của máy khách thay vì UTC
+const localDateString = ngàyBắtĐầuValue.replace(/-/g, '/');
+let date = new Date(localDateString); 
+
+if (isNaN(date.getTime())) { 
+    if (inputEnd) inputEnd.value = ""; 
+    this.ngayConLaiThucTe = 0; 
+    return; 
+}
+
+// Đưa mốc giờ ngày bắt đầu về đúng 00:00:00 để tính toán chính xác
+date.setHours(0, 0, 0, 0);
+
         const địnhDạngKiểuLịch = (dObj) => {
     const day = String(dObj.getDate()).padStart(2, '0');
     const month = String(dObj.getMonth() + 1).padStart(2, '0');
@@ -296,7 +308,10 @@ renderGiaoDienSieuToc(allInvoices);
         let diffDays = 0;
         if (gói !== 'HẾT HẠN') {
             const today = new Date(); today.setHours(0, 0, 0, 0);
-            const diffTime = date - today; diffDays = Math.ceil(diffTime / 86400000);
+            const diffTime = date - today; 
+// Dùng Math.round để loại bỏ hoàn toàn các sai lệch vài mili-giây do hệ thống
+diffDays = Math.round(diffTime / 86400000);
+
             if (diffDays < 0) diffDays = 0;
         }
         this.ngayConLaiThucTe = diffDays; // Gán vào biến của module
