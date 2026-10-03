@@ -264,12 +264,27 @@ renderGiaoDienSieuToc(allInvoices);
         });
     },
 
-
-    tínhNgàyKếtThúc: function() {
-        const ngàyBắtĐầuValue = document.getElementById('r-start').value;
+tínhNgàyKếtThúc: function() {
+        let ngàyBắtĐầuValue = document.getElementById('r-start').value;
         const gói = document.getElementById('r-goi').value;
         const inputEnd = document.getElementById('r-end');
         const inputTien = document.getElementById('r-tien');
+
+        // =========================================================================
+        // SỬA GỐC: Tự động phát hiện và ép ô nhập liệu về đúng ngày hôm nay (04/10) 
+        // nếu hệ thống vừa tải trang hoặc giá trị bị lệch lùi ngày do múi giờ ban đêm.
+        // =========================================================================
+        const realTime = new Date();
+        const realY = realTime.getFullYear();
+        const realM = String(realTime.getMonth() + 1).padStart(2, '0');
+        const realD = String(realTime.getDate()).padStart(2, '0');
+        const chuoiNgayThucTe = `${realY}-${realM}-${realD}`; // Định dạng: YYYY-MM-DD
+
+        // Nếu ô ngày bắt đầu đang trống, hoặc hệ thống vừa mở lên gán sai ngày cũ (nhỏ hơn ngày thực tế)
+        if (!ngàyBắtĐầuValue || ngàyBắtĐầuValue.trim() === "" || ngàyBắtĐầuValue < chuoiNgayThucTe) {
+            document.getElementById('r-start').value = chuoiNgayThucTe;
+            ngàyBắtĐầuValue = chuoiNgayThucTe; // Cập nhật lại biến để tính toán bên dưới
+        }
 
         if (this.mode === 'NEW') { const oC = document.getElementById('opt-cancel'); if (oC) oC.remove(); } 
         else if (this.mode === 'RENEW' && !document.getElementById('opt-cancel')) {
@@ -281,37 +296,32 @@ renderGiaoDienSieuToc(allInvoices);
             this.ngayConLaiThucTe = 0; this.capNhatKhungChamSocKhachHang(); return;
         }
 
-        // Thay thế dấu '-' thành '/' để ép JavaScript parse theo giờ Local của máy khách thay vì UTC
-const localDateString = ngàyBắtĐầuValue.replace(/-/g, '/');
-let date = new Date(localDateString); 
-
-if (isNaN(date.getTime())) { 
-    if (inputEnd) inputEnd.value = ""; 
-    this.ngayConLaiThucTe = 0; 
-    return; 
-}
-
-// Đưa mốc giờ ngày bắt đầu về đúng 00:00:00 để tính toán chính xác
-date.setHours(0, 0, 0, 0);
+        // FIX MÚI GIỜ BAN ĐÊM: Thay '-' bằng '/' để ép JavaScript nhận ngày theo múi giờ Local Việt Nam
+        const localStartDateString = ngàyBắtĐầuValue.replace(/-/g, '/');
+        let date = new Date(localStartDateString); 
+        if (isNaN(date.getTime())) { if (inputEnd) inputEnd.value = ""; this.ngayConLaiThucTe = 0; return; }
+        
+        // Ép mốc giờ ngày bắt đầu về đúng 00:00:00
+        date.setHours(0, 0, 0, 0);
 
         const địnhDạngKiểuLịch = (dObj) => {
-    const day = String(dObj.getDate()).padStart(2, '0');
-    const month = String(dObj.getMonth() + 1).padStart(2, '0');
-    return `${day}/${month}/${dObj.getFullYear()}`;
-};
+            const day = String(dObj.getDate()).padStart(2, '0');
+            const month = String(dObj.getMonth() + 1).padStart(2, '0');
+            return `${day}/${month}/${dObj.getFullYear()}`;
+        };
 
-        
         if (gói === '1 THÁNG') { date.setMonth(date.getMonth() + 1); if (inputEnd) inputEnd.value = địnhDạngKiểuLịch(date); if (inputTien) inputTien.value = "199000"; } 
         else if (gói === '3 THÁNG') { date.setMonth(date.getMonth() + 3); if (inputEnd) inputEnd.value = địnhDạngKiểuLịch(date); if (inputTien) inputTien.value = "500000"; } 
         else if (gói === 'HẾT HẠN') { if (inputEnd) inputEnd.value = "HỦY NGAY"; if (inputTien) inputTien.value = "0"; }
 
         let diffDays = 0;
         if (gói !== 'HẾT HẠN') {
-            const today = new Date(); today.setHours(0, 0, 0, 0);
+            // Khởi tạo ngày hôm nay thuần địa phương (Local) từ đồng hồ hệ thống máy tính
+            const now = new Date();
+            const today = new Date(`${now.getFullYear()}/${now.getMonth() + 1}/${now.getDate()}`);
+            
             const diffTime = date - today; 
-// Dùng Math.round để loại bỏ hoàn toàn các sai lệch vài mili-giây do hệ thống
-diffDays = Math.round(diffTime / 86400000);
-
+            diffDays = Math.round(diffTime / 86400000); // Dùng Math.round để triệt tiêu chênh lệch mili-giây
             if (diffDays < 0) diffDays = 0;
         }
         this.ngayConLaiThucTe = diffDays; // Gán vào biến của module
@@ -319,13 +329,11 @@ diffDays = Math.round(diffTime / 86400000);
         this.capNhatKhungChamSocKhachHang();
     },
 
-
-
     capNhatKhungChamSocKhachHang: function() {
         const gid = document.getElementById('r-gid').value || 'TỰ ĐỘNG SINH';
         const name = document.getElementById('r-name').value.trim() || 'Chưa nhập tên';
         const goi = document.getElementById('r-goi').value;
-        const startVal = document.getElementById('r-start').value; // Định dạng HTML5: YYYY-MM-DD
+        const startVal = document.getElementById('r-start').value; 
         const endVal = document.getElementById('r-end').value;     
         const tienVal = document.getElementById('r-tien').value || 0;
 
@@ -338,26 +346,25 @@ diffDays = Math.round(diffTime / 86400000);
             startFormatted = `${d.padStart(2, '0')}/${m.padStart(2, '0')}/${y}`;
         }
 
-        // 2. SỬA ĐỊNH DẠNG LỊCH SAI & TÍNH NGÀY CÒN LẠI
+        // 2. Định dạng Ngày kết thúc
         let endFormatted = '--/--/----';
         let endDateObj = null;
 
         if (endVal && endVal !== "HỦY NGAY") {
-            // Dùng Regex trích xuất tất cả các cụm số bất kể chuỗi là "ngày 29 thg 8, 2026" hay "29/08/2026"
             const parts = endVal.match(/\d+/g);
             
             if (parts && parts.length >= 3) {
                 const d = parseInt(parts[0], 10);
-                const m = parseInt(parts[1], 10); // Tháng thực tế (1 - 12)
+                const m = parseInt(parts[1], 10); 
                 const y = parseInt(parts[2], 10);
                 
-                // Ép lịch hiển thị quay trở lại dạng số truyền thống DD/MM/YYYY 
                 const dayStr = String(d).padStart(2, '0');
                 const monthStr = String(m).padStart(2, '0');
                 endFormatted = `${dayStr}/${monthStr}/${y}`;
                 
-                // Khởi tạo đối tượng Date phục vụ tính toán (tháng trong JS trừ đi 1)
+                // Khởi tạo Date bằng tham số cụ thể, đồng bộ giờ giấc
                 endDateObj = new Date(y, m - 1, d);
+                endDateObj.setHours(0, 0, 0, 0); 
             } else {
                 endFormatted = endVal;
             }
@@ -368,11 +375,11 @@ diffDays = Math.round(diffTime / 86400000);
         // 3. Tính số ngày còn lại thực tế từ HÔM NAY đến NGÀY KẾT THÚC
         let diffDays = 0;
         if (endDateObj && !isNaN(endDateObj.getTime())) {
-            const today = new Date();
-            today.setHours(0, 0, 0, 0); // Đưa mốc hôm nay về 00:00:00 để tính chính xác theo ngày
+            const now = new Date();
+            const today = new Date(`${now.getFullYear()}/${now.getMonth() + 1}/${now.getDate()}`);
             
             const diffTime = endDateObj - today;
-            diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24)); 
             if (diffDays < 0) diffDays = 0; 
         }
 
@@ -381,6 +388,7 @@ diffDays = Math.round(diffTime / 86400000);
         document.getElementById('lbl-days').innerText = (goi === 'HẾT HẠN' || endVal === "HỦY NGAY") ? '0 ngày' : `${diffDays} ngày`;
         document.getElementById('lbl-tien').innerText = Number(tienVal).toLocaleString('vi-VN') + 'đ';
     },
+
 
 
     dangKySuKienCopy: function() {
