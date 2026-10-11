@@ -1,6 +1,6 @@
 const R199kModule = {
     // 🌟 ĐÃ SỬA: Điền chính xác link tên miền Firebase Singapore của dự án, KHÔNG CÓ DẤU / Ở CUỐI
-    FB_URL: "https://noibo-nhactdtm-default-rtdb.asia-southeast1.firebasedatabase.app/", 
+    FB_URL: "https://firebasedatabase.app"    , 
     FB_KEY: "", // Để trống nếu Firebase của bạn cấu hình Rules là public công khai
     mode: 'NEW', searchId: 0, isSubmitting: false, isAutofilling: false, isSubmittingMembers: false, currentGhiChu: "",
 
