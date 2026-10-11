@@ -1,6 +1,6 @@
 // js/thuchi/thuchi.js - FULL MODULE FIREBASE COMPLETE (SIÊU TIẾT KIỆM DÒNG)
 const ThuChiModule = {
-    FB_URL: "https://firebasedatabase.app", FB_KEY: "", 
+    FB_URL: "https://noibo-nhactdtm-default-rtdb.asia-southeast1.firebasedatabase.app/", FB_KEY: "", 
     md: 'THU',
     mode: 'RENEW', 
     searchId: 0,
