@@ -11,6 +11,18 @@ const ThuChiModule = {
     init() { 
         this.iId(); 
         this.initLgdRong(); 
+
+        // TỰ ĐỘNG ĐIỀN SỐ TIỀN PACK NHẠC 199K
+        const selectLGD = document.getElementById('lgd');
+        if (selectLGD) {
+            selectLGD.addEventListener('change', () => {
+        if (selectLGD.value === 'PACK NHẠC 199K') {
+            const inputST = document.getElementById('st');
+            if (inputST) inputST.value = 199000;
+        }
+        });
+        }
+
         this.taiHoatDongHomNay(); 
 
         // 🌟 SỬA TẠI ĐÂY: Đổi 'id' thành 'gid-thuchi'
