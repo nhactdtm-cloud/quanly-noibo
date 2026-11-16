@@ -173,31 +173,16 @@ capNhatDanhSachTimKiem: function(found) {
     // Không đưa khách hàng thiếu GID hoặc tên vào danh sách
     if (!gid || !name) return;
 
-    // Lấy danh sách hiện tại
-    let members = this.cachedMembers || [];
+// CHỈ HIỂN THỊ KHÁCH HÀNG VỪA TÌM KIẾM
+const members = [{
+    ...found,
+    gid: gid,
+    name: name,
+    goi: found.goi || ''
+}];
 
-    // Loại bỏ bản ghi thiếu GID, thiếu tên và GID trùng
-    members = members.filter(item => {
-        if (!item) return false;
-
-        const itemGid = String(item.gid || '').trim();
-        const itemName = String(item.name || '').trim();
-
-        return itemGid !== '' &&
-               itemName !== '' &&
-               itemGid.toUpperCase() !== gid;
-    });
-
-    // Đưa khách hàng vừa tìm kiếm lên đầu danh sách
-    members.unshift({
-        ...found,
-        gid: gid,
-        name: name,
-        goi: found.goi || ''
-    });
-
-    // Cập nhật cache
-    this.cachedMembers = members;
+// Cập nhật danh sách tạm thời
+this.cachedMembers = members;
 
     // Áp dụng bộ lọc hiện tại
     const filter = document.getElementById('filterStatus');
