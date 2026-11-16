@@ -161,6 +161,139 @@ document.getElementById('r-gid').addEventListener('input', () => {
 },
 
 
+capNhatDanhSachTimKiem: function(found) {
+    if (!found) return;
+
+    const container = document.getElementById('r199k-member-container');
+    if (!container) return;
+
+    const gid = String(found.gid || '').trim().toUpperCase();
+    const name = String(found.name || '').trim();
+
+    // Không đưa khách hàng thiếu GID hoặc tên vào danh sách
+    if (!gid || !name) return;
+
+    // Lấy danh sách hiện tại
+    let members = this.cachedMembers || [];
+
+    // Loại bỏ bản ghi thiếu GID, thiếu tên và GID trùng
+    members = members.filter(item => {
+        if (!item) return false;
+
+        const itemGid = String(item.gid || '').trim();
+        const itemName = String(item.name || '').trim();
+
+        return itemGid !== '' &&
+               itemName !== '' &&
+               itemGid.toUpperCase() !== gid;
+    });
+
+    // Đưa khách hàng vừa tìm kiếm lên đầu danh sách
+    members.unshift({
+        ...found,
+        gid: gid,
+        name: name,
+        goi: found.goi || ''
+    });
+
+    // Cập nhật cache
+    this.cachedMembers = members;
+
+    // Áp dụng bộ lọc hiện tại
+    const filter = document.getElementById('filterStatus');
+    const status = filter ? filter.value : 'ALL';
+
+    const filteredData = members.filter(item => {
+        const goi = String(item.goi || '').trim();
+
+        if (status === 'ALL') return true;
+
+        if (status === 'REGISTERED') {
+            return goi.includes('THÁNG') || !goi.includes('HẾT HẠN');
+        }
+
+        if (status === 'CANCELLED') {
+            return goi.includes('HẾT HẠN');
+        }
+
+        return true;
+    });
+
+    // Cập nhật số lượng
+    const countSpan = document.getElementById('customerCount');
+
+    if (countSpan) {
+        countSpan.textContent = `${filteredData.length} Thành viên`;
+    }
+
+    // Render danh sách
+    container.innerHTML = '';
+
+    if (filteredData.length === 0) {
+        container.innerHTML =
+            '<div class="member-empty-state">Không có thành viên nào phù hợp bộ lọc.</div>';
+        return;
+    }
+
+    const fragment = document.createDocumentFragment();
+
+    filteredData.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'member-item';
+        div.dataset.gid = item.gid;
+
+        const info = document.createElement('div');
+        info.className = 'member-item-info';
+
+        const nameEl = document.createElement('span');
+        nameEl.className = 'member-item-name r-click-name';
+        nameEl.style.cursor = 'pointer';
+        nameEl.dataset.action = 'view-history';
+        nameEl.dataset.gid = item.gid;
+        nameEl.textContent = item.name;
+
+        const gidEl = document.createElement('span');
+        gidEl.className = 'member-item-gid';
+        gidEl.dataset.gid = item.gid;
+        gidEl.textContent = item.gid;
+
+        const badge = document.createElement('span');
+        badge.className = 'member-item-badge';
+        badge.dataset.gid = item.gid;
+        badge.textContent = item.goi || '';
+
+        info.append(nameEl, gidEl);
+        div.append(info, badge);
+        fragment.appendChild(div);
+    });
+
+    container.appendChild(fragment);
+
+    // Giữ nguyên chức năng click
+    container.onclick = (e) => {
+        const target = e.target;
+        const clickGid = target.getAttribute('data-gid');
+
+        if (!clickGid) return;
+
+        if (target.dataset.action === 'view-history') {
+            e.stopPropagation();
+
+            if (typeof RenewalModule !== 'undefined') {
+                RenewalModule.hienThiLichSuGiaHan(clickGid);
+            }
+        } else {
+            const inputGid = document.getElementById('r-gid');
+
+            if (inputGid) {
+                inputGid.value = clickGid;
+                tựĐộngTìmKiếmKháchHàng(this, 'GID');
+            }
+        }
+    };
+},
+
+
 taiDanhSachThanhVienTheoUser: function() {
         const container = document.getElementById('r199k-member-container'); if (!container) return;
         const cleanUrl = this.FB_URL.replace(/\/$/, '');

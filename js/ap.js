@@ -136,10 +136,18 @@ function tựĐộngTìmKiếmKháchHàng(context, type = 'GID') {
 
         let customerRows = allInvoices.filter(i => type === 'GID' ? (i.gid || '').toUpperCase() === kw : (i.name || '').toLowerCase().includes(kw.toLowerCase()));
         
-        if (customerRows.length > 0) {
-            let found = customerRows[0]; 
+if (customerRows.length > 0) {
+    let found = customerRows[0];
 
-            context.currentGhiChu = found.ghiChu || ""; 
+    // ĐƯA KHÁCH HÀNG VỪA TÌM ĐƯỢC LÊN ĐẦU DANH SÁCH
+    if (
+        !isThuChiPage &&
+        typeof context.capNhatDanhSachTimKiem === 'function'
+    ) {
+        context.capNhatDanhSachTimKiem(found);
+    }
+
+    context.currentGhiChu = found.ghiChu || "";
             context.isAutofilling = true;
             
             // Đổ dữ liệu tên khách hàng chính xác theo từng giao diện cụ thể
@@ -153,8 +161,12 @@ function tựĐộngTìmKiếmKháchHàng(context, type = 'GID') {
             // Các trường phụ trợ điền dữ liệu của riêng trang R199k
             if (iGm) iGm.value = found.gmail || ""; 
             if (sG && found.goi) {
-                sG.value = found.goi.toString().trim().toUpperCase();
-                sG.dispatchEvent(new Event('change'));
+            if (context.mode === 'RENEW' && sG.value.trim()) {
+            // Giữ nguyên gói đang chọn
+            } else {
+            sG.value = found.goi.toString().trim().toUpperCase();
+            }
+              sG.dispatchEvent(new Event('change'));
             }
             
             // Kích hoạt hàm xử lý ngày kết thúc (chỉ chạy nếu bên file gọi có khai báo hàm này)
