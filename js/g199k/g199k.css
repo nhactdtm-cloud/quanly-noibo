@@ -1,80 +1,54 @@
 /* ==========================================================================
-   CẤU TRÚC KHUNG CHUẨN TRANG G_199K (ĐÃ THU NGẮN CÁC DÒNG PHÍA DƯỚI)
+   TRANG G_199K - BẢN ĐÃ LÀM SẠCH
+   Thứ tự: 1) Khung chính  2) Form trái  3) Ô nhập liệu  4) Sidebar phải
+           5) Bộ lọc & select  6) Icon kính lúp  7) Responsive PC
    ========================================================================== */
 
-/* Khung chứa chính: Bằng khít bề ngang trang thu chi */
+/* ---------- 1. KHUNG CHÍNH ---------- */
 .r199k-workspace {
     display: grid;
-    grid-template-columns: 2fr 1fr; 
-    gap: 24px; 
+    grid-template-columns: 2fr 1fr;
+    gap: 24px;
     width: 100%;
     max-width: 1200px;
     margin: auto;
-    height: calc(100vh - 160px); 
+    height: calc(100vh - 160px);
     box-sizing: border-box;
 }
-
-
-
-/* Thanh tab điều hướng */
-#p-g .card .seg {
-    grid-column: span 2; 
-    display: grid;
-    grid-template-columns: 1fr 1fr; 
-    width: 100%;                     
-    background: var(--bg);
-    padding: 4px;                  
-    border-radius: 10px;
-    margin-bottom: 4px !important;  
-    box-sizing: border-box;         
-}
-
-/* ĐẨY DUY NHẤT HÀNG ĐẦU TIÊN (MÃ GID) XUỐNG THOÁNG BẰNG TRANG THU CHI */
-#p-g .card .gr:has(#r-gid) {
-    grid-column: span 2;
-    margin-top: 14px !important;    /* Bù khoảng trống đẩy hàng 1 xuống rộng rãi */
-}
-
 
 .d-none {
     display: none !important;
 }
 
-
-/* Khối Form bên trái: Giữ chiều cao cố định */
+/* ---------- 2. FORM BÊN TRÁI ---------- */
 #p-g .card {
     background: var(--sf);
     border: 1px solid var(--b);
     border-radius: var(--r);
-    padding: 16px 24px;             
+    padding: 16px 24px;
     display: grid;
-    grid-template-columns: 1fr 1fr; 
-    column-gap: 20px;               
-    row-gap: 4px !important;        
+    grid-template-columns: 1fr 1fr;
+    column-gap: 20px;
+    row-gap: 4px !important;
     align-content: start;
-    align-items: end;               
-    height: 100% !important; /* Đảm bảo luôn lấp đầy chiều cao khung cha */
+    align-items: end;
+    height: 100% !important;
     box-sizing: border-box;
 }
 
-/* KHỐI SIDEBAR BÊN PHẢI: Giữ chiều cao cố định bằng form trái */
-.r199k-sidebar {
-    background: var(--sf);
-    border: 1px solid var(--b);
-    border-radius: var(--r);
-    padding: 10px 20px;             
-    display: flex;
-    flex-direction: column;
-    gap: 6px;                       
-    height: 100% !important; /* Đảm bảo luôn lấp đầy chiều cao khung cha */
+/* Thanh tab điều hướng (gộp từ 2 khối trùng nhau) */
+#p-g .card .seg {
+    grid-column: span 2;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    width: 100%;
+    background: var(--bg);
+    padding: 4px;
+    border-radius: 10px;
+    margin-bottom: 4px !important;
     box-sizing: border-box;
-    overflow: hidden; /* Ngăn chặn nội dung bên trong tràn ra làm hỏng form */
 }
 
-
-
-
-/* ĐIỀU CHỈNH CÁC NÚT TAB BÊN TRONG TO LÊN */
 #p-g .card .seg > button,
 #p-g .card .seg > div,
 #p-g .card .seg > a {
@@ -82,50 +56,48 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 42px;                  /* TĂNG CHIỀU CAO NÚT (Từ 36px lên 42px) */
-    font-size: var(--f-size-sm);   /* Đảm bảo dùng size chữ sm hoặc m */
-    font-weight: var(--f-weight-bold); /* Làm chữ đậm lên hẳn */
-    letter-spacing: 0.3px;         /* Giãn chữ ra một chút cho đẹp */
+    height: 42px;
+    font-size: var(--f-size-sm);
+    font-weight: var(--f-weight-bold);
+    letter-spacing: 0.3px;
     box-sizing: border-box;
 }
 
-
-/* ==========================================================================
-   TỐI ƯU CỰC HẠN TRANG G_199K: ĐẨY HÀNG ĐẦU THOÁNG - ÉP SÁT CÁC HÀNG DƯỚI
-   ========================================================================== */
-
-/* Thanh tab: Đưa về khoảng cách margin đáy tiêu chuẩn */
-#p-g .card .seg {
-    grid-column: span 2; 
-    display: grid;
-    grid-template-columns: 1fr 1fr; 
-    width: 100%;                     
-    background: var(--bg);
-    padding: 4px;                  
-    border-radius: 10px;
-    margin-bottom: 4px !important;  /* Giữ 4px đồng bộ hệ thống */
-    box-sizing: border-box;         
+/* Hàng đầu (GID) đẩy xuống thoáng; hàng nút thêm ép sát */
+#p-g .card .gr:has(#r-gid) {
+    grid-column: span 2;
+    margin-top: 14px !important;
 }
-
-
-
-
 
 #p-g .card .gr:has(#btn-add-r199k) {
     grid-column: span 2;
     margin-top: 4px;
 }
 
-/* CẤU TRÚC Ô NHẬP LIỆU (INPUT FIELD) */
+/* Nút bấm nhập liệu */
+#p-g .card .btn-sm {
+    width: 100%;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--f-size-sm);
+    font-weight: var(--f-weight-bold);
+    margin: 0;
+    box-sizing: border-box;
+}
+
+/* ---------- 3. Ô NHẬP LIỆU (.gr) ---------- */
 .gr {
     display: flex;
     flex-direction: column;
     width: 100%;
+    position: relative; /* điểm neo cho icon kính lúp */
 }
 
 .gr label {
-    font-size: var(--f-size-xs);          
-    font-weight: var(--f-weight-semibold); 
+    font-size: var(--f-size-xs);
+    font-weight: var(--f-weight-semibold);
     color: var(--ts);
     text-transform: uppercase;
     letter-spacing: .4px;
@@ -140,8 +112,8 @@
     border: 1px solid var(--b);
     border-radius: 6px;
     background: var(--input-bg);
-    font-size: var(--f-size-sm);          
-    font-weight: var(--f-weight-medium);   
+    font-size: var(--f-size-sm);
+    font-weight: var(--f-weight-medium);
     color: var(--t);
     outline: none;
     box-sizing: border-box;
@@ -153,24 +125,38 @@
     cursor: not-allowed;
 }
 
-/* NÚT BẤM NHẬP LIỆU */
-#p-g .card .btn-sm {
-    width: 100%;
-    height: 36px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: var(--f-size-sm);          
-    font-weight: var(--f-weight-bold);    
-    margin: 0;
-    box-sizing: border-box;
+/* Tab gia hạn/hủy (input mở khóa): chừa chỗ cho icon kính lúp */
+.gr:has(input:not([readonly])) input {
+    padding-left: 32px !important;
 }
-/* ==========================================================================
-   PHẦN 2: SIDEBAR PHẢI, DANH SÁCH THÀNH VIÊN VÀ BỘ LỌC
-   ========================================================================== */
 
+/* Select: chưa chọn -> chữ mờ; danh sách mở -> đồng bộ theme */
+#r-goi:invalid,
+#lgd:invalid {
+    color: var(--ts) !important;
+}
 
+#r-goi option,
+#lgd option {
+    color: var(--t) !important;
+    background-color: var(--sf) !important;
+}
 
+/* ---------- 4. SIDEBAR BÊN PHẢI ---------- */
+.r199k-sidebar {
+    background: var(--sf);
+    border: 1px solid var(--b);
+    border-radius: var(--r);
+    padding: 10px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    height: 100% !important;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+/* Thẻ CSKH */
 .cskh-wrapper {
     display: flex;
     flex-direction: column;
@@ -178,48 +164,43 @@
     width: 100%;
 }
 
-/* THẺ CSKH DẠNG DÒNG ĐƠN */
+.cskh-card,
+.cskh-card-block {
+    background: var(--sf);
+    border: 1px solid var(--b);
+    cursor: pointer;
+    transition: var(--transition);
+    box-sizing: border-box;
+}
+
 .cskh-card {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 10px 12px;
-    background: var(--sf);
-    border: 1px solid var(--b);
     border-radius: 8px;
-    cursor: pointer;
-    transition: var(--transition);
-    box-sizing: border-box;
 }
 
-#display-customer-info {
-    font-size: var(--f-size-sub);         
-    font-weight: var(--f-weight-semibold); 
-}
-
-/* THẺ CSKH DẠNG KHỐI DỮ LIỆU */
 .cskh-card-block {
     display: flex;
     flex-direction: column;
     padding: 14px;
-    background: var(--sf);
-    border: 1px solid var(--b);
     border-radius: 10px;
-    cursor: pointer;
-    transition: var(--transition);
-    box-sizing: border-box;
 }
 
-/* HIỆU ỨNG HOVER CHO THẺ CSKH */
-.cskh-card:hover, 
+/* (đã bỏ border-color: var(--b) vì trùng giá trị gốc) */
+.cskh-card:hover,
 .cskh-card-block:hover {
-    border-color: var(--b);
-    background-color: var(--hover-bg);   
+    background-color: var(--hover-bg);
     transform: translateY(-1px);
-    box-shadow: var(--shadow-md);         
+    box-shadow: var(--shadow-md);
 }
 
-/* CÁC THÀNH PHẦN TRONG THẺ KHỐI CSKH */
+#display-customer-info {
+    font-size: var(--f-size-sub);
+    font-weight: var(--f-weight-semibold);
+}
+
 .cskh-header-row {
     display: flex;
     justify-content: space-between;
@@ -230,16 +211,16 @@
 }
 
 .cskh-title-text {
-    font-weight: var(--f-weight-bold);    
-    font-size: var(--f-size-label);       
+    font-weight: var(--f-weight-bold);
+    font-size: var(--f-size-label);
     color: var(--t);
     letter-spacing: 0.3px;
 }
 
 .cskh-badge-copy {
-    font-size: var(--f-size-xs-fine);     
+    font-size: var(--f-size-xs-fine);
     color: var(--ts);
-    font-weight: var(--f-weight-semibold); 
+    font-weight: var(--f-weight-semibold);
     background: #f8fafc;
     padding: 3px 6px;
     border-radius: 6px;
@@ -256,16 +237,16 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: var(--f-size-sm);          
+    font-size: var(--f-size-sm);
 }
 
 .cskh-label {
     color: var(--ts);
-    font-weight: var(--f-weight-medium);   
+    font-weight: var(--f-weight-medium);
 }
 
 .cskh-value {
-    font-weight: var(--f-weight-semibold); 
+    font-weight: var(--f-weight-semibold);
     color: var(--t);
 }
 
@@ -273,9 +254,8 @@
     font-variant-numeric: tabular-nums;
 }
 
-/* NHÃN TRẠNG THÁI ĐẶC BIỆT */
 .cskh-value.danger {
-    font-weight: var(--f-weight-bold);    
+    font-weight: var(--f-weight-bold);
     color: var(--d);
     background: var(--danger-light);
     padding: 2px 6px;
@@ -283,11 +263,11 @@
 }
 
 .cskh-value.success {
-    font-weight: var(--f-weight-bold);    
+    font-weight: var(--f-weight-bold);
     color: var(--s);
 }
 
-/* DANH SÁCH THÀNH VIÊN (.member-list-card) */
+/* Danh sách thành viên */
 .member-list-card {
     display: flex;
     flex-direction: column;
@@ -301,20 +281,19 @@
 
 .member-list-header {
     display: flex;
-    justify-content: space-between; 
-    align-items: center; 
-    font-size: var(--f-size-label);       
+    justify-content: space-between;
+    align-items: center;
+    font-size: var(--f-size-label);
     color: var(--ts);
     border-bottom: 1px solid #f1f5f9;
     padding-bottom: 6px;
     margin-bottom: 8px;
 }
 
-/* KHU VỰC CUỘN */
 .member-container-scroll {
-    max-height: 200px !important; /* Hạ từ 280px xuống 200px để không kích chiều cao sidebar */
+    max-height: 200px !important;
     overflow-y: auto;
-    scrollbar-gutter: stable; 
+    scrollbar-gutter: stable;
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -323,8 +302,6 @@
     box-sizing: border-box;
 }
 
-
-/* THANH CUỘN SIÊU MẢNH */
 .member-container-scroll::-webkit-scrollbar {
     width: 4px;
 }
@@ -334,7 +311,6 @@
     border-radius: 4px;
 }
 
-/* ITEM THÀNH VIÊN */
 .member-item {
     display: flex;
     justify-content: space-between;
@@ -343,7 +319,7 @@
     background: #f8fafc;
     border: 1px solid #e2e8f0;
     border-radius: 6px;
-    font-size: var(--f-size-sub);         
+    font-size: var(--f-size-sub);
     cursor: pointer;
     transition: var(--transition);
     box-sizing: border-box;
@@ -364,7 +340,7 @@
 
 .member-item-name {
     display: block;
-    font-weight: var(--f-weight-semibold); 
+    font-weight: var(--f-weight-semibold);
     color: var(--t);
     white-space: nowrap;
     overflow: hidden;
@@ -372,14 +348,14 @@
 }
 
 .member-item-gid {
-    font-size: var(--f-size-xs);          
+    font-size: var(--f-size-xs);
     color: var(--ts);
     font-family: monospace;
 }
 
 .member-item-badge {
-    font-size: var(--f-size-xs);          
-    font-weight: var(--f-weight-semibold); 
+    font-size: var(--f-size-xs);
+    font-weight: var(--f-weight-semibold);
     color: var(--p);
     background: var(--info-light);
     padding: 2px 6px;
@@ -389,18 +365,17 @@
 .member-empty-state {
     text-align: center;
     color: var(--ts);
-    font-size: var(--f-size-sub);         
+    font-size: var(--f-size-sub);
     padding: 20px 0;
 }
 
-/* Ô CHỌN BỘ LỌC */
+/* ---------- 5. BỘ LỌC TRẠNG THÁI ---------- */
 #filterStatus {
-    width: 135px !important;      /* TĂNG CHIỀU RỘNG LÊN ĐÂY */
-    min-width: 135px !important;  /* TĂNG CHIỀU RỘNG LÊN ĐÂY */
-    max-width: 135px !important;  /* TĂNG CHIỀU RỘNG LÊN ĐÂY */
+    width: 135px !important;
+    min-width: 135px !important;
+    max-width: 135px !important;
     box-sizing: border-box !important;
 
-    /* Giống .stat-filter-select */
     padding: 5px 16px;
     font-size: var(--f-size-label);
     font-weight: var(--f-weight-medium);
@@ -434,26 +409,8 @@
     box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
 }
 
-/* ==========================================================================
-   SELECT OPTIONS THEME SYNC
-   ========================================================================== */
-/* Khi chưa lựa chọn (Trạng thái mặc định) -> Chữ mờ đồng bộ màu Text Secondary */
-#r-goi:invalid, #lgd:invalid {
-    color: var(--ts) !important;
-}
-
-/* Khi bấm mở danh sách lựa chọn -> Đồng bộ màu chữ mặc định và màu nền Surface */
-#r-goi option, #lgd option {
-    color: var(--t) !important;
-    background-color: var(--sf) !important; /* Triệt tiêu hoàn toàn lỗi chuyển màu xám đen của trình duyệt */
-}
-
-/* ==========================================================================
-   BỘ LỌC ÉP ẨN ICON KÍNH LÚP TỰ ĐỘNG Ở TAB ĐĂNG KÝ MỚI
-   ========================================================================== */
-
-/* 1. KHI Ở TAB ĐĂNG KÝ MỚI (Ô input đang có trạng thái readOnly - Khóa chữ "TỰ ĐỘNG SINH"):
-   Tìm tất cả các thẻ icon kính lúp đứng cùng cấp hoặc nằm chung khối với ô input này và ẩn vĩnh viễn đi */
+/* ---------- 6. ICON KÍNH LÚP ---------- */
+/* Tab đăng ký mới (input readonly): ẩn icon */
 .gr:has(input[readonly]) .r-gid-icon-emoji,
 .gr:has(input[readonly]) .ui-emoji-container,
 .gr:has(input[readonly]) .ui-emoji-img,
@@ -461,20 +418,19 @@
     display: none !important;
 }
 
-/* 2. KHI Ở TAB GIA HẠN / HỦY (Ô input mở khóa cho gõ chữ - KHÔNG có readOnly):
-   Hiển thị chiếc kính lúp sắc nét ở góc trái ô nhập liệu phục vụ tìm kiếm GID */
+/* Tab gia hạn / hủy (input mở khóa): hiện icon ở góc trái ô nhập */
 .gr:has(input:not([readonly])) .r-gid-icon-emoji,
 .gr:has(input:not([readonly])) [data-emoji="tim-kiem"] {
     display: flex !important;
     position: absolute;
     left: 12px;
-    bottom: 11px; /* Điều chỉnh tăng/giảm 1px nếu cần để ảnh nằm chính giữa ô input */
+    bottom: 11px; /* chỉnh ±1px nếu icon lệch tâm */
     z-index: 5;
     pointer-events: none;
     align-items: center;
 }
 
-/* Định dạng kích thước cố định chuẩn cho hình ảnh kính lúp SVG */
+/* Kích thước icon SVG */
 .gr .r-gid-icon-emoji .ui-emoji-img,
 .gr [data-emoji="tim-kiem"] .ui-emoji-img {
     display: block !important;
@@ -482,30 +438,14 @@
     height: 14px !important;
     object-fit: contain;
 }
-/* Thêm vào cuối file CSS của bạn */
-.gr {
-    position: relative; /* Tạo điểm neo cho icon tuyệt đối */
-}
 
-/* Khi input KHÔNG có readonly (đang ở tab gia hạn) thì đẩy chữ sang phải 30px */
-.gr:has(input:not([readonly])) input {
-    padding-left: 32px !important;
-}
-
-
-/* =========================================================
-   R199K - PC: MỞ RỘNG DANH SÁCH KHÁCH HÀNG XUỐNG CHÂN
-   MOBILE: GIỮ NGUYÊN CSS GỐC
-   ========================================================= */
-
+/* ---------- 7. PC (>1024px): danh sách khách kéo dài xuống chân ---------- */
 @media screen and (min-width: 1025px) {
 
-    /* Cho sidebar co giãn đúng chiều cao */
     .r199k-sidebar {
         min-height: 0;
     }
 
-    /* Khối danh sách chiếm phần chiều cao còn trống */
     #member-list-group {
         display: flex;
         flex-direction: column;
@@ -513,19 +453,16 @@
         min-height: 0;
     }
 
-    /* Khung trắng danh sách */
     #member-list-group .member-list-card {
         flex: 1 1 auto;
         min-height: 0;
         overflow: hidden;
     }
 
-    /* Danh sách kéo dài đến sát chân khung */
     #member-list-group .member-container-scroll {
         flex: 1 1 auto;
         min-height: 0;
         max-height: none !important;
         overflow-y: auto;
     }
-
 }
