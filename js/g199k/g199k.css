@@ -287,17 +287,25 @@
     color: var(--s);
 }
 
-/* DANH SÁCH THÀNH VIÊN (.member-list-card) */
+
 .member-list-card {
     display: flex;
     flex-direction: column;
+
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    height: 100%;
+
     background: var(--sf);
     border: 1px solid var(--b);
     border-radius: 10px;
     padding: 12px;
+
     box-sizing: border-box;
     width: 100%;
+    overflow: hidden;
 }
+
 
 .member-list-header {
     display: flex;
@@ -310,18 +318,26 @@
     margin-bottom: 8px;
 }
 
-/* KHU VỰC CUỘN */
+
+/* DANH SÁCH THÀNH VIÊN KÉO DÀI */
 .member-container-scroll {
-    max-height: 200px !important; /* Hạ từ 280px xuống 200px để không kích chiều cao sidebar */
-    overflow-y: auto;
-    scrollbar-gutter: stable; 
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    height: auto !important;
+    max-height: none !important;
+
+    overflow-y: auto !important;
+    scrollbar-gutter: stable;
+
     display: flex;
     flex-direction: column;
     gap: 8px;
+
     padding-right: 2px;
     width: 100%;
     box-sizing: border-box;
 }
+
 
 
 /* THANH CUỘN SIÊU MẢNH */
@@ -490,4 +506,33 @@
 /* Khi input KHÔNG có readonly (đang ở tab gia hạn) thì đẩy chữ sang phải 30px */
 .gr:has(input:not([readonly])) input {
     padding-left: 32px !important;
+}
+
+
+/* =================================================
+   MỞ RỘNG DANH SÁCH KHÁCH HÀNG ĐẾN CHÂN SIDEBAR
+   ================================================= */
+
+.r199k-sidebar {
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 0 !important;
+    height: 100% !important;
+}
+
+#member-list-group {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+}
+
+#member-list-group .member-list-card {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+}
+
+#member-list-group .member-container-scroll {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
 }
